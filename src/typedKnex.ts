@@ -1,48 +1,46 @@
-import * as knex from 'knex';
+import * as Knex from 'knex';
 import { unflatten } from './unflatten';
 
 
 type TransformAll<T, IT> = {
     [Key in keyof T]: IT
-}
+};
 
 export class TypedKnex {
 
-    constructor(private knex: knex) {
+    constructor(private knex: Knex) {
 
     }
 
-    public query<T>(type: new () => T): TypedQueryBuilder<T> {
+    public query<T>(tableClass: new () => T): TypedQueryBuilder<T> {
 
-        return new TypedQueryBuilder<T>(type, this.knex);
+        return new TypedQueryBuilder<T>(tableClass, this.knex);
     }
 
 }
 
-class TypedQueryBuilder<Model, Row = {}>{
+class TypedQueryBuilder<Model, Row = {}> {
 
-    private queryBuilder: knex.QueryBuilder;
+    private queryBuilder: Knex.QueryBuilder;
     private tableName: string;
 
-    constructor(private type: new () => Model, private knex: knex) {
-        this.tableName = this.getTableName(type);
+    constructor(private tableClass: new () => Model, private knex: Knex) {
+        this.tableName = this.getTableName(tableClass);
         this.queryBuilder = this.knex.from(this.tableName);
     }
 
-    private getTableName(type: new () => any) {
-        // TODO: if missing error!
-        return type.prototype.typedKnextableName;
-    }
 
-    selectWithName<Prev extends Row, K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2?: K2): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev>;
-    selectWithName<K extends keyof Model>(key1: K): TypedQueryBuilder<Model, Pick<Model, K> & Row> {
+    public selectWithName<Prev extends Row, K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2?: K2): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev>;
+    public selectWithName<K extends keyof Model>(key1: K): TypedQueryBuilder<Model, Pick<Model, K> & Row> {
 
 
         if (arguments.length === 1) {
-            this.queryBuilder.select(arguments[0])
+            // tslint:disable-next-line:use-named-parameter
+            this.queryBuilder.select(arguments[0]);
         } else if (arguments.length === 2) {
             // find name of table ... Practitioner.prototype.employment
-            this.queryBuilder.select(this.tableName + '.' + this.getTableName(this.type.prototype[arguments[1]]) + ' as ' + arguments[0] + '_' + arguments[1])
+            // tslint:disable-next-line:use-named-parameter
+            this.queryBuilder.select(this.tableName + '.' + this.getTableName(this.tableClass.prototype[arguments[1]]) + ' as ' + arguments[0] + '_' + arguments[1]);
         }
         return this as any;
     }
@@ -56,7 +54,7 @@ class TypedQueryBuilder<Model, Row = {}>{
     }
 
 
-    public knexFunction(f: (query: knex.QueryBuilder) => void) {
+    public knexFunction(f: (query: Knex.QueryBuilder) => void) {
         f(this.queryBuilder);
     }
 
@@ -66,6 +64,12 @@ class TypedQueryBuilder<Model, Row = {}>{
             return key1;
         }
         return key1 + '_' + key2;
+    }
+
+
+    private getTableName(tableClass: new () => any) {
+        // TODO: if missing error!
+        return tableClass.prototype.typedKnextableName;
     }
 }
 

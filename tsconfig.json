@@ -3,12 +3,13 @@
         "module": "commonjs",
         "sourceMap": false,
         "target": "ES2017",
-        "jsx": "react",
         "experimentalDecorators": true,
         "strict": true,
-        "strictPropertyInitialization": false,
+        "strictPropertyInitialization": true,
         "noUnusedLocals": true,
-        "emitDecoratorMetadata": true
+        "emitDecoratorMetadata": true,
+        "skipLibCheck": true,
+        "outDir": "build"
     },
     "include": [
         "src/**/*",
