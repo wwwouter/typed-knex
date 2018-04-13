@@ -1,0 +1,194 @@
+{
+    "rulesDirectory": [
+        "node_modules/tslint-microsoft-contrib",
+        "node_modules/@wwwouter/tslint-contrib"
+    ],
+    "rules": {
+        "no-promise-as-boolean": true,
+        "no-floating-promises": true,
+        "no-irregular-whitespace": true,
+        "prefer-object-spread": true,
+        "ordered-imports": true,
+        "prefer-const": true,
+        "align": [
+            true,
+            "parameters",
+            "arguments",
+            "statements"
+        ],
+        "ban": false,
+        "class-name": true,
+        "comment-format": [
+            true,
+            "check-space"
+        ],
+        "curly": true,
+        "eofline": true,
+        "forin": true,
+        "indent": [
+            true,
+            "spaces"
+        ],
+        "interface-name": true,
+        "jsdoc-format": true,
+        "label-position": true,
+        "max-line-length": false,
+        "member-access": true,
+        "member-ordering": [
+            true,
+            "public-before-private",
+            "static-before-instance",
+            "variables-before-functions"
+        ],
+        "no-any": false,
+        "no-arg": true,
+        "no-bitwise": true,
+        "no-conditional-assignment": true,
+        "no-consecutive-blank-lines": false,
+        "no-console": [
+            true,
+            "debug",
+            "info",
+            "time",
+            "timeEnd",
+            "trace"
+        ],
+        "no-construct": true,
+        "no-debugger": true,
+        "no-duplicate-variable": true,
+        "no-empty": true,
+        "no-eval": true,
+        "no-inferrable-types": false,
+        "no-internal-module": true,
+        "no-null-keyword": false,
+        "no-require-imports": true,
+        "no-shadowed-variable": true,
+        "no-string-literal": false,
+        "no-switch-case-fall-through": true,
+        "no-trailing-whitespace": true,
+        "no-unused-expression": true,
+        "no-var-keyword": true,
+        "no-var-requires": true,
+        "object-literal-sort-keys": false,
+        "one-line": [
+            true,
+            "check-open-brace",
+            "check-catch",
+            "check-else",
+            "check-finally",
+            "check-whitespace"
+        ],
+        "quotemark": [
+            true,
+            "single",
+            "avoid-escape",
+            "jsx-double"
+        ],
+        "radix": true,
+        "semicolon": [
+            true,
+            "always"
+        ],
+        "switch-default": true,
+        "trailing-comma": [
+            true,
+            {
+                "multiline": {
+                    "objects": "always",
+                    "arrays": "always",
+                    "functions": "never",
+                    "typeLiterals": "ignore"
+                }
+            }
+        ],
+        "triple-equals": true,
+        "typedef": [
+            true,
+            "callSignature",
+            "indexSignature",
+            "parameter",
+            "propertySignature",
+            "variableDeclarator",
+            "memberVariableDeclarator"
+        ],
+        "typedef-whitespace": [
+            true,
+            {
+                "call-signature": "nospace",
+                "index-signature": "nospace",
+                "parameter": "nospace",
+                "property-declaration": "nospace",
+                "variable-declaration": "nospace"
+            },
+            {
+                "call-signature": "space",
+                "index-signature": "space",
+                "parameter": "space",
+                "property-declaration": "space",
+                "variable-declaration": "space"
+            }
+        ],
+        "variable-name": [
+            true,
+            "check-format",
+            "allow-leading-underscore",
+            "ban-keywords"
+        ],
+        "whitespace": [
+            true,
+            "check-branch",
+            "check-decl",
+            "check-operator",
+            "check-separator",
+            "check-type"
+        ],
+        "chai-vague-errors": false,
+        "export-name": false,
+        "use-isnan": true,
+        "jquery-deferred-must-complete": true,
+        "missing-jsdoc": false,
+        "missing-optional-annotation": true,
+        "mocha-avoid-only": true,
+        "no-backbone-get-set-outside-model": false,
+        "no-banned-terms": true,
+        "no-constant-condition": true,
+        "no-control-regex": true,
+        "no-cookies": false,
+        "no-delete-expression": true,
+        "no-document-write": false,
+        "no-disable-auto-sanitization": true,
+        "no-duplicate-case": true,
+        "no-duplicate-parameter-names": true,
+        "no-empty-interfaces": true,
+        "no-exec-script": true,
+        "no-function-constructor-with-string-args": true,
+        "no-function-expression": true,
+        "no-http-string": [
+            true,
+            "http://www.zxy-builders.com",
+            "http://www.examples.com/?.*",
+            "http://localhost*"
+        ],
+        "no-increment-decrement": false,
+        "no-invalid-regexp": true,
+        "no-for-in": true,
+        "no-missing-visibility-modifiers": false,
+        "no-multiline-string": true,
+        "no-multiple-var-decl": true,
+        "no-unnecessary-bind": true,
+        "no-unnecessary-semicolons": true,
+        "no-octal-literal": true,
+        "no-regex-spaces": true,
+        "no-reserved-keywords": true,
+        "no-sparse-arrays": true,
+        "no-string-based-set-immediate": true,
+        "no-string-based-set-interval": true,
+        "no-string-based-set-timeout": true,
+        "no-with-statement": true,
+        "prefer-array-literal": true,
+        "promise-must-complete": true,
+        "react-no-dangerous-html": true,
+        "use-named-parameter": true,
+        "valid-typeof": true
+    }
+}

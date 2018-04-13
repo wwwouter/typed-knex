@@ -1,0 +1,38 @@
+{
+  "name": "typed-knex",
+  "version": "1.0.0",
+  "description": "Makes knex better by working with TypeScript",
+  "main": "index.js",
+  "dependencies": {
+    "@types/flat": "0.0.28",
+    "flat": "^4.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc -p tsconfig.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wwwouter/typed-knex.git"
+  },
+  "keywords": [
+    "knex",
+    "typed",
+    "typescript",
+    "typeknex"
+  ],
+  "author": "W.Mooij",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wwwouter/typed-knex/issues"
+  },
+  "homepage": "https://github.com/wwwouter/typed-knex#readme",
+  "devDependencies": {
+    "@wwwouter/tslint-contrib": "^1.0.0",
+    "tslint": "^5.9.1",
+    "tslint-microsoft-contrib": "^5.0.3",
+    "typescript": "^2.8.1",
+    "@types/knex": "^0.14.9",
+    "knex": "^0.14.6"
+  }
+}
