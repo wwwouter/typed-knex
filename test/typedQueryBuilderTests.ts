@@ -197,4 +197,17 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+    it('should join three levels of tables and use where on a column of last joined table', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(UserSetting)
+            .where('user', 'category', 'region', 'code', 2)
+            .innerJoinColumn('user', 'category', 'region');
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "userSettings" inner join "regions" as "user_category_region" on "user_category_region"."id" = "user_category"."regionId" where "user_category_region"."code" = 2');
+
+        done();
+    });
+
 });

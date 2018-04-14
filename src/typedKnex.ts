@@ -59,6 +59,7 @@ class TypedQueryBuilder<Model, Row = {}> {
     public where<K extends keyof Model>(key1: K, value: Model[K]): this;
     public where<K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2, value: Model[K1][K2]): this;
     public where<K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, value: Model[K1][K2][K3]): this;
+    public where<K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keysAndValues: any[]): this;
     public where<K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1?: K1, key2?: K2, key3?: K3, value?: Model[K1][K2][K3] | Model[K1][K2] | Model[K1]): this {
 
         if (arguments.length === 2) {
