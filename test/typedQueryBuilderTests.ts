@@ -138,7 +138,7 @@ describe('TypedKnexQueryBuilder', () => {
             .innerJoinColumn('user')
             .innerJoinColumn('user', 'category');
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select * from "userSettings" inner join "users" as "user" on "user"."id" = "userSettings"."userId" inner join "userCategories" as "category" on "category"."id" = "user"."categoryId"');
+        assert.equal(queryString, 'select * from "userSettings" inner join "users" as "user" on "user"."id" = "userSettings"."userId" inner join "userCategories" as "user_category" on "user_category"."id" = "user"."categoryId"');
 
         done();
     });
@@ -151,7 +151,21 @@ describe('TypedKnexQueryBuilder', () => {
             .query(UserSetting)
             .innerJoinColumn('user', 'category', 'region');
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select * from "userSettings" inner join "regions" as "region" on "region"."id" = "category"."regionId"');
+        assert.equal(queryString, 'select * from "userSettings" inner join "regions" as "user_category_region" on "user_category_region"."id" = "user_category"."regionId"');
+
+        done();
+    });
+
+
+    it('should join two levels of tables and select a column of joined table', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(UserSetting)
+            .selectColumn('user', 'category', 'name')
+            .innerJoinColumn('user', 'category');
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select "user_category"."name" as "user_category_name" from "userSettings" inner join "userCategories" as "user_category" on "user_category"."id" = "user"."categoryId"');
 
         done();
     });

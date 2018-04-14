@@ -47,7 +47,7 @@ class TypedQueryBuilder<Model, Row = {}> {
             let columnName = arguments[0];
             let columnAlias = arguments[0];
             for (let i = 1; i < arguments.length; i++) {
-                columnName += '.' + arguments[i];
+                columnName = columnAlias + '.' + arguments[i];
                 columnAlias += '_' + arguments[i];
             }
             this.queryBuilder.select(columnName + ' as ' + columnAlias);
@@ -80,6 +80,7 @@ class TypedQueryBuilder<Model, Row = {}> {
         let firstColumnAlias = this.tableName;
         let firstColumnClass = this.tableClass;
         let secondColumnAlias = arguments[0];
+        let secondColumnName = arguments[0];
         let secondColumnClass = getColumn(firstColumnClass.prototype, secondColumnAlias).columnClass;
 
 
@@ -87,8 +88,10 @@ class TypedQueryBuilder<Model, Row = {}> {
             const beforeSecondColumnAlias = secondColumnAlias;
             const beforeSecondColumnClass = secondColumnClass;
 
-            secondColumnAlias = arguments[i];
-            secondColumnClass = getColumn(beforeSecondColumnClass.prototype, secondColumnAlias).columnClass;
+
+            secondColumnName = arguments[i];
+            secondColumnAlias = beforeSecondColumnAlias + '_' + arguments[i];
+            secondColumnClass = getColumn(beforeSecondColumnClass.prototype, arguments[i]).columnClass;
 
             firstColumnAlias = beforeSecondColumnAlias;
             firstColumnClass = beforeSecondColumnClass;
@@ -96,7 +99,7 @@ class TypedQueryBuilder<Model, Row = {}> {
         const tableToJoinName = this.getTableName(secondColumnClass);
         const tableToJoinAlias = secondColumnAlias;
         const tableToJoinJoinColumnName = `${tableToJoinAlias}.id`;
-        const tableJoinedColumnName = `${firstColumnAlias}.${secondColumnAlias}Id`;
+        const tableJoinedColumnName = `${firstColumnAlias}.${secondColumnName}Id`;
 
         this.queryBuilder.join(`${tableToJoinName} as ${tableToJoinAlias}`, tableToJoinJoinColumnName, tableJoinedColumnName);
 
