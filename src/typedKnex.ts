@@ -34,7 +34,6 @@ class TypedQueryBuilder<Model, Row = {}> {
     }
 
 
-
     public selectColumn<Prev extends Row, K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, TransformAll<Pick<Model[K1][K2], K3>, any>>> & Prev>;
     public selectColumn<Prev extends Row, K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, Pick<Model[K1][K2], K3>>> & Prev>;
     public selectColumn<Prev extends Row, K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev>;
@@ -45,36 +44,26 @@ class TypedQueryBuilder<Model, Row = {}> {
         if (arguments.length === 1) {
             this.queryBuilder.select(arguments[0]);
         } else {
-            let columnName = arguments[0];
-            let columnAlias = arguments[0];
-            for (let i = 1; i < arguments.length; i++) {
-                columnName = columnAlias + '.' + arguments[i];
-                columnAlias += '_' + arguments[i];
-            }
-            this.queryBuilder.select(columnName + ' as ' + columnAlias);
+
+            this.queryBuilder.select(this.getColumnName(...arguments) + ' as ' + this.getColumnAlias(...arguments));
         }
         return this as any;
     }
+
+
 
     public where<K extends keyof Model>(key1: K, value: Model[K]): this;
     public where<K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2, value: Model[K1][K2]): this;
     public where<K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, value: Model[K1][K2][K3]): this;
     public where<K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keysAndValues: any[]): this;
     public where<K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1?: K1, key2?: K2, key3?: K3, value?: Model[K1][K2][K3] | Model[K1][K2] | Model[K1]): this {
-
-        if (arguments.length === 2) {
-            this.queryBuilder.where(arguments[0], arguments[1]);
-        } else {
-            let tableAlias = arguments[0];
-            for (let i = 1; i < arguments.length - 2; i++) {
-                tableAlias += '_' + arguments[i];
-            }
-            const columnName = tableAlias + '.' + arguments[arguments.length - 2];
-            this.queryBuilder.where(columnName, arguments[arguments.length - 1]);
-        }
+        const argumentsExpectLast = [...(arguments as any)].slice(0, -1);
+        this.queryBuilder.where(this.getColumnName(...argumentsExpectLast), arguments[arguments.length - 1]);
 
         return this;
     }
+
+
 
     public innerJoinColumn<K1 extends ObjectPropertyNames<Model>, K2 extends ObjectPropertyNames<Model[K1]>>(key1: K1, key2: K2, ...keys: string[]): this;
     public innerJoinColumn<K1 extends ObjectPropertyNames<Model>, K2 extends ObjectPropertyNames<Model[K1]>>(key1: K1, key2: K2): this;
@@ -125,14 +114,6 @@ class TypedQueryBuilder<Model, Row = {}> {
         f(this.queryBuilder);
     }
 
-    public getColumnName<K extends keyof Model>(key1: K): string;
-    public getColumnName<K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2?: K2): string {
-        if (!key2) {
-            return key1;
-        }
-        return key1 + '_' + key2;
-    }
-
     public toQuery() {
         return this.queryBuilder.toQuery();
     }
@@ -146,6 +127,34 @@ class TypedQueryBuilder<Model, Row = {}> {
             throw new Error(`Cannot get table name from class ${tableClass.name} `);
         }
     }
+
+    private getColumnAlias(...keys: string[]): string {
+        if (arguments.length === 1) {
+            return arguments[0];
+        } else {
+            let columnAlias = arguments[0];
+            for (let i = 1; i < arguments.length; i++) {
+                columnAlias += '_' + arguments[i];
+            }
+            return columnAlias;
+        }
+    }
+
+    private getColumnName(...keys: string[]): string {
+        if (arguments.length === 1) {
+            return arguments[0];
+        } else {
+            let columnName = arguments[0];
+            let columnAlias = arguments[0];
+            for (let i = 1; i < arguments.length; i++) {
+                columnName = columnAlias + '.' + arguments[i];
+                columnAlias += '_' + arguments[i];
+            }
+            return columnName;
+        }
+    }
+
+
 
 
 }
