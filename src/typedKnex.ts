@@ -1,6 +1,7 @@
+// tslint:disable:use-named-parameter
 import * as Knex from 'knex';
+import { getEntityMetadata } from './decorators';
 import { unflatten } from './unflatten';
-
 
 type TransformAll<T, IT> = {
     [Key in keyof T]: IT
@@ -35,14 +36,23 @@ class TypedQueryBuilder<Model, Row = {}> {
 
 
         if (arguments.length === 1) {
-            // tslint:disable-next-line:use-named-parameter
             this.queryBuilder.select(arguments[0]);
         } else if (arguments.length === 2) {
             // find name of table ... Practitioner.prototype.employment
-            // tslint:disable-next-line:use-named-parameter
             this.queryBuilder.select(this.tableName + '.' + this.getTableName(this.tableClass.prototype[arguments[1]]) + ' as ' + arguments[0] + '_' + arguments[1]);
         }
         return this as any;
+    }
+
+    public where<K extends keyof Model>(key1: K, value: any): this;
+    public where<K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2?: K2, value?: any): this {
+
+        if (arguments.length === 2) {
+
+            this.queryBuilder.where(arguments[0], arguments[1]);
+        }
+
+        return this;
     }
 
     public async firstItem(): Promise<Row | undefined> {
@@ -66,10 +76,16 @@ class TypedQueryBuilder<Model, Row = {}> {
         return key1 + '_' + key2;
     }
 
+    public toQuery() {
+        return this.queryBuilder.toQuery();
+    }
+
 
     private getTableName(tableClass: new () => any) {
         // TODO: if missing error!
-        return tableClass.prototype.typedKnextableName;
+        return getEntityMetadata(tableClass).tableName;
     }
+
+
 }
 
