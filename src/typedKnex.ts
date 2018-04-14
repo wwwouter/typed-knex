@@ -33,6 +33,12 @@ class TypedQueryBuilder<Model, Row = {}> {
         this.queryBuilder = this.knex.from(this.tableName);
     }
 
+    public selectColumns<K extends keyof Model>(keys: K[]): TypedQueryBuilder<Model, Pick<Model, K> & Row> {
+        for (const key of keys) {
+            this.queryBuilder.select(key);
+        }
+        return this as any;
+    }
 
     public selectColumn<Prev extends Row, K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, TransformAll<Pick<Model[K1][K2], K3>, any>>> & Prev>;
     public selectColumn<Prev extends Row, K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, Pick<Model[K1][K2], K3>>> & Prev>;
