@@ -7,6 +7,28 @@ type TransformAll<T, IT> = {
     [Key in keyof T]: IT
 };
 
+
+// type FilterNonObjects<T> = {
+//     [Key in keyof T]: T[Key] extends {} ? T[Key] : never;
+// };
+
+type ObjectPropertyNames<T> = { [K in keyof T]: T[K] extends object ? K : never }[keyof T];
+
+
+// class Test {
+//     public id!: string;
+//     public c!: { someting: string };
+// }
+
+// type F001 = ObjectPropertyNames<Test>;
+
+// const fo001 = {} as F001;
+// // tslint:disable-next-line:no-unused-expression
+// fo001.c;
+// // tslint:disable-next-line:no-unused-expression
+// fo001.id;
+
+
 export class TypedKnex {
 
     constructor(private knex: Knex) {
@@ -55,8 +77,8 @@ class TypedQueryBuilder<Model, Row = {}> {
         return this;
     }
 
-    public innerJoin<K extends keyof Model>(key1: K): this;
-    public innerJoin<K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2?: K2): this {
+    public innerJoin<K extends ObjectPropertyNames<Model>>(key1: K): this {
+        // public innerJoin<K1 extends keyof FilterNonObjects<Model>, K2 extends keyof FilterNonObjects<Model>[K1]>(key1: K1, key2?: K2): this {
 
         if (arguments.length === 1) {
 
