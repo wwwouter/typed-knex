@@ -41,9 +41,9 @@ class TypedQueryBuilder<Model, Row = {}> {
         return this as any;
     }
 
-    public selectColumn<Prev extends Row, K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, TransformAll<Pick<Model[K1][K2], K3>, any>>> & Prev>;
-    public selectColumn<Prev extends Row, K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends FilterNonObjects<Model[K1][K2]>>(key1: K1, key2: K2, key3: K3): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, Pick<Model[K1][K2], K3>>> & Prev>;
-    public selectColumn<Prev extends Row, K1 extends keyof Model, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, key2: K2): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev>;
+    public selectColumn<Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterObjectsOnly<Model[K1]>, K3 extends FilterObjectsOnly<Model[K1][K2]>>(key1: K1, key2: K2, key3: K3, ...keys: string[]): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, TransformAll<Pick<Model[K1][K2], K3>, any>>> & Prev>;
+    public selectColumn<Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterObjectsOnly<Model[K1]>, K3 extends FilterNonObjects<Model[K1][K2]>>(key1: K1, key2: K2, key3: K3): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, Pick<Model[K1][K2], K3>>> & Prev>;
+    public selectColumn<Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, key2: K2): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev>;
     public selectColumn<K extends FilterNonObjects<Model>>(key1: K): TypedQueryBuilder<Model, Pick<Model, K> & Row>;
     public selectColumn<Prev extends Row, K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2?: K2): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev> {
 
