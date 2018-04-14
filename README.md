@@ -1,4 +1,4 @@
 
 # typed-knex
 
-Knex, buy now it's typed!
+Knex, but now it's typed!
