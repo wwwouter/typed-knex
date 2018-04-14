@@ -1,14 +1,23 @@
 import 'reflect-metadata';
 
-const entityMetadataKey = Symbol('entity');
+const tableyMetadataKey = Symbol('table');
 
-export function entity(tableName: string) {
-    return Reflect.metadata(entityMetadataKey, { tableName: tableName });
-    // return (tableClass: Function) => {
-    //     tableClass.prototype.typedKnex = { tableName: tableName };
-    // };
+export function table(tableName: string) {
+    return Reflect.metadata(tableyMetadataKey, { tableName: tableName });
 }
 
-export function getEntityMetadata(tableClass: Function): { tableName: string } {
-    return Reflect.getMetadata(entityMetadataKey, tableClass);
+export function getTableMetadata(tableClass: Function): { tableName: string } {
+    return Reflect.getMetadata(tableyMetadataKey, tableClass);
+}
+
+
+
+const columnMetadataKey = Symbol('column');
+
+export function column() {
+    return Reflect.metadata(columnMetadataKey, { isColumn: true });
+}
+
+export function getColumn(target: any, propertyKey: string): { columnClass: new () => any } {
+    return { columnClass: Reflect.getMetadata('design:type', target, propertyKey), ...Reflect.getMetadata(columnMetadataKey, target, propertyKey) };
 }

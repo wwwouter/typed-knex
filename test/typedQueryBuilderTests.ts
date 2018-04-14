@@ -1,20 +1,22 @@
 import { assert } from 'chai';
 import * as knex from 'knex';
-import { entity } from '../src/decorators';
+import { column, table } from '../src/decorators';
 import { TypedKnex } from '../src/typedKnex';
 
 
-@entity('users')
+@table('users')
 class User {
     public id!: string;
     public name!: string;
     public someValue!: string;
+
 }
 
-@entity('userSettings')
+@table('userSettings')
 class UserSetting {
     public id!: string;
     public userId!: string;
+    @column()
     public user!: User;
     public key!: string;
     public value!: string;
@@ -63,4 +65,17 @@ describe('TypedKnexQueryBuilder', () => {
         assert.equal(queryString, 'select * from "users" where "name" = \'user1\'');
         done();
     });
+
+    it('should join a table', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(UserSetting)
+            .innerJoin('user');
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "userSettings" inner join "users" as "user" on "user"."id" = "userSettings"."userId"');
+        done();
+    });
+
+
 });

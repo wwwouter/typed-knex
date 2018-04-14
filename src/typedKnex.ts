@@ -1,6 +1,6 @@
 // tslint:disable:use-named-parameter
 import * as Knex from 'knex';
-import { getEntityMetadata } from './decorators';
+import { getColumn, getTableMetadata } from './decorators';
 import { unflatten } from './unflatten';
 
 type TransformAll<T, IT> = {
@@ -55,6 +55,25 @@ class TypedQueryBuilder<Model, Row = {}> {
         return this;
     }
 
+    public innerJoin<K extends keyof Model>(key1: K): this;
+    public innerJoin<K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2?: K2): this {
+
+        if (arguments.length === 1) {
+
+            const tableToJoinColumn = getColumn(this.tableClass.prototype, arguments[0]);
+            const tableToJoinName = this.getTableName(tableToJoinColumn.columnClass);
+            const tableToJoinAlias = arguments[0];
+            const tableToJoinJoinColumnName = `${tableToJoinAlias}.id`;
+            const tableJoinedColumnName = `${this.getTableName(this.tableClass)}.${arguments[0]}Id`;
+
+            this.queryBuilder.join(`${tableToJoinName} as ${tableToJoinAlias}`, tableToJoinJoinColumnName, tableJoinedColumnName);
+        }
+
+        return this;
+    }
+
+
+
     public async firstItem(): Promise<Row | undefined> {
         const items = await this.queryBuilder;
         if (!items || items.length === 0) {
@@ -83,7 +102,7 @@ class TypedQueryBuilder<Model, Row = {}> {
 
     private getTableName(tableClass: new () => any) {
         // TODO: if missing error!
-        return getEntityMetadata(tableClass).tableName;
+        return getTableMetadata(tableClass).tableName;
     }
 
 
