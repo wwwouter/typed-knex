@@ -14,6 +14,7 @@ class User {
 
 @table('userSettings')
 class UserSetting {
+    @column()
     public id!: string;
     public userId!: string;
     @column()
@@ -71,7 +72,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .innerJoin('user');
+            .innerJoin('id');
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "userSettings" inner join "users" as "user" on "user"."id" = "userSettings"."userId"');
         done();

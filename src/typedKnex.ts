@@ -101,8 +101,12 @@ class TypedQueryBuilder<Model, Row = {}> {
 
 
     private getTableName(tableClass: new () => any) {
-        // TODO: if missing error!
-        return getTableMetadata(tableClass).tableName;
+        try {
+
+            return getTableMetadata(tableClass).tableName;
+        } catch (e) {
+            throw new Error(`Cannot get table name from class ${tableClass.name} `);
+        }
     }
 
 

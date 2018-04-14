@@ -19,5 +19,9 @@ export function column() {
 }
 
 export function getColumn(target: any, propertyKey: string): { columnClass: new () => any } {
-    return { columnClass: Reflect.getMetadata('design:type', target, propertyKey), ...Reflect.getMetadata(columnMetadataKey, target, propertyKey) };
+    const columnData = Reflect.getMetadata(columnMetadataKey, target, propertyKey);
+    if (!columnData) {
+        throw new Error(`Cannot get column data from ${target.constructor.name}.${propertyKey}, did you set @column() attribute?`);
+    }
+    return { columnClass: Reflect.getMetadata('design:type', target, propertyKey) };
 }
