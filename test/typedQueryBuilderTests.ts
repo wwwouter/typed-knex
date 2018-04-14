@@ -3,12 +3,20 @@ import * as knex from 'knex';
 import { column, table } from '../src/decorators';
 import { TypedKnex } from '../src/typedKnex';
 
+@table('userCategories')
+class UserCategory {
+    public id!: string;
+    public name!: string;
+}
+
 
 @table('users')
 class User {
     public id!: string;
     public name!: string;
     public someValue!: string;
+    @column()
+    public category!: UserCategory;
 
 }
 
@@ -26,6 +34,8 @@ class UserSetting {
     public intitialValue!: string;
 }
 
+
+
 describe('TypedKnexQueryBuilder', () => {
 
     it('should return select * from "users"', (done) => {
@@ -34,6 +44,7 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex.query(User);
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users"');
+
         done();
     });
 
@@ -45,6 +56,7 @@ describe('TypedKnexQueryBuilder', () => {
             .selectColumn('id');
         const queryString = query.toQuery();
         assert.equal(queryString, 'select "id" from "users"');
+
         done();
     });
 
@@ -55,6 +67,7 @@ describe('TypedKnexQueryBuilder', () => {
             .selectColumn('intitialValue');
         const queryString = query.toQuery();
         assert.equal(queryString, 'select "intitialValue" from "userSettings"');
+
         done();
     });
 
@@ -66,6 +79,7 @@ describe('TypedKnexQueryBuilder', () => {
             .where('name', 'user1');
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where "name" = \'user1\'');
+
         done();
     });
 
@@ -77,6 +91,7 @@ describe('TypedKnexQueryBuilder', () => {
             .innerJoinColumn('user');
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "userSettings" inner join "users" as "user" on "user"."id" = "userSettings"."userId"');
+
         done();
     });
 
@@ -89,6 +104,7 @@ describe('TypedKnexQueryBuilder', () => {
             .innerJoinColumn('user');
         const queryString = query.toQuery();
         assert.equal(queryString, 'select "user"."name" as "user_name" from "userSettings" inner join "users" as "user" on "user"."id" = "userSettings"."userId"');
+
         done();
     });
 
@@ -101,6 +117,20 @@ describe('TypedKnexQueryBuilder', () => {
             .innerJoinColumn('user');
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "userSettings" inner join "users" as "user" on "user"."id" = "userSettings"."userId" where "user"."name" = \'user1\'');
+
+        done();
+    });
+
+    it('should join two level of tables', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(UserSetting)
+            .innerJoinColumn('user')
+            .innerJoinColumn('user', 'category');
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "userSettings" inner join "users" as "user" on "user"."id" = "userSettings"."userId" inner join "userCategories" as "category" on "category"."id" = "user"."categoryId"');
+
         done();
     });
 

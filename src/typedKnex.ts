@@ -7,26 +7,7 @@ type TransformAll<T, IT> = {
     [Key in keyof T]: IT
 };
 
-
-// type FilterNonObjects<T> = {
-//     [Key in keyof T]: T[Key] extends {} ? T[Key] : never;
-// };
-
 type ObjectPropertyNames<T> = { [K in keyof T]: T[K] extends object ? K : never }[keyof T];
-
-
-// class Test {
-//     public id!: string;
-//     public c!: { someting: string };
-// }
-
-// type F001 = ObjectPropertyNames<Test>;
-
-// const fo001 = {} as F001;
-// // tslint:disable-next-line:no-unused-expression
-// fo001.c;
-// // tslint:disable-next-line:no-unused-expression
-// fo001.id;
 
 
 export class TypedKnex {
@@ -53,14 +34,23 @@ class TypedQueryBuilder<Model, Row = {}> {
     }
 
 
-    public selectColumn<Prev extends Row, K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2?: K2): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev>;
-    public selectColumn<K extends keyof Model>(key1: K): TypedQueryBuilder<Model, Pick<Model, K> & Row> {
+
+    public selectColumn<Prev extends Row, K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, Pick<Model[K1][K2], K3>>> & Prev>;
+    public selectColumn<Prev extends Row, K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev>;
+    public selectColumn<K extends keyof Model>(key1: K): TypedQueryBuilder<Model, Pick<Model, K> & Row>;
+    public selectColumn<Prev extends Row, K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2?: K2): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev> {
 
 
         if (arguments.length === 1) {
             this.queryBuilder.select(arguments[0]);
-        } else if (arguments.length === 2) {
-            this.queryBuilder.select(arguments[0] + '.' + arguments[1] + ' as ' + arguments[0] + '_' + arguments[1]);
+        } else {
+            let columnName = arguments[0];
+            let columnAlias = arguments[0];
+            for (let i = 1; i < arguments.length; i++) {
+                columnName += '.' + arguments[i];
+                columnAlias += '_' + arguments[i];
+            }
+            this.queryBuilder.select(columnName + ' as ' + columnAlias);
         }
         return this as any;
     }
@@ -82,8 +72,15 @@ class TypedQueryBuilder<Model, Row = {}> {
         return this;
     }
 
+    // public innerJoinColumn<K1 extends keyof ObjectPropertyNames<Model>, K2 extends keyof ObjectPropertyNames<ObjectPropertyNames<Model>[K1]>>(key1: K1, key2: K2): this {
+    public innerJoinColumn<K1 extends ObjectPropertyNames<Model>, K2 extends ObjectPropertyNames<Model[K1]>>(key1: K1, key2: K2): this;
     public innerJoinColumn<K extends ObjectPropertyNames<Model>>(key1: K): this;
-    public innerJoinColumn<K1 extends keyof ObjectPropertyNames<Model>, K2 extends keyof ObjectPropertyNames<Model>[K1]>(key1: K1, key2?: K2): this {
+
+    public innerJoinColumn<K1 extends ObjectPropertyNames<Model>, K2 extends ObjectPropertyNames<Model[K1]>>(key1?: K1, key2?: K2): this {
+
+        // public innerJoinColumn<K1 extends keyof ObjectPropertyNames<Model>, K2 extends keyof ObjectPropertyNames<Model>[K1]>(key1?: K1, key2?: K2): this {
+        // public innerJoinColumn<K1 extends keyof ObjectPropertyNames<Model>, K2 extends keyof ObjectPropertyNames<Model>[K1], K3 extends keyof ObjectPropertyNames<Model>[K1][K2]>(key1: K1, key2: K2, key3: K3): this;
+        // public innerJoinColumn<K1 extends keyof ObjectPropertyNames<Model>, K2 extends keyof ObjectPropertyNames<Model>[K1], K3 extends keyof ObjectPropertyNames<Model>[K1][K2]>(key1: K1, key2?: K2, key3?: K3): this {
 
         if (arguments.length === 1) {
 
@@ -92,6 +89,30 @@ class TypedQueryBuilder<Model, Row = {}> {
             const tableToJoinAlias = arguments[0];
             const tableToJoinJoinColumnName = `${tableToJoinAlias}.id`;
             const tableJoinedColumnName = `${this.getTableName(this.tableClass)}.${arguments[0]}Id`;
+
+            this.queryBuilder.join(`${tableToJoinName} as ${tableToJoinAlias}`, tableToJoinJoinColumnName, tableJoinedColumnName);
+        } else {
+
+            let firstColumnAlias = this.tableName;
+            let firstColumnClass = this.tableClass;
+            let secondColumnAlias = arguments[0];
+            let secondColumnClass = getColumn(firstColumnClass.prototype, secondColumnAlias).columnClass;
+
+
+            for (let i = 1; i < arguments.length; i++) {
+                const beforeSecondColumnAlias = secondColumnAlias;
+                const beforeSecondColumnClass = secondColumnClass;
+
+                secondColumnAlias = arguments[i];
+                secondColumnClass = getColumn(beforeSecondColumnClass.prototype, secondColumnAlias).columnClass;
+
+                firstColumnAlias = beforeSecondColumnAlias;
+                firstColumnClass = beforeSecondColumnClass;
+            }
+            const tableToJoinName = this.getTableName(secondColumnClass);
+            const tableToJoinAlias = secondColumnAlias;
+            const tableToJoinJoinColumnName = `${tableToJoinAlias}.id`;
+            const tableJoinedColumnName = `${firstColumnAlias}.${secondColumnAlias}Id`;
 
             this.queryBuilder.join(`${tableToJoinName} as ${tableToJoinAlias}`, tableToJoinJoinColumnName, tableJoinedColumnName);
         }
