@@ -183,4 +183,18 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+
+    it('should join two levels of tables and use where on a column of last joined table', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(UserSetting)
+            .where('user', 'category', 'name', 'user1')
+            .innerJoinColumn('user', 'category');
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "userSettings" inner join "userCategories" as "user_category" on "user_category"."id" = "user"."categoryId" where "user_category"."name" = \'user1\'');
+
+        done();
+    });
+
 });
