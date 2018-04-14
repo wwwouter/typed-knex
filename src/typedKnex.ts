@@ -53,15 +53,14 @@ class TypedQueryBuilder<Model, Row = {}> {
     }
 
 
-    public selectWithName<Prev extends Row, K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2?: K2): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev>;
-    public selectWithName<K extends keyof Model>(key1: K): TypedQueryBuilder<Model, Pick<Model, K> & Row> {
+    public selectColumn<Prev extends Row, K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2?: K2): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev>;
+    public selectColumn<K extends keyof Model>(key1: K): TypedQueryBuilder<Model, Pick<Model, K> & Row> {
 
 
         if (arguments.length === 1) {
             this.queryBuilder.select(arguments[0]);
         } else if (arguments.length === 2) {
-            // find name of table ... Practitioner.prototype.employment
-            this.queryBuilder.select(this.tableName + '.' + this.getTableName(this.tableClass.prototype[arguments[1]]) + ' as ' + arguments[0] + '_' + arguments[1]);
+            this.queryBuilder.select(arguments[0] + '.' + arguments[1] + ' as ' + arguments[0] + '_' + arguments[1]);
         }
         return this as any;
     }
@@ -77,8 +76,8 @@ class TypedQueryBuilder<Model, Row = {}> {
         return this;
     }
 
-    public innerJoin<K extends ObjectPropertyNames<Model>>(key1: K): this {
-        // public innerJoin<K1 extends keyof FilterNonObjects<Model>, K2 extends keyof FilterNonObjects<Model>[K1]>(key1: K1, key2?: K2): this {
+    public innerJoinColumn<K extends ObjectPropertyNames<Model>>(key1: K): this;
+    public innerJoinColumn<K1 extends keyof ObjectPropertyNames<Model>, K2 extends keyof ObjectPropertyNames<Model>[K1]>(key1: K1, key2?: K2): this {
 
         if (arguments.length === 1) {
 
