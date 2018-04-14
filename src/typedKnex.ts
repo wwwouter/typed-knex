@@ -66,11 +66,17 @@ class TypedQueryBuilder<Model, Row = {}> {
     }
 
     public where<K extends keyof Model>(key1: K, value: Model[K]): this;
-    public where<K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2?: K2, value?: Model[K1][K2]): this {
+    public where<K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2, value: Model[K1][K2]): this;
+    public where<K1 extends keyof Model, K2 extends keyof Model[K1]>(key1?: K1, key2?: K2, value?: Model[K1][K2] | Model[K1]): this {
 
         if (arguments.length === 2) {
-
             this.queryBuilder.where(arguments[0], arguments[1]);
+        } else {
+            let columnName = arguments[0];
+            for (let i = 1; i < arguments.length - 1; i++) {
+                columnName += '.' + arguments[i];
+            }
+            this.queryBuilder.where(columnName, arguments[arguments.length - 1]);
         }
 
         return this;

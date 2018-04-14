@@ -80,8 +80,7 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-
-    it('should join a table and select column of joined table', (done) => {
+    it('should join a table and select a column of joined table', (done) => {
 
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
@@ -90,6 +89,18 @@ describe('TypedKnexQueryBuilder', () => {
             .innerJoinColumn('user');
         const queryString = query.toQuery();
         assert.equal(queryString, 'select "user"."name" as "user_name" from "userSettings" inner join "users" as "user" on "user"."id" = "userSettings"."userId"');
+        done();
+    });
+
+    it('should join a table and use where on a column of joined table', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(UserSetting)
+            .where('user', 'name', 'user1')
+            .innerJoinColumn('user');
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "userSettings" inner join "users" as "user" on "user"."id" = "userSettings"."userId" where "user"."name" = \'user1\'');
         done();
     });
 
