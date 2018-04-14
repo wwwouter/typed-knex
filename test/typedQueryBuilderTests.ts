@@ -3,10 +3,19 @@ import * as knex from 'knex';
 import { column, table } from '../src/decorators';
 import { TypedKnex } from '../src/typedKnex';
 
+
+@table('regions')
+class Region {
+    public id!: string;
+    public code!: number;
+}
+
 @table('userCategories')
 class UserCategory {
     public id!: string;
     public name!: string;
+    @column()
+    public region!: Region;
 }
 
 
@@ -130,6 +139,19 @@ describe('TypedKnexQueryBuilder', () => {
             .innerJoinColumn('user', 'category');
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "userSettings" inner join "users" as "user" on "user"."id" = "userSettings"."userId" inner join "userCategories" as "category" on "category"."id" = "user"."categoryId"');
+
+        done();
+    });
+
+
+    it('should join three level of tables', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(UserSetting)
+            .innerJoinColumn('user', 'category', 'region');
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "userSettings" inner join "regions" as "region" on "region"."id" = "category"."regionId"');
 
         done();
     });

@@ -72,6 +72,7 @@ class TypedQueryBuilder<Model, Row = {}> {
         return this;
     }
 
+    public innerJoinColumn<K1 extends ObjectPropertyNames<Model>, K2 extends ObjectPropertyNames<Model[K1]>>(key1: K1, key2: K2, ...keys: string[]): this;
     public innerJoinColumn<K1 extends ObjectPropertyNames<Model>, K2 extends ObjectPropertyNames<Model[K1]>>(key1: K1, key2: K2): this;
     public innerJoinColumn<K extends ObjectPropertyNames<Model>>(key1: K): this;
     public innerJoinColumn<K1 extends ObjectPropertyNames<Model>, K2 extends ObjectPropertyNames<Model[K1]>>(key1?: K1, key2?: K2): this {
