@@ -72,50 +72,32 @@ class TypedQueryBuilder<Model, Row = {}> {
         return this;
     }
 
-    // public innerJoinColumn<K1 extends keyof ObjectPropertyNames<Model>, K2 extends keyof ObjectPropertyNames<ObjectPropertyNames<Model>[K1]>>(key1: K1, key2: K2): this {
     public innerJoinColumn<K1 extends ObjectPropertyNames<Model>, K2 extends ObjectPropertyNames<Model[K1]>>(key1: K1, key2: K2): this;
     public innerJoinColumn<K extends ObjectPropertyNames<Model>>(key1: K): this;
-
     public innerJoinColumn<K1 extends ObjectPropertyNames<Model>, K2 extends ObjectPropertyNames<Model[K1]>>(key1?: K1, key2?: K2): this {
 
-        // public innerJoinColumn<K1 extends keyof ObjectPropertyNames<Model>, K2 extends keyof ObjectPropertyNames<Model>[K1]>(key1?: K1, key2?: K2): this {
-        // public innerJoinColumn<K1 extends keyof ObjectPropertyNames<Model>, K2 extends keyof ObjectPropertyNames<Model>[K1], K3 extends keyof ObjectPropertyNames<Model>[K1][K2]>(key1: K1, key2: K2, key3: K3): this;
-        // public innerJoinColumn<K1 extends keyof ObjectPropertyNames<Model>, K2 extends keyof ObjectPropertyNames<Model>[K1], K3 extends keyof ObjectPropertyNames<Model>[K1][K2]>(key1: K1, key2?: K2, key3?: K3): this {
-
-        if (arguments.length === 1) {
-
-            const tableToJoinColumn = getColumn(this.tableClass.prototype, arguments[0]);
-            const tableToJoinName = this.getTableName(tableToJoinColumn.columnClass);
-            const tableToJoinAlias = arguments[0];
-            const tableToJoinJoinColumnName = `${tableToJoinAlias}.id`;
-            const tableJoinedColumnName = `${this.getTableName(this.tableClass)}.${arguments[0]}Id`;
-
-            this.queryBuilder.join(`${tableToJoinName} as ${tableToJoinAlias}`, tableToJoinJoinColumnName, tableJoinedColumnName);
-        } else {
-
-            let firstColumnAlias = this.tableName;
-            let firstColumnClass = this.tableClass;
-            let secondColumnAlias = arguments[0];
-            let secondColumnClass = getColumn(firstColumnClass.prototype, secondColumnAlias).columnClass;
+        let firstColumnAlias = this.tableName;
+        let firstColumnClass = this.tableClass;
+        let secondColumnAlias = arguments[0];
+        let secondColumnClass = getColumn(firstColumnClass.prototype, secondColumnAlias).columnClass;
 
 
-            for (let i = 1; i < arguments.length; i++) {
-                const beforeSecondColumnAlias = secondColumnAlias;
-                const beforeSecondColumnClass = secondColumnClass;
+        for (let i = 1; i < arguments.length; i++) {
+            const beforeSecondColumnAlias = secondColumnAlias;
+            const beforeSecondColumnClass = secondColumnClass;
 
-                secondColumnAlias = arguments[i];
-                secondColumnClass = getColumn(beforeSecondColumnClass.prototype, secondColumnAlias).columnClass;
+            secondColumnAlias = arguments[i];
+            secondColumnClass = getColumn(beforeSecondColumnClass.prototype, secondColumnAlias).columnClass;
 
-                firstColumnAlias = beforeSecondColumnAlias;
-                firstColumnClass = beforeSecondColumnClass;
-            }
-            const tableToJoinName = this.getTableName(secondColumnClass);
-            const tableToJoinAlias = secondColumnAlias;
-            const tableToJoinJoinColumnName = `${tableToJoinAlias}.id`;
-            const tableJoinedColumnName = `${firstColumnAlias}.${secondColumnAlias}Id`;
-
-            this.queryBuilder.join(`${tableToJoinName} as ${tableToJoinAlias}`, tableToJoinJoinColumnName, tableJoinedColumnName);
+            firstColumnAlias = beforeSecondColumnAlias;
+            firstColumnClass = beforeSecondColumnClass;
         }
+        const tableToJoinName = this.getTableName(secondColumnClass);
+        const tableToJoinAlias = secondColumnAlias;
+        const tableToJoinJoinColumnName = `${tableToJoinAlias}.id`;
+        const tableJoinedColumnName = `${firstColumnAlias}.${secondColumnAlias}Id`;
+
+        this.queryBuilder.join(`${tableToJoinName} as ${tableToJoinAlias}`, tableToJoinJoinColumnName, tableJoinedColumnName);
 
         return this;
     }
