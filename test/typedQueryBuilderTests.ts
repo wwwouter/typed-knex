@@ -16,6 +16,7 @@ class UserCategory {
     public name!: string;
     @column()
     public region!: Region;
+    public regionId!: string;
 }
 
 
@@ -26,6 +27,7 @@ class User {
     public someValue!: string;
     @column()
     public category!: UserCategory;
+    public categoryId!: string;
 
 }
 
@@ -33,11 +35,12 @@ class User {
 class UserSetting {
     @column()
     public id!: string;
-    public userId!: string;
     @column()
     public user!: User;
+    public userId!: string;
     @column()
     public user2!: User;
+    public user2Id!: string;
     public key!: string;
     public value!: string;
     public intitialValue!: string;
