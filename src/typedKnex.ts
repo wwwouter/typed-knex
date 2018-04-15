@@ -38,12 +38,8 @@ class TypedQueryBuilder<Model, Row = {}> {
     public selectColumns<K extends FilterNonObjects<Model>>(keys: K[]): TypedQueryBuilder<Model, Pick<Model, K> & Row>;
     public selectColumns<K extends FilterNonObjects<Model>>(keys1: K[] | string, keys2?: K[]): TypedQueryBuilder<Model, Pick<Model, K> & Row> {
 
-        // const prefix = typeof arguments[0] === 'string' ? arguments[0] + '_' : '';
         const argumentsKeys = arguments[arguments.length - 1];
         for (const key of argumentsKeys) {
-            // this.queryBuilder.select(prefix + key);
-
-
             if (arguments.length === 1) {
                 this.queryBuilder.select(key);
             } else {
