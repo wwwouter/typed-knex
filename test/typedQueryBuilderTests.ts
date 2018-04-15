@@ -226,4 +226,17 @@ describe('TypedKnexQueryBuilder', () => {
     });
 
 
+    it('should select 2 columns at once from parent', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(UserSetting)
+            .selectColumns('user', ['id', 'name']);
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select "user"."id" as "user_id", "user"."name" as "user_name" from "userSettings"');
+
+        done();
+    });
+
+
 });

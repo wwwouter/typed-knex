@@ -34,9 +34,22 @@ class TypedQueryBuilder<Model, Row = {}> {
         this.queryBuilder = this.knex.from(this.tableName);
     }
 
-    public selectColumns<K extends FilterNonObjects<Model>>(keys: K[]): TypedQueryBuilder<Model, Pick<Model, K> & Row> {
-        for (const key of keys) {
-            this.queryBuilder.select(key);
+    public selectColumns<Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, keys2: K2[]): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev>;
+    public selectColumns<K extends FilterNonObjects<Model>>(keys: K[]): TypedQueryBuilder<Model, Pick<Model, K> & Row>;
+    public selectColumns<K extends FilterNonObjects<Model>>(keys1: K[] | string, keys2?: K[]): TypedQueryBuilder<Model, Pick<Model, K> & Row> {
+
+        // const prefix = typeof arguments[0] === 'string' ? arguments[0] + '_' : '';
+        const argumentsKeys = arguments[arguments.length - 1];
+        for (const key of argumentsKeys) {
+            // this.queryBuilder.select(prefix + key);
+
+
+            if (arguments.length === 1) {
+                this.queryBuilder.select(key);
+            } else {
+
+                this.queryBuilder.select(this.getColumnName(arguments[0], key) + ' as ' + this.getColumnAlias(arguments[0], key));
+            }
         }
         return this as any;
     }
