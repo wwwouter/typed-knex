@@ -83,12 +83,13 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with where on column of own table', (done) => {
+    it('should create query with where on column of own table', async (done) => {
 
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
             .where('name', 'user1');
+
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where "name" = \'user1\'');
 
@@ -237,6 +238,19 @@ describe('TypedKnexQueryBuilder', () => {
 
         done();
     });
+
+
+    // it('should create query with where not on column of own table', (done) => {
+
+    //     const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    //     const query = typedKnex
+    //         .query(User)
+    //         .whereNot('name', 'user1');
+    //     const queryString = query.toQuery();
+    //     assert.equal(queryString, 'select * from "users" where "name" != \'user1\'');
+
+    //     done();
+    // });
 
 
 });

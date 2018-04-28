@@ -11,20 +11,60 @@ type FilterObjectsOnly<T> = { [K in keyof T]: T[K] extends object ? K : never }[
 type FilterNonObjects<T> = { [K in keyof T]: T[K] extends object ? never : K }[keyof T];
 
 
-export class TypedKnex {
+interface IWhere<Model, Row> {
 
-    constructor(private knex: Knex) {
+    <K extends FilterNonObjects<Model>>(key1: K, value: Model[K]): ITypedQueryBuilder<Model, Row>;
+    <K1 extends keyof Model, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, key2: K2, value: Model[K1][K2]): ITypedQueryBuilder<Model, Row>;
+    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends FilterNonObjects<Model[K1][K2]>>(key1: K1, key2: K2, key3: K3, value: Model[K1][K2][K3]): ITypedQueryBuilder<Model, Row>;
+    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keysAndValues: any[]): ITypedQueryBuilder<Model, Row>;
+}
 
-    }
 
-    public query<T>(tableClass: new () => T): TypedQueryBuilder<T> {
-
-        return new TypedQueryBuilder<T>(tableClass, this.knex);
-    }
+interface ISelectColumns<Model, Row> {
+    <Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, keys2: K2[]): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev>;
+    <K extends FilterNonObjects<Model>>(keys: K[]): ITypedQueryBuilder<Model, Pick<Model, K> & Row>;
 
 }
 
-class TypedQueryBuilder<Model, Row = {}> {
+
+interface ISelectColumn<Model, Row> {
+    <Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterObjectsOnly<Model[K1]>, K3 extends FilterObjectsOnly<Model[K1][K2]>>(key1: K1, key2: K2, key3: K3, ...keys: string[]): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, TransformAll<Pick<Model[K1][K2], K3>, any>>> & Prev>;
+    <Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterObjectsOnly<Model[K1]>, K3 extends FilterNonObjects<Model[K1][K2]>>(key1: K1, key2: K2, key3: K3): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, Pick<Model[K1][K2], K3>>> & Prev>;
+    <Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, key2: K2): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev>;
+    <K extends FilterNonObjects<Model>>(key1: K): ITypedQueryBuilder<Model, Pick<Model, K> & Row>;
+
+}
+
+interface IInnerJoinColumn<Model, Row> {
+
+    <K1 extends FilterObjectsOnly<Model>, K2 extends FilterObjectsOnly<Model[K1]>>(key1: K1, key2: K2, ...keys: string[]): ITypedQueryBuilder<Model, Row>;
+    <K1 extends FilterObjectsOnly<Model>, K2 extends FilterObjectsOnly<Model[K1]>>(key1: K1, key2: K2): ITypedQueryBuilder<Model, Row>;
+    <K extends FilterObjectsOnly<Model>>(key1: K): ITypedQueryBuilder<Model, Row>;
+
+
+}
+
+export interface ITypedQueryBuilder<Model, Row> {
+    where: IWhere<Model, Row>;
+    selectColumns: ISelectColumns<Model, Row>;
+    selectColumn: ISelectColumn<Model, Row>;
+    innerJoinColumn: IInnerJoinColumn<Model, Row>;
+    firstItem(): Promise<Row | undefined>;
+    knexFunction(f: (query: Knex.QueryBuilder) => void): void;
+    toQuery(): string;
+}
+
+
+export class TypedKnex {
+
+    constructor(private knex: Knex) { }
+
+    public query<T>(tableClass: new () => T): ITypedQueryBuilder<T, {}> {
+        return new TypedQueryBuilder<T>(tableClass, this.knex);
+    }
+}
+
+class TypedQueryBuilder<Model, Row = {}> implements ITypedQueryBuilder<Model, Row> {
 
     private queryBuilder: Knex.QueryBuilder;
     private tableName: string;
@@ -34,9 +74,9 @@ class TypedQueryBuilder<Model, Row = {}> {
         this.queryBuilder = this.knex.from(this.tableName);
     }
 
-    public selectColumns<Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, keys2: K2[]): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev>;
-    public selectColumns<K extends FilterNonObjects<Model>>(keys: K[]): TypedQueryBuilder<Model, Pick<Model, K> & Row>;
-    public selectColumns<K extends FilterNonObjects<Model>>(keys1: K[] | string, keys2?: K[]): TypedQueryBuilder<Model, Pick<Model, K> & Row> {
+
+
+    public selectColumns() {
 
         const argumentsKeys = arguments[arguments.length - 1];
         for (const key of argumentsKeys) {
@@ -50,11 +90,7 @@ class TypedQueryBuilder<Model, Row = {}> {
         return this as any;
     }
 
-    public selectColumn<Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterObjectsOnly<Model[K1]>, K3 extends FilterObjectsOnly<Model[K1][K2]>>(key1: K1, key2: K2, key3: K3, ...keys: string[]): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, TransformAll<Pick<Model[K1][K2], K3>, any>>> & Prev>;
-    public selectColumn<Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterObjectsOnly<Model[K1]>, K3 extends FilterNonObjects<Model[K1][K2]>>(key1: K1, key2: K2, key3: K3): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, Pick<Model[K1][K2], K3>>> & Prev>;
-    public selectColumn<Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, key2: K2): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev>;
-    public selectColumn<K extends FilterNonObjects<Model>>(key1: K): TypedQueryBuilder<Model, Pick<Model, K> & Row>;
-    public selectColumn<Prev extends Row, K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2?: K2): TypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev> {
+    public selectColumn() {
 
 
         if (arguments.length === 1) {
@@ -67,24 +103,14 @@ class TypedQueryBuilder<Model, Row = {}> {
     }
 
 
-
-    public where<K extends FilterNonObjects<Model>>(key1: K, value: Model[K]): this;
-    public where<K1 extends keyof Model, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, key2: K2, value: Model[K1][K2]): this;
-    public where<K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends FilterNonObjects<Model[K1][K2]>>(key1: K1, key2: K2, key3: K3, value: Model[K1][K2][K3]): this;
-    public where<K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keysAndValues: any[]): this;
-    public where<K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1?: K1, key2?: K2, key3?: K3, value?: Model[K1][K2][K3] | Model[K1][K2] | Model[K1]): this {
+    public where() {
         const argumentsExpectLast = [...(arguments as any)].slice(0, -1);
         this.queryBuilder.where(this.getColumnName(...argumentsExpectLast), arguments[arguments.length - 1]);
-
         return this;
     }
 
 
-
-    public innerJoinColumn<K1 extends FilterObjectsOnly<Model>, K2 extends FilterObjectsOnly<Model[K1]>>(key1: K1, key2: K2, ...keys: string[]): this;
-    public innerJoinColumn<K1 extends FilterObjectsOnly<Model>, K2 extends FilterObjectsOnly<Model[K1]>>(key1: K1, key2: K2): this;
-    public innerJoinColumn<K extends FilterObjectsOnly<Model>>(key1: K): this;
-    public innerJoinColumn<K1 extends FilterObjectsOnly<Model>, K2 extends FilterObjectsOnly<Model[K1]>>(key1?: K1, key2?: K2): this {
+    public innerJoinColumn() {
 
         let firstColumnAlias = this.tableName;
         let firstColumnClass = this.tableClass;
