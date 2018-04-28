@@ -105,15 +105,17 @@ class TypedQueryBuilder<Model, Row = {}> implements ITypedQueryBuilder<Model, Ro
 
 
     public where() {
-        const argumentsExpectLast = [...(arguments as any)].slice(0, -1);
-        this.queryBuilder.where(this.getColumnName(...argumentsExpectLast), arguments[arguments.length - 1]);
+        const argumentsExceptLast = [...(arguments as any)].slice(0, -1);
+        const value = arguments[arguments.length - 1];
+        this.queryBuilder.where(this.getColumnName(...argumentsExceptLast), value);
         return this;
     }
 
 
     public whereNot() {
-        const argumentsExpectLast = [...(arguments as any)].slice(0, -1);
-        this.queryBuilder.whereNot(this.getColumnName(...argumentsExpectLast), arguments[arguments.length - 1]);
+        const argumentsExceptLast = [...(arguments as any)].slice(0, -1);
+        const value = arguments[arguments.length - 1];
+        this.queryBuilder.whereNot(this.getColumnName(...argumentsExceptLast), value);
         return this;
     }
 
