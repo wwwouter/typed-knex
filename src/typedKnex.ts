@@ -46,6 +46,7 @@ interface IInnerJoinColumn<Model, Row> {
 
 export interface ITypedQueryBuilder<Model, Row> {
     where: IWhere<Model, Row>;
+    whereNot: IWhere<Model, Row>;
     selectColumns: ISelectColumns<Model, Row>;
     selectColumn: ISelectColumn<Model, Row>;
     innerJoinColumn: IInnerJoinColumn<Model, Row>;
@@ -106,6 +107,13 @@ class TypedQueryBuilder<Model, Row = {}> implements ITypedQueryBuilder<Model, Ro
     public where() {
         const argumentsExpectLast = [...(arguments as any)].slice(0, -1);
         this.queryBuilder.where(this.getColumnName(...argumentsExpectLast), arguments[arguments.length - 1]);
+        return this;
+    }
+
+
+    public whereNot() {
+        const argumentsExpectLast = [...(arguments as any)].slice(0, -1);
+        this.queryBuilder.whereNot(this.getColumnName(...argumentsExpectLast), arguments[arguments.length - 1]);
         return this;
     }
 
