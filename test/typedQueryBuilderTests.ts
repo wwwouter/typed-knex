@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import * as knex from 'knex';
-import { column, table } from '../src/decorators';
+import { column, table, toManyColumn } from '../src/decorators';
 import { TypedKnex } from '../src/typedKnex';
 
 
@@ -28,6 +28,8 @@ class User {
     @column()
     public category!: UserCategory;
     public categoryId!: string;
+    @toManyColumn('userSettings')
+    public userSettings!: UserSetting[];
 
 }
 
@@ -43,7 +45,7 @@ class UserSetting {
     public user2Id!: string;
     public key!: string;
     public value!: string;
-    public intitialValue!: string;
+    public initialValue!: string;
 }
 
 
@@ -76,9 +78,9 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .selectColumn('intitialValue');
+            .selectColumn('initialValue');
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select "intitialValue" from "userSettings"');
+        assert.equal(queryString, 'select "initialValue" from "userSettings"');
 
         done();
     });
@@ -248,6 +250,18 @@ describe('TypedKnexQueryBuilder', () => {
             .whereNot('name', 'user1');
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where not "name" = \'user1\'');
+
+        done();
+    });
+
+    it('should select column from table with to-many relationship', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .selectColumnWithArrays('userSettings', 'initialValue');
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select "userSettings"."initialValue" as "userSettings_initialValue" from "users"');
 
         done();
     });

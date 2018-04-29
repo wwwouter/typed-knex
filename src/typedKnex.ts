@@ -7,8 +7,79 @@ type TransformAll<T, IT> = {
     [Key in keyof T]: IT
 };
 
-type FilterObjectsOnly<T> = { [K in keyof T]: T[K] extends object ? K : never }[keyof T];
+type FilterObjectsOnly<T> = { [K in keyof T]:
+    T[K] extends object ? K : never }[keyof T];
 type FilterNonObjects<T> = { [K in keyof T]: T[K] extends object ? never : K }[keyof T];
+
+
+
+
+// type TransformAllAndArray<T, IT> = {
+//     [Key in keyof T]:
+//     T[Key] extends (infer ArrayType)[] ? ArrayType :
+//     T[Key] extends object ? IT : never
+// };
+
+type FilterObjectsAndArraysOnly<T> = { [K in keyof T]:
+    // T[K] extends (infer ArrayType)[] ? K :
+    T[K] extends any[] ? K :
+    T[K] extends object ? K : never }[keyof T];
+
+type FilterNonObjectsAndNonArrays<T> = { [K in keyof T]:
+    T[K] extends (infer ArrayType)[] ? never :
+    T[K] extends object ? never : K }[keyof T];
+
+
+type CollapseArray<T> =
+    // {
+    T extends (infer ArrayType)[] ? ArrayType : T;
+
+// [Key in keyof T]:
+// T[Key] extends (infer ArrayType)[] ? ArrayType : T[Key]
+// T[Key] extends any[] ? boolean : T[Key]
+// };
+
+class Region {
+    public id!: string;
+    public code!: number;
+}
+
+class UserCategory {
+    public id!: string;
+    public name!: string;
+    public region!: Region;
+    public regionId!: string;
+}
+
+
+class User {
+    public id!: string;
+    public name!: string;
+    public someValue!: string;
+    public category!: UserCategory;
+    public categoryId!: string;
+    public userSettings!: UserSetting[];
+
+}
+
+class UserSetting {
+    public id!: string;
+    public user!: User;
+    public userId!: string;
+    public user2!: User;
+    public user2Id!: string;
+    public key!: string;
+    public value!: string;
+    public intitialValue!: string;
+}
+
+
+
+interface ISelectColumnsWithArrays<Model, Row> {
+    <Prev extends Row, K1 extends FilterObjectsAndArraysOnly<Model>, K2 extends FilterNonObjectsAndNonArrays<CollapseArray<Model[K1]>>>(key1: K1, keys2: K2): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<CollapseArray<Model[K1]>, K2>> & Prev>;
+    <K extends FilterNonObjectsAndNonArrays<Model>>(keys: K[]): ITypedQueryBuilder<Model, Pick<Model, K> & Row>;
+
+}
 
 
 interface IWhere<Model, Row> {
@@ -49,6 +120,7 @@ export interface ITypedQueryBuilder<Model, Row> {
     whereNot: IWhere<Model, Row>;
     selectColumns: ISelectColumns<Model, Row>;
     selectColumn: ISelectColumn<Model, Row>;
+    selectColumnWithArrays: ISelectColumnsWithArrays<Model, Row>;
     innerJoinColumn: IInnerJoinColumn<Model, Row>;
     firstItem(): Promise<Row | undefined>;
     knexFunction(f: (query: Knex.QueryBuilder) => void): void;
@@ -92,6 +164,18 @@ class TypedQueryBuilder<Model, Row = {}> implements ITypedQueryBuilder<Model, Ro
     }
 
     public selectColumn() {
+
+
+        if (arguments.length === 1) {
+            this.queryBuilder.select(arguments[0]);
+        } else {
+
+            this.queryBuilder.select(this.getColumnName(...arguments) + ' as ' + this.getColumnAlias(...arguments));
+        }
+        return this as any;
+    }
+
+    public selectColumnWithArrays() {
 
 
         if (arguments.length === 1) {

@@ -25,3 +25,8 @@ export function getColumn(target: any, propertyKey: string): { columnClass: new 
     }
     return { columnClass: Reflect.getMetadata('design:type', target, propertyKey) };
 }
+
+
+export function toManyColumn(tableName: string) {
+    return Reflect.metadata(columnMetadataKey, { isColumn: true, toMany: true, toManyTableName: tableName });
+}
