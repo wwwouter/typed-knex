@@ -2,16 +2,19 @@
   "name": "typed-knex",
   "version": "1.0.0",
   "description": "Makes knex better by working with TypeScript",
-  "main": "index.js",
   "dependencies": {
     "@types/flat": "0.0.28",
     "flat": "^4.0.0",
     "mocha": "^5.1.0",
     "reflect-metadata": "^0.1.12"
   },
+  "main": "./dist/src/index.js",
+  "typings": "dist/src/index",
   "scripts": {
     "test": "npm run mocha-unit",
     "build": "tsc -p tsconfig.json",
+    "build:dist": "tsc --outDir dist -d --sourceMap",
+    "prepublish": "npm run build:dist",
     "mocha-unit": "npm run build && mocha \"build/test/**/*Tests.js\""
   },
   "repository": {

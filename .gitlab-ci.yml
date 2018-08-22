@@ -1,0 +1,12 @@
+image: node:6.2.0
+cache:
+  paths:
+  - node_modules/
+test:
+  script:
+  - npm install
+  - npm test
+  - npm pack --unsafe-perm
+  - mv replacestuff-*.tgz local.tgz
+  - npm install -g local.tgz
+  - replacestuff -h
