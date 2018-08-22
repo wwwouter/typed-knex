@@ -13,7 +13,7 @@
   "scripts": {
     "test": "npm run mocha-unit",
     "build": "tsc -p tsconfig.json",
-    "build:dist": "tsc --outDir dist -d --sourceMap",
+    "build:dist": "tsc --outDir dist",
     "prepublish": "npm run build:dist",
     "mocha-unit": "npm run build && mocha \"build/test/**/*Tests.js\""
   },
