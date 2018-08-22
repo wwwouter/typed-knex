@@ -286,7 +286,7 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
 
     public selectColumn() {
         if (arguments.length === 1) {
-            this.queryBuilder.select(this.getColumnName(arguments[0]));
+            this.queryBuilder.select(this.getColumnName(arguments[0]) + ' as ' + arguments[0]);
         } else {
 
             this.queryBuilder.select(this.getColumnName(...arguments) + ' as ' + this.getColumnSelectAlias(...arguments));

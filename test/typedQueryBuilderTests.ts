@@ -70,7 +70,7 @@ describe('TypedKnexQueryBuilder', () => {
             .query(User)
             .selectColumn('id');
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select "id" from "users"');
+        assert.equal(queryString, 'select "users"."id" as "id" from "users"');
 
         done();
     });
@@ -81,12 +81,12 @@ describe('TypedKnexQueryBuilder', () => {
             .query(UserSetting)
             .selectColumn('initialValue');
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select "initialValue" from "userSettings"');
+        assert.equal(queryString, 'select "userSettings"."initialValue" as "initialValue" from "userSettings"');
 
         done();
     });
 
-    it('should create query with where on column of own table', async (done) => {
+    it('should create query with where on column of own table', (done) => {
 
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
@@ -94,7 +94,7 @@ describe('TypedKnexQueryBuilder', () => {
             .where('name', 'user1');
 
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select * from "users" where "name" = \'user1\'');
+        assert.equal(queryString, 'select * from "users" where "users"."name" = \'user1\'');
 
         done();
     });
@@ -119,7 +119,7 @@ describe('TypedKnexQueryBuilder', () => {
             .selectColumn('user', 'name')
             .innerJoinColumn('user');
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select "user"."name" as "user_name" from "userSettings" inner join "users" as "user" on "user"."id" = "userSettings"."userId"');
+        assert.equal(queryString, 'select "user"."name" as "user.name" from "userSettings" inner join "users" as "user" on "user"."id" = "userSettings"."userId"');
 
         done();
     });
@@ -172,7 +172,7 @@ describe('TypedKnexQueryBuilder', () => {
             .selectColumn('user', 'category', 'name')
             .innerJoinColumn('user', 'category');
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select "user_category"."name" as "user_category_name" from "userSettings" inner join "userCategories" as "user_category" on "user_category"."id" = "user"."categoryId"');
+        assert.equal(queryString, 'select "user_category"."name" as "user.category.name" from "userSettings" inner join "userCategories" as "user_category" on "user_category"."id" = "user"."categoryId"');
 
         done();
     });
@@ -183,12 +183,9 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(UserSetting)
             .selectColumn('user', 'category', 'region', 'code')
-            .selectColumn('user', 'category', 'id')
-            .selectColumn('user', 'name')
-            .selectColumn('id')
             .innerJoinColumn('user', 'category', 'region');
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select "user_category_region"."code" as "user_category_region_code" from "userSettings" inner join "regions" as "user_category_region" on "user_category_region"."id" = "user_category"."regionId"');
+        assert.equal(queryString, 'select "user_category_region"."code" as "user.category.region.code" from "userSettings" inner join "regions" as "user_category_region" on "user_category_region"."id" = "user_category"."regionId"');
 
         done();
     });
@@ -227,7 +224,7 @@ describe('TypedKnexQueryBuilder', () => {
             .query(User)
             .selectColumns(['id', 'name']);
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select "id", "name" from "users"');
+        assert.equal(queryString, 'select "users"."id", "users"."name" from "users"');
 
         done();
     });
@@ -240,7 +237,7 @@ describe('TypedKnexQueryBuilder', () => {
             .query(UserSetting)
             .selectColumns('user', ['id', 'name']);
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select "user"."id" as "user_id", "user"."name" as "user_name" from "userSettings"');
+        assert.equal(queryString, 'select "user"."id" as "user.id", "user"."name" as "user.name" from "userSettings"');
 
         done();
     });
@@ -270,7 +267,7 @@ describe('TypedKnexQueryBuilder', () => {
         // .selectColumn('user2s', 'category');
         // .selectColumn('name');
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select "userSettings"."initialValue" as "userSettings_initialValue" from "users"');
+        assert.equal(queryString, 'select "user_category"."regionId" as "user.category.regionId" from "userSettings"');
 
         // const i = await query.firstItem();
         // if (i) {

@@ -10,9 +10,9 @@
     "reflect-metadata": "^0.1.12"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run mocha-unit",
     "build": "tsc -p tsconfig.json",
-    "mocha-unit": "npm run build && mocha --bail \"build/test/**/*Tests.js\""
+    "mocha-unit": "npm run build && mocha \"build/test/**/*Tests.js\""
   },
   "repository": {
     "type": "git",
