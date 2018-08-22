@@ -7,7 +7,7 @@ import { TypedKnex } from '../src/typedKnex';
 @table('regions')
 class Region {
     public id!: string;
-    public code!: number;
+    public code: number;
 }
 
 @table('userCategories')
@@ -17,6 +17,7 @@ class UserCategory {
     @column()
     public region!: Region;
     public regionId!: string;
+    public year!: number;
 }
 
 
@@ -28,6 +29,8 @@ class User {
     @column()
     public category!: UserCategory;
     public categoryId!: string;
+    @column()
+    public category2!: UserCategory;
     @toManyColumn('userSettings')
     public userSettings!: UserSetting[];
 
@@ -46,6 +49,8 @@ class UserSetting {
     public key!: string;
     public value!: string;
     public initialValue!: string;
+    @column()
+    public user2s!: User[];
 }
 
 
@@ -182,6 +187,9 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(UserSetting)
             .selectColumn('user', 'category', 'region', 'code')
+            .selectColumn('user', 'category', 'id')
+            .selectColumn('user', 'name')
+            .selectColumn('id')
             .innerJoinColumn('user', 'category', 'region');
         const queryString = query.toQuery();
         assert.equal(queryString, 'select "user_category_region"."code" as "user_category_region_code" from "userSettings" inner join "regions" as "user_category_region" on "user_category_region"."id" = "user_category"."regionId"');
@@ -258,10 +266,26 @@ describe('TypedKnexQueryBuilder', () => {
 
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
-            .query(User)
-            .selectColumnWithArrays('userSettings', 'initialValue');
+            // .query(User)
+            .query(UserSetting)
+            // .selectColumnWithArrays('category', 'name');
+            // .selectColumn('category2', 'regionId');
+            .selectColumn('user', 'category', 'regionId');
+        // .selectColumn('user2s', 'category');
+        // .selectColumn('name');
         const queryString = query.toQuery();
         assert.equal(queryString, 'select "userSettings"."initialValue" as "userSettings_initialValue" from "users"');
+
+        // const i = await query.firstItem();
+        // if (i) {
+        //     // const i1 = i.userSettings;
+        //     const i1 = i.category.name;
+        //     const i2 = i.category.id;
+        //     const i3 = i.id;
+        //     const i4 = i.name;
+        //     i.user.category.regionId
+
+        // }
 
         done();
     });
