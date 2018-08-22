@@ -1,5 +1,5 @@
 {
-  "name": "typed-knex",
+  "name": "@wwwouter/typed-knex",
   "version": "1.0.1",
   "description": "Makes knex better by working with TypeScript",
   "dependencies": {
@@ -28,7 +28,7 @@
     "typeknex"
   ],
   "author": "W.Mooij",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/wwwouter/typed-knex/issues"
   },
