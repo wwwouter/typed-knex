@@ -122,7 +122,7 @@ export interface IJoinOnClause<Model> {
 
 export interface IJoinTableMultipleOnClauses<Model, Row> {
     // <NewPropertyType, NewPropertyKey extends keyof TypeWithIndexerOf<NewPropertyType>, L1K1 extends keyof AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, L2K1 extends keyof AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, L2K2 extends keyof AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>[L2K1]>(newPropertyKey: NewPropertyKey, newPropertyClass: new () => NewPropertyType, column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2]): ITypedQueryBuilder<AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, Row>;
-    <NewPropertyType, NewPropertyKey extends keyof TypeWithIndexerOf<NewPropertyType>, L1K1 extends keyof AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, L2K1 extends keyof AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, L2K2 extends keyof AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>[L2K1]>(newPropertyKey: NewPropertyKey, newPropertyClass: new () => NewPropertyType, on: (join: IJoinOnClause<AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>>) => void): ITypedQueryBuilder<AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, Row>;
+    <NewPropertyType, NewPropertyKey extends keyof TypeWithIndexerOf<NewPropertyType>>(newPropertyKey: NewPropertyKey, newPropertyClass: new () => NewPropertyType, on: (join: IJoinOnClause<AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>>) => void): ITypedQueryBuilder<AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, Row>;
 }
 
 export interface IWhereCompareTwoColumns<Model, Row> {
@@ -484,14 +484,14 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
     }
 
     private getColumnName(...keys: string[]): string {
-        if (arguments.length === 1) {
-            return this.tableName + '.' + arguments[0];
+        if (keys.length === 1) {
+            return this.tableName + '.' + keys[0];
         } else {
-            let columnName = arguments[0];
-            let columnAlias = arguments[0];
-            for (let i = 1; i < arguments.length; i++) {
-                columnName = columnAlias + '.' + arguments[i];
-                columnAlias += '_' + arguments[i];
+            let columnName = keys[0];
+            let columnAlias = keys[0];
+            for (let i = 1; i < keys.length; i++) {
+                columnName = columnAlias + '.' + keys[i];
+                columnAlias += '_' + keys[i];
             }
             return columnName;
         }
@@ -510,12 +510,12 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
     // }
 
     private getColumnSelectAlias(...keys: string[]): string {
-        if (arguments.length === 1) {
-            return arguments[0];
+        if (keys.length === 1) {
+            return keys[0];
         } else {
-            let columnAlias = arguments[0];
-            for (let i = 1; i < arguments.length; i++) {
-                columnAlias += '.' + arguments[i];
+            let columnAlias = keys[0];
+            for (let i = 1; i < keys.length; i++) {
+                columnAlias += '.' + keys[i];
             }
             return columnAlias;
         }

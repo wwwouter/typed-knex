@@ -9,7 +9,12 @@
         "noUnusedLocals": true,
         "emitDecoratorMetadata": true,
         "skipLibCheck": true,
-        "outDir": "build"
+        "outDir": "build",
+        "noUnusedParameters": true,
+        "inlineSourceMap": true,
+        "inlineSources": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true
     },
     "include": [
         "src/**/*",
