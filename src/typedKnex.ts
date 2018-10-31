@@ -82,7 +82,7 @@ export type Operator = '=' | '!=';
 
 
 
-interface IConstructor<T> {
+export interface IConstructor<T> {
     new(...args: any[]): T;
 }
 

@@ -14,7 +14,8 @@
         "inlineSourceMap": true,
         "inlineSources": true,
         "noImplicitReturns": true,
-        "noImplicitThis": true
+        "noImplicitThis": true,
+        "declaration": true
     },
     "include": [
         "src/**/*",
