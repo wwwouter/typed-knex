@@ -54,6 +54,9 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     leftOuterJoinTableOnFunction: IJoinTableMultipleOnClauses<ModelType, Row>;
 
 
+    selectRaw: ISelectRaw<ModelType, Row>;
+
+
 
     findById: IFindById<ModelType, Row>;
     firstItemOrNull(): Promise<Row | null>;
@@ -76,6 +79,14 @@ export type FilterObjectsOnly<T> = { [K in keyof T]: T[K] extends object ? K : n
 export type FilterNonObjects<T> = { [K in keyof T]: T[K] extends object ? never : K }[keyof T];
 
 export type Operator = '=' | '!=';
+
+
+
+interface IConstructor<T> {
+    new(...args: any[]): T;
+}
+
+
 
 
 export type AddPropertyWithType<Original, NewKey extends keyof TypeWithIndexerOf<NewKeyType>, NewKeyType> = Original & Pick<TypeWithIndexerOf<NewKeyType>, NewKey>;
@@ -147,6 +158,9 @@ export interface IWhereCompareTwoColumns<Model, Row> {
 
 
 
+export interface ISelectRaw<Model, Row> {
+    <TReturn extends Boolean | String | Number, TName extends keyof TypeWithIndexerOf<TReturn>>(name: TName, returnType: IConstructor<TReturn>, query: string): ITypedQueryBuilder<Model, Pick<TypeWithIndexerOf<TReturn>, TName> & Row>;
+}
 
 export interface ISelectColumn<Model, Row> {
     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, TransformAll<Pick<Model[K1][K2], K3>, any>>> & Row>;
@@ -330,6 +344,14 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
     public async list() {
         const items = await this.queryBuilder;
         return unflatten(items) as Row[];
+    }
+
+    public selectRaw() {
+        const name = arguments[0];
+        const query = arguments[2];
+
+        this.queryBuilder.select(this.knex.raw(`(${query}) as "${name}"`));
+        return this as any;
     }
 
     public innerJoinColumn() {
