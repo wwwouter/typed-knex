@@ -276,12 +276,12 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
 
     public limit(value: number) {
         this.queryBuilder.limit(value);
-        return this.queryBuilder as any;
+        return this as any;
     }
 
     public offset(value: number) {
         this.queryBuilder.offset(value);
-        return this.queryBuilder as any;
+        return this as any;
     }
 
     public async findById(id: string, columns: (keyof ModelType)[]) {
