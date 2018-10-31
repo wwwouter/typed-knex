@@ -59,6 +59,10 @@ export interface ITypedQueryBuilder<ModelType, Row> {
 
 
     findById: IFindById<ModelType, Row>;
+
+    limit(value: number): ITypedQueryBuilder<ModelType, Row>;
+    offset(value: number): ITypedQueryBuilder<ModelType, Row>;
+
     firstItemOrNull(): Promise<Row | null>;
     firstItem(): Promise<Row>;
     list(): Promise<Row[]>;
@@ -69,6 +73,8 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     countResult(): Promise<number>;
     delById(id: string): Promise<void>;
     update(id: string, item: Partial<ModelType>): Promise<void>;
+
+
 }
 
 export type TransformAll<T, IT> = {
@@ -266,6 +272,16 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
             await this.knex.raw(sql);
             // }
         }
+    }
+
+    public limit(value: number) {
+        this.queryBuilder.limit(value);
+        return this.queryBuilder as any;
+    }
+
+    public offset(value: number) {
+        this.queryBuilder.offset(value);
+        return this.queryBuilder as any;
     }
 
     public async findById(id: string, columns: (keyof ModelType)[]) {
