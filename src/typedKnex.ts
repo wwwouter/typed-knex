@@ -84,6 +84,11 @@ export type TransformAll<T, IT> = {
 export type FilterObjectsOnly<T> = { [K in keyof T]: T[K] extends object ? K : never }[keyof T];
 export type FilterNonObjects<T> = { [K in keyof T]: T[K] extends object ? never : K }[keyof T];
 
+export type ObjectToPrimitive<T> =
+    T extends String ? string :
+    T extends Number ? number :
+    T extends Boolean ? boolean : never;
+
 export type Operator = '=' | '!=';
 
 
@@ -165,7 +170,7 @@ export interface IWhereCompareTwoColumns<Model, Row> {
 
 
 export interface ISelectRaw<Model, Row> {
-    <TReturn extends Boolean | String | Number, TName extends keyof TypeWithIndexerOf<TReturn>>(name: TName, returnType: IConstructor<TReturn>, query: string): ITypedQueryBuilder<Model, Pick<TypeWithIndexerOf<TReturn>, TName> & Row>;
+    <TReturn extends Boolean | String | Number, TName extends keyof TypeWithIndexerOf<TReturn>>(name: TName, returnType: IConstructor<TReturn>, query: string): ITypedQueryBuilder<Model, Pick<TypeWithIndexerOf<ObjectToPrimitive<TReturn>>, TName> & Row>;
 }
 
 export interface ISelectColumn<Model, Row> {

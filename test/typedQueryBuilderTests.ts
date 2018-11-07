@@ -288,13 +288,14 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .selectRaw('subQuery', Boolean, 'select other.id from other');
+            .selectRaw('subQuery', Number, 'select other.id from other');
         const queryString = query.toQuery();
         assert.equal(queryString, 'select (select other.id from other) as "subQuery" from "users"');
 
         // const i = await query.firstItem();
         // console.log(i.name);
         // console.log(i.subQuery === true);
+        // console.log(i.subQuery === 'true');
         // console.log(i.subQueryd);
 
 
