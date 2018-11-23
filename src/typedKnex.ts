@@ -14,8 +14,8 @@ export class TypedKnex {
 
     constructor(private knex: Knex) { }
 
-    public query<T>(tableClass: new () => T): ITypedQueryBuilder<T, {}> {
-        return new TypedQueryBuilder<T>(tableClass, this.knex);
+    public query<T>(tableClass: new () => T): ITypedQueryBuilder<T, T> {
+        return new TypedQueryBuilder<T, T>(tableClass, this.knex);
     }
 }
 
@@ -37,8 +37,8 @@ export function registerBeforeUpdateTransform<T>(f: (item: T, typedQueryBuilder:
 export interface ITypedQueryBuilder<ModelType, Row> {
     where: IWhere<ModelType, Row>;
     //     whereNot: IWhere<ModelType, Row>;
-    selectColumns: ISelectColumns<ModelType, Row>;
-    selectColumn: ISelectColumn<ModelType, Row>;
+    selectColumns: ISelectColumns<ModelType, Row extends ModelType ? {} : Row>;
+    selectColumn: ISelectColumn<ModelType, Row extends ModelType ? {} : Row>;
     orderBy: IKeysAsParametersReturnQueryBuider<ModelType, Row>;
     innerJoinColumn: IKeysAsParametersReturnQueryBuider<ModelType, Row>;
     leftOuterJoinColumn: IKeysAsParametersReturnQueryBuider<ModelType, Row>;
