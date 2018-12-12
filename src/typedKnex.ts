@@ -36,7 +36,7 @@ export function registerBeforeUpdateTransform<T>(f: (item: T, typedQueryBuilder:
 
 export interface ITypedQueryBuilder<ModelType, Row> {
     where: IWhere<ModelType, Row>;
-    //     whereNot: IWhere<ModelType, Row>;
+    whereNot: IWhere<ModelType, Row>;
     selectColumns: ISelectColumns<ModelType, Row extends ModelType ? {} : Row>;
     selectColumn: ISelectColumn<ModelType, Row extends ModelType ? {} : Row>;
     orderBy: IKeysAsParametersReturnQueryBuider<ModelType, Row>;
@@ -488,6 +488,13 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
         const argumentsExceptLast = [...(arguments as any)].slice(0, -1);
         const value = arguments[arguments.length - 1];
         this.queryBuilder.where(this.getColumnName(...argumentsExceptLast), value);
+        return this;
+    }
+
+    public whereNot() {
+        const argumentsExceptLast = [...(arguments as any)].slice(0, -1);
+        const value = arguments[arguments.length - 1];
+        this.queryBuilder.whereNot(this.getColumnName(...argumentsExceptLast), value);
         return this;
     }
 
