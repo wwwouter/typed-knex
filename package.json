@@ -1,6 +1,6 @@
 {
   "name": "@wwwouter/typed-knex",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Makes knex better by working with TypeScript",
   "dependencies": {
     "@types/flat": "0.0.28",
