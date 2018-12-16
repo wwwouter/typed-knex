@@ -74,13 +74,65 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     firstItemOrNull(): Promise<Row | null>;
     firstItem(): Promise<Row>;
     list(): Promise<Row[]>;
-    //     knexFunction(f: (query: Knex.QueryBuilder) => void): void;
+    useKnexQueryBuilder(f: (query: Knex.QueryBuilder) => void): void;
     toQuery(): string;
 
     insert(newObject: Partial<ModelType>): Promise<void>;
     countResult(): Promise<number>;
     delById(id: string): Promise<void>;
     update(id: string, item: Partial<ModelType>): Promise<void>;
+
+    andWhere(): void;
+    orWhere(): void;
+    whereIn(): void;
+    whereNotIn(): void;
+    whereBetween(): void;
+    whereNotBetween(): void;
+    whereExists(): void;
+    whereNotExists(): void;
+    whereRaw(): void;
+    having(): void;
+    havingIn(): void;
+    havingNotIn(): void;
+    havingNull(): void;
+    havingNotNull(): void;
+    havingExists(): void;
+    havingNotExists(): void;
+    havingRaw(): void;
+    havingBetween(): void;
+    havingNotBetween(): void;
+    union(): void;
+    unionAll(): void;
+    returningColumn(): void;
+    returningColumns(): void;
+    transacting(trx: Knex.Transaction): void;
+    minColumn(): void;
+    countColumn(): void;
+    countDistinctColumn(): void;
+    maxColumn(): void;
+    sumColumn(): void;
+    sumDistinctColumn(): void;
+    avgColumn(): void;
+    avgDistinctColumn(): void;
+    minResult(): void;
+    countDistinctResult(): void;
+    maxResult(): void;
+    sumResult(): void;
+    sumDistinctResult(): void;
+    avgResult(): void;
+    avgDistinctResult(): void;
+    increment(): void;
+    decrement(): void;
+    truncate(): void;
+    clearSelect(): void;
+    clearWhere(): void;
+    clearOrder(): void;
+    distinct(): void;
+    clone(): void;
+    beginTransaction(): Promise<Knex.Transaction>;
+    groupByColumn(): void;
+    groupByColumns(): void;
+    groupByRaw(): void;
 
 
 }
@@ -277,13 +329,8 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
                 sql += query.where('id', item.id).toString().replace('?', '\\?') + ';\n';
             }
 
-            // const knexTransaction = this.transactionProvider.getKnexTransaction();
-            // if (knexTransaction) {
-            // await knexTransaction.raw(sql);
-            // } else {
-            // await this.knexProvider.knex.raw(sql);
+
             await this.knex.raw(sql);
-            // }
         }
     }
 
@@ -309,6 +356,7 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
         }
         return result[0].count;
     }
+
 
     public async firstItemOrNull() {
         const items = await this.queryBuilder;
@@ -349,6 +397,7 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
         }
         return this as any;
     }
+
 
     public orderBy() {
         if (arguments.length === 1) {
@@ -462,17 +511,7 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
         const operator = arguments[1];
         const column2Parts = arguments[2];
 
-        // this.queryBuilder.where(this.getColumnName(column1Parts), operator, this.getColumnName(column2Parts));
-
-        // const rawColumnName1 = typedColumn1.getRawColumnName();
-        // const rawColumnName2 = typedColumn2.getRawColumnName();
-
-        // const condition = `${rawColumnName1} = ${rawColumnName2}`;
-        // return this.whereRaw(condition) as ITypedQueryBuilder<ModelType>;
-
-
         this.queryBuilder.whereRaw(`?? ${operator} ??`, [this.getColumnName(...column1Parts), this.getColumnName(...column2Parts)]);
-
 
         return this;
     }
@@ -564,7 +603,185 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
         return this;
     }
 
+    public havingNotIn() {
+        const value = arguments[arguments.length - 1];
+        this.queryBuilder.havingIn(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
+        return this;
+    }
 
+    public havingNull() {
+        (this.queryBuilder as any).havingNull(this.getColumnName(...arguments));
+        return this;
+    }
+
+    public havingNotNull() {
+        (this.queryBuilder as any).havingNotNull(this.getColumnName(...arguments));
+        return this;
+    }
+
+    public havingExists() {
+        throw new NotImplementedError();
+    }
+
+    public havingNotExists() {
+        throw new NotImplementedError();
+    }
+
+    public havingRaw() {
+        throw new NotImplementedError();
+    }
+
+    public havingBetween() {
+        const value = arguments[arguments.length - 1];
+        (this.queryBuilder as any).havingBetween(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
+        return this;
+    }
+
+    public havingNotBetween() {
+        const value = arguments[arguments.length - 1];
+        (this.queryBuilder as any).havingNotBetween(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
+        return this;
+    }
+
+
+    public union() {
+        throw new NotImplementedError();
+    }
+
+    public unionAll() {
+        throw new NotImplementedError();
+    }
+
+    public returningColumn() {
+        throw new NotImplementedError();
+    }
+
+    public returningColumns() {
+        throw new NotImplementedError();
+    }
+
+    public transacting(trx: Knex.Transaction) {
+        this.queryBuilder.transacting(trx);
+    }
+
+
+    public minColumn() {
+        throw new NotImplementedError();
+    }
+
+    public countColumn() {
+        throw new NotImplementedError();
+    }
+
+    public countDistinctColumn() {
+        throw new NotImplementedError();
+    }
+
+    public maxColumn() {
+        throw new NotImplementedError();
+    }
+
+    public sumColumn() {
+        throw new NotImplementedError();
+    }
+
+    public sumDistinctColumn() {
+        throw new NotImplementedError();
+    }
+
+    public avgColumn() {
+        throw new NotImplementedError();
+    }
+
+    public avgDistinctColumn() {
+        throw new NotImplementedError();
+    }
+
+    public minResult() {
+        throw new NotImplementedError();
+    }
+
+    public countDistinctResult() {
+        throw new NotImplementedError();
+    }
+
+    public maxResult() {
+        throw new NotImplementedError();
+    }
+
+    public sumResult() {
+        throw new NotImplementedError();
+    }
+
+    public sumDistinctResult() {
+        throw new NotImplementedError();
+    }
+
+    public avgResult() {
+        throw new NotImplementedError();
+    }
+
+    public avgDistinctResult() {
+        throw new NotImplementedError();
+    }
+
+    public increment() {
+        const value = arguments[arguments.length - 1];
+        this.queryBuilder.increment(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
+        return this;
+    }
+    public decrement() {
+        const value = arguments[arguments.length - 1];
+        this.queryBuilder.decrement(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
+        return this;
+    }
+
+
+    public truncate() {
+        this.queryBuilder.truncate();
+    }
+
+    public clearSelect() {
+        this.queryBuilder.clearSelect();
+    }
+    public clearWhere() {
+        this.queryBuilder.clearWhere();
+    }
+    public clearOrder() {
+        (this.queryBuilder as any).clearOrder();
+    }
+
+    public distinct() {
+        this.queryBuilder.distinct();
+    }
+
+    public clone() {
+        throw new NotImplementedError();
+    }
+
+    public beginTransaction(): Promise<Knex.Transaction> {
+        return new Promise((resolve) => {
+            this.knex.transaction((tr) => resolve(tr))
+                // If this error is not caught here, it will throw, resulting in an unhandledRejection
+                // tslint:disable-next-line:no-empty
+                .catch((_e) => { });
+        });
+    }
+
+
+    public groupByColumn() {
+        throw new NotImplementedError();
+    }
+    public groupByColumns() {
+        throw new NotImplementedError();
+    }
+    public groupByRaw() {
+        throw new NotImplementedError();
+    }
+
+    public useKnexQueryBuilder(f: (query: Knex.QueryBuilder) => void): void {
+        f(this.queryBuilder);
+    }
 
     private joinColumn(joinType: 'innerJoin' | 'leftOuterJoin', args: any) {
 
