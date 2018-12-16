@@ -34,6 +34,14 @@ export function registerBeforeUpdateTransform<T>(f: (item: T, typedQueryBuilder:
 }
 
 
+class NotImplementedError extends Error {
+    constructor() {
+        super('Not implemented');
+    }
+
+
+}
+
 export interface ITypedQueryBuilder<ModelType, Row> {
     where: IWhere<ModelType, Row>;
     whereNot: IWhere<ModelType, Row>;
@@ -352,16 +360,6 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
         return this as any;
     }
 
-    public whereNull() {
-        this.queryBuilder.whereNull(this.getColumnName(...arguments));
-        return this;
-    }
-
-    public whereNotNull() {
-        this.queryBuilder.whereNotNull(this.getColumnName(...arguments));
-        return this;
-    }
-
     public async list() {
         const items = await this.queryBuilder;
         return unflatten(items) as Row[];
@@ -484,19 +482,89 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
         return this.queryBuilder.toQuery();
     }
 
+    public whereNull() {
+        this.queryBuilder.whereNull(this.getColumnName(...arguments));
+        return this;
+    }
+
+    public whereNotNull() {
+        this.queryBuilder.whereNotNull(this.getColumnName(...arguments));
+        return this;
+    }
+
     public where() {
-        const argumentsExceptLast = [...(arguments as any)].slice(0, -1);
         const value = arguments[arguments.length - 1];
-        this.queryBuilder.where(this.getColumnName(...argumentsExceptLast), value);
+        this.queryBuilder.where(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
         return this;
     }
 
     public whereNot() {
-        const argumentsExceptLast = [...(arguments as any)].slice(0, -1);
         const value = arguments[arguments.length - 1];
-        this.queryBuilder.whereNot(this.getColumnName(...argumentsExceptLast), value);
+        this.queryBuilder.whereNot(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
         return this;
     }
+
+    public andWhere() {
+        const value = arguments[arguments.length - 1];
+        this.queryBuilder.andWhere(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
+        return this;
+    }
+
+    public orWhere() {
+        const value = arguments[arguments.length - 1];
+        this.queryBuilder.orWhere(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
+        return this;
+    }
+
+    public whereIn() {
+        const value = arguments[arguments.length - 1];
+        this.queryBuilder.whereIn(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
+        return this;
+    }
+    public whereNotIn() {
+        const value = arguments[arguments.length - 1];
+        this.queryBuilder.whereNotIn(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
+        return this;
+    }
+
+    public whereBetween() {
+        const value = arguments[arguments.length - 1];
+        this.queryBuilder.whereBetween(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
+        return this;
+    }
+    public whereNotBetween() {
+        const value = arguments[arguments.length - 1];
+        this.queryBuilder.whereNotBetween(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
+        return this;
+    }
+
+    public whereExists() {
+        throw new NotImplementedError();
+    }
+
+    public whereNotExists() {
+        throw new NotImplementedError();
+    }
+
+    public whereRaw() {
+        throw new NotImplementedError();
+    }
+
+
+    public having() {
+        const value = arguments[arguments.length - 1];
+        const operator = arguments[arguments.length - 2];
+        this.queryBuilder.having(this.getColumnNameFromArgumentsIgnoringLastTwoParameters(...arguments), operator, value);
+        return this;
+    }
+
+    public havingIn() {
+        const value = arguments[arguments.length - 1];
+        this.queryBuilder.havingIn(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
+        return this;
+    }
+
+
 
     private joinColumn(joinType: 'innerJoin' | 'leftOuterJoin', args: any) {
 
@@ -530,6 +598,19 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
         }
 
         return this;
+
+    }
+
+    private getColumnNameFromArgumentsIgnoringLastParameter(...keys: string[]): string {
+        const argumentsExceptLast = keys.slice(0, -1);
+        return this.getColumnName(...argumentsExceptLast);
+
+    }
+
+
+    private getColumnNameFromArgumentsIgnoringLastTwoParameters(...keys: string[]): string {
+        const argumentsExceptLastTwo = keys.slice(0, -2);
+        return this.getColumnName(...argumentsExceptLastTwo);
 
     }
 
