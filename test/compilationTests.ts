@@ -6,12 +6,14 @@ import { Project } from 'ts-simple-ast';
 describe('compile time typed-knex', function() {
     this.timeout(1000000);
 
-    it('should return type with properties from the selectColumn method', (done) => {
-        const project = new Project({
-            tsConfigFilePath: './tsconfig.json',
-        });
+    const project = new Project({
+        tsConfigFilePath: './tsconfig.json',
+    });
 
-        project.createSourceFile(
+    it('should return type with properties from the selectColumn method', (done) => {
+
+
+        const file = project.createSourceFile(
             'test/test.ts'
             ,
             `
@@ -35,16 +37,15 @@ describe('compile time typed-knex', function() {
 
         assert.equal(project.getPreEmitDiagnostics().length, 0);
 
+        file.delete();
         done();
     });
 
 
     it('should error on calling property not used in selectColumn method', (done) => {
-        const project = new Project({
-            tsConfigFilePath: './tsconfig.json',
-        });
 
-        project.createSourceFile(
+
+        const file = project.createSourceFile(
             'test/test.ts'
             ,
             `
@@ -68,6 +69,65 @@ describe('compile time typed-knex', function() {
 
         assert.notEqual(project.getPreEmitDiagnostics().length, 0);
 
+        file.delete();
+        done();
+    });
+
+    it('should allow to call whereIn with type of property', (done) => {
+
+
+        const file = project.createSourceFile(
+            'test/test.ts'
+            ,
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                const query = typedKnex
+                .query(User)
+                .whereIn('name', ['user1', 'user2']);
+
+
+            })();
+        `);
+
+        assert.notEqual(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
+
+    it('should error on calling whereIn with different type', (done) => {
+
+
+        const file = project.createSourceFile(
+            'test/test.ts'
+            ,
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
+
+
+            (async () => {
+
+                const query = typedKnex
+                .query(User)
+                .whereIn('name', [1]);
+
+                console.log(result.unknown);
+
+            })();
+        `);
+
+        assert.notEqual(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
         done();
     });
 });

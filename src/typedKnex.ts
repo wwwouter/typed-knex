@@ -70,6 +70,8 @@ export interface ITypedQueryBuilder<ModelType, Row> {
 
     findById: IFindById<ModelType, Row>;
 
+    whereIn: IWhereIn<ModelType, Row>;
+
     limit(value: number): ITypedQueryBuilder<ModelType, Row>;
     offset(value: number): ITypedQueryBuilder<ModelType, Row>;
 
@@ -84,7 +86,6 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     delById(id: string): Promise<void>;
     update(id: string, item: Partial<ModelType>): Promise<void>;
 
-    whereIn(): void;
     whereNotIn(): void;
     whereBetween(): void;
     whereNotBetween(): void;
@@ -262,6 +263,13 @@ export interface IWhere<Model, Row> {
     <K extends FilterNonObjects<Model>>(key1: K, value: Model[K]): ITypedQueryBuilder<Model, Row>;
     <K1 extends keyof Model, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, key2: K2, value: Model[K1][K2]): ITypedQueryBuilder<Model, Row>;
     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends FilterNonObjects<Model[K1][K2]>>(key1: K1, key2: K2, key3: K3, value: Model[K1][K2][K3]): ITypedQueryBuilder<Model, Row>;
+    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keysAndValues: any[]): ITypedQueryBuilder<Model, Row>;
+}
+
+export interface IWhereIn<Model, Row> {
+    <K extends FilterNonObjects<Model>>(key1: K, value: Model[K][]): ITypedQueryBuilder<Model, Row>;
+    <K1 extends keyof Model, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, key2: K2, value: Model[K1][K2][]): ITypedQueryBuilder<Model, Row>;
+    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends FilterNonObjects<Model[K1][K2]>>(key1: K1, key2: K2, key3: K3, value: Model[K1][K2][K3][]): ITypedQueryBuilder<Model, Row>;
     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keysAndValues: any[]): ITypedQueryBuilder<Model, Row>;
 }
 

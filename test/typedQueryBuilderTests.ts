@@ -300,5 +300,18 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+    it('should create query with where in', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .whereIn('name', ['user1', 'user2']);
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" where "users"."name" in (\'user1\', \'user2\')');
+
+        done();
+    });
+
 
 });
