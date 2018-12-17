@@ -317,7 +317,7 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with and in where clause', (done) => {
+    it('should create query with AND in where clause', (done) => {
 
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
@@ -327,6 +327,20 @@ describe('TypedKnexQueryBuilder', () => {
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where "users"."name" = \'user1\' and "users"."name" = \'user2\'');
+
+        done();
+    });
+
+    it('should create query with OR in where clause', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .where('name', 'user1')
+            .orWhere('name', 'user2');
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" where "users"."name" = \'user1\' or "users"."name" = \'user2\'');
 
         done();
     });
