@@ -73,6 +73,10 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     whereIn: IWhereIn<ModelType, Row>;
     whereNotIn: IWhereIn<ModelType, Row>;
 
+
+    whereBetween: IWhereBetween<ModelType, Row>;
+    whereNotBetween: IWhereBetween<ModelType, Row>;
+
     limit(value: number): ITypedQueryBuilder<ModelType, Row>;
     offset(value: number): ITypedQueryBuilder<ModelType, Row>;
 
@@ -87,8 +91,6 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     delById(id: string): Promise<void>;
     update(id: string, item: Partial<ModelType>): Promise<void>;
 
-    whereBetween(): void;
-    whereNotBetween(): void;
     whereExists(): void;
     whereNotExists(): void;
     whereRaw(): void;
@@ -273,6 +275,13 @@ export interface IWhereIn<Model, Row> {
     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keysAndValues: any[]): ITypedQueryBuilder<Model, Row>;
 }
 
+
+export interface IWhereBetween<Model, Row> {
+    <K extends FilterNonObjects<Model>>(key1: K, range: [Model[K], Model[K]]): ITypedQueryBuilder<Model, Row>;
+    <K1 extends keyof Model, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, key2: K2, range: [Model[K1][K2], Model[K1][K2]]): ITypedQueryBuilder<Model, Row>;
+    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends FilterNonObjects<Model[K1][K2]>>(key1: K1, key2: K2, key3: K3, range: [Model[K1][K2][K3], Model[K1][K2][K3]]): ITypedQueryBuilder<Model, Row>;
+    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keysAndValues: any[]): ITypedQueryBuilder<Model, Row>;
+}
 
 export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilder<ModelType, Row> {
     public columns: { name: string; }[];

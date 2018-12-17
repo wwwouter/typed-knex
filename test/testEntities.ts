@@ -22,6 +22,7 @@ export class UserCategory {
 export class User {
     public id!: string;
     public name!: string;
+    public numericValue: number;
     public someValue!: string;
     @column()
     public category!: UserCategory;

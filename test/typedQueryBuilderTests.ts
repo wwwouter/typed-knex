@@ -327,4 +327,32 @@ describe('TypedKnexQueryBuilder', () => {
     });
 
 
+    it('should create query with where between', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .whereBetween('numericValue', [1, 10]);
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" where "users"."numericValue" between 1 and 10');
+
+        done();
+    });
+
+    it('should create query with where not between', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .whereNotBetween('numericValue', [1, 10]);
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" where "users"."numericValue" not between 1 and 10');
+
+        done();
+    });
+
+
+
 });

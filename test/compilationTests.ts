@@ -120,7 +120,89 @@ describe('compile time typed-knex', function() {
                 .query(User)
                 .whereIn('name', [1]);
 
-                console.log(result.unknown);
+            })();
+        `);
+
+        assert.notEqual(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
+
+    it('should allow to call whereBetween with type of property', (done) => {
+
+
+        const file = project.createSourceFile(
+            'test/test.ts'
+            ,
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                const query = typedKnex
+                .query(User)
+                .whereBetween('numericValue', [1,10]);
+
+
+            })();
+        `);
+
+        assert.notEqual(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
+
+    it('should error on calling whereBetween with different type', (done) => {
+
+
+        const file = project.createSourceFile(
+            'test/test.ts'
+            ,
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
+
+
+            (async () => {
+
+                const query = typedKnex
+                .query(User)
+                .whereBetween('numericValue', ['','']);
+
+            })();
+        `);
+
+        assert.notEqual(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
+
+
+    it('should error on calling whereBetween with array of more than 2', (done) => {
+
+
+        const file = project.createSourceFile(
+            'test/test.ts'
+            ,
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
+
+
+            (async () => {
+
+                const query = typedKnex
+                .query(User)
+                .whereBetween('numericValue', [1,2,3]);
 
             })();
         `);
