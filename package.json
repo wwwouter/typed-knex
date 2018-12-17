@@ -6,7 +6,7 @@
     "@types/flat": "0.0.28",
     "flat": "4.1.0",
     "mocha": "5.2.0",
-    "reflect-metadata": "^0.1.12"
+    "reflect-metadata": "0.1.12"
   },
   "main": "./dist/src/index.js",
   "typings": "dist/src/index",
@@ -35,13 +35,14 @@
   "homepage": "https://github.com/wwwouter/typed-knex#readme",
   "devDependencies": {
     "@types/chai": "4.1.7",
-    "@types/chai-as-promised": "^7.1.0",
+    "@types/chai-as-promised": "7.1.0",
     "@types/knex": "0.15.1",
     "@types/mocha": "5.2.5",
-    "@wwwouter/tslint-contrib": "^1.0.0",
+    "@wwwouter/tslint-contrib": "1.0.0",
     "chai": "4.2.0",
-    "chai-as-promised": "^7.1.1",
+    "chai-as-promised": "7.1.1",
     "knex": "0.16.2",
+    "ts-simple-ast": "20.0.0",
     "tslint": "5.11.0",
     "tslint-microsoft-contrib": "6.0.0",
     "typescript": "3.2.2"

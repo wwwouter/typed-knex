@@ -1,53 +1,8 @@
 import { assert } from 'chai';
 import * as knex from 'knex';
-import { column, table } from '../src/decorators';
 import { TypedKnex } from '../src/typedKnex';
+import { User, UserSetting } from './testEntities';
 
-
-@table('regions')
-class Region {
-    public id!: string;
-    public code: number;
-}
-
-@table('userCategories')
-class UserCategory {
-    public id!: string;
-    public name!: string;
-    @column()
-    public region!: Region;
-    public regionId!: string;
-    public year!: number;
-}
-
-
-@table('users')
-class User {
-    public id!: string;
-    public name!: string;
-    public someValue!: string;
-    @column()
-    public category!: UserCategory;
-    public categoryId!: string;
-    @column()
-    public category2!: UserCategory;
-
-}
-
-@table('userSettings')
-class UserSetting {
-    @column()
-    public id!: string;
-    @column()
-    public user!: User;
-    public userId!: string;
-    @column()
-    public user2!: User;
-    public user2Id!: string;
-    public key!: string;
-    public value!: string;
-    public initialValue!: string;
-}
 
 
 
