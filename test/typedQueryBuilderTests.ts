@@ -313,5 +313,18 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+    it('should create query with where not in', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .whereNotIn('name', ['user1', 'user2']);
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" where "users"."name" not in (\'user1\', \'user2\')');
+
+        done();
+    });
+
 
 });

@@ -71,6 +71,7 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     findById: IFindById<ModelType, Row>;
 
     whereIn: IWhereIn<ModelType, Row>;
+    whereNotIn: IWhereIn<ModelType, Row>;
 
     limit(value: number): ITypedQueryBuilder<ModelType, Row>;
     offset(value: number): ITypedQueryBuilder<ModelType, Row>;
@@ -86,7 +87,6 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     delById(id: string): Promise<void>;
     update(id: string, item: Partial<ModelType>): Promise<void>;
 
-    whereNotIn(): void;
     whereBetween(): void;
     whereNotBetween(): void;
     whereExists(): void;
