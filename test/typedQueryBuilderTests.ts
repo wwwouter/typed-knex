@@ -317,5 +317,19 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+    it('should create query with and in where clause', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .where('name', 'user1')
+            .andWhere('name', 'user2');
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" where "users"."name" = \'user1\' and "users"."name" = \'user2\'');
+
+        done();
+    });
+
 
 });

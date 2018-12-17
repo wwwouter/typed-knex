@@ -44,6 +44,7 @@ class NotImplementedError extends Error {
 
 export interface ITypedQueryBuilder<ModelType, Row> {
     where: IWhere<ModelType, Row>;
+    andWhere: IWhere<ModelType, Row>;
     whereNot: IWhere<ModelType, Row>;
     selectColumns: ISelectColumns<ModelType, Row extends ModelType ? {} : Row>;
     selectColumn: ISelectColumn<ModelType, Row extends ModelType ? {} : Row>;
@@ -82,7 +83,6 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     delById(id: string): Promise<void>;
     update(id: string, item: Partial<ModelType>): Promise<void>;
 
-    andWhere(): void;
     orWhere(): void;
     whereIn(): void;
     whereNotIn(): void;
