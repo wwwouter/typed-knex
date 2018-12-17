@@ -212,4 +212,66 @@ describe('compile time typed-knex', function() {
         file.delete();
         done();
     });
+
+    it('should allow property of parent query in where exists', (done) => {
+
+
+        const file = project.createSourceFile(
+            'test/test.ts'
+            ,
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User, UserSetting } from './testEntities';
+
+
+            (async () => {
+
+                const query = typedKnex
+                .query(User)
+                .whereExists(UserSetting, (subQuery, parentColumn) => {
+
+                    subQuery.whereColumns(['user', 'id'], '=', parentColumn('someValue'));
+                });
+
+
+            })();
+        `);
+
+        assert.notEqual(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
+
+    it('should not allow unknown property of parent query in where exists', (done) => {
+
+
+        const file = project.createSourceFile(
+            'test/test.ts'
+            ,
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User, UserSetting } from './testEntities';
+
+
+            (async () => {
+
+                const query = typedKnex
+                .query(User)
+                .whereExists(UserSetting, (subQuery, parentColumn) => {
+
+                    subQuery.whereColumns(['user', 'id'], '=', parentColumn('unknown'));
+                });
+
+
+            })();
+        `);
+
+        assert.notEqual(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
 });

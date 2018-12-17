@@ -77,6 +77,8 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     whereBetween: IWhereBetween<ModelType, Row>;
     whereNotBetween: IWhereBetween<ModelType, Row>;
 
+    whereExists: IWhereExists<ModelType, Row>;
+
     limit(value: number): ITypedQueryBuilder<ModelType, Row>;
     offset(value: number): ITypedQueryBuilder<ModelType, Row>;
 
@@ -91,8 +93,11 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     delById(id: string): Promise<void>;
     update(id: string, item: Partial<ModelType>): Promise<void>;
 
-    whereExists(): void;
+    orWhereExists(): void;
     whereNotExists(): void;
+    orWhereNotExists(): void;
+
+
     whereRaw(): void;
     having(): void;
     havingIn(): void;
@@ -137,7 +142,12 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     groupByColumns(): void;
     groupByRaw(): void;
 
-
+    // whereIn — .whereIn(column|columns, array|callback|builder)
+    // orWhereIn
+    // whereNotIn(column, array|callback|builder) /
+    //  .orWhereNotIn
+    // .orWhereBetween
+    // .orWhereNotBetween
 }
 
 export type TransformAll<T, IT> = {
@@ -205,6 +215,12 @@ export interface IJoinOnClause<Model> {
 
 // interface
 
+
+// tslint:disable-next-line:no-empty-interfaces
+interface IReferencedColumn {
+
+
+}
 export interface IJoinTableMultipleOnClauses<Model, Row> {
     // <NewPropertyType, NewPropertyKey extends keyof TypeWithIndexerOf<NewPropertyType>, L1K1 extends keyof AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, L2K1 extends keyof AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, L2K2 extends keyof AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>[L2K1]>(newPropertyKey: NewPropertyKey, newPropertyClass: new () => NewPropertyType, column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2]): ITypedQueryBuilder<AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, Row>;
     <NewPropertyType, NewPropertyKey extends keyof TypeWithIndexerOf<NewPropertyType>>(newPropertyKey: NewPropertyKey, newPropertyClass: new () => NewPropertyType, on: (join: IJoinOnClause<AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>>) => void): ITypedQueryBuilder<AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, Row>;
@@ -217,7 +233,7 @@ export interface IWhereCompareTwoColumns<Model, Row> {
     // (): { left: IKeysAsArguments<Model, { right: IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> }> };
 
 
-    <L1K1 extends keyof Model, L2K1 extends keyof Model, L2K2 extends keyof Model[L2K1]>(column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2]): ITypedQueryBuilder<Model, Row>;
+    <L1K1 extends keyof Model, L2K1 extends keyof Model, L2K2 extends keyof Model[L2K1]>(column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2] | IReferencedColumn): ITypedQueryBuilder<Model, Row>;
 
 
 }
@@ -241,6 +257,14 @@ export interface ISelectColumn<Model, Row> {
     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, Pick<Model[K1][K2], K3>>> & Row>;
     <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Row>;
     <K extends keyof Model>(key1: K): ITypedQueryBuilder<Model, Pick<Model, K> & Row>;
+}
+
+
+export interface IReferenceColumn<Model> {
+    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): IReferencedColumn;
+    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): IReferencedColumn;
+    <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): IReferencedColumn;
+    <K extends keyof Model>(key1: K): IReferencedColumn;
 }
 
 // export interface IOrderBy<Model, Row> {
@@ -283,6 +307,12 @@ export interface IWhereBetween<Model, Row> {
     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keysAndValues: any[]): ITypedQueryBuilder<Model, Row>;
 }
 
+
+export interface IWhereExists<Model, Row> {
+    <SubQueryModel>(subQueryModel: new () => SubQueryModel, code: (subQuery: ITypedQueryBuilder<SubQueryModel, {}>, parent: ISelectColumn<Model, Row>) => void): ITypedQueryBuilder<Model, Row>;
+}
+
+
 export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilder<ModelType, Row> {
     public columns: { name: string; }[];
 
@@ -290,11 +320,17 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
     private tableName: string;
     private extraJoinedProperties: { name: string, propertyType: new () => any }[];
 
-    constructor(private tableClass: new () => ModelType, private knex: Knex) {
+    constructor(private tableClass: new () => ModelType, private knex: Knex, queryBuilder?: Knex.QueryBuilder) {
         this.tableName = getTableMetadata(tableClass).tableName;
         this.columns = getColumnProperties(tableClass);
 
-        this.queryBuilder = this.knex.from(this.tableName);
+        if (queryBuilder !== undefined) {
+            this.queryBuilder = queryBuilder;
+            this.queryBuilder.from(this.tableName);
+        } else {
+            this.queryBuilder = this.knex.from(this.tableName);
+        }
+
 
         this.extraJoinedProperties = [];
     }
@@ -528,7 +564,14 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
         const operator = arguments[1];
         const column2Parts = arguments[2];
 
-        this.queryBuilder.whereRaw(`?? ${operator} ??`, [this.getColumnName(...column1Parts), this.getColumnName(...column2Parts)]);
+        let column2Name;
+        if (typeof (column2Parts) === 'string') {
+            column2Name = column2Parts;
+        } else {
+            column2Name = this.getColumnName(...column2Parts);
+        }
+
+        this.queryBuilder.whereRaw(`?? ${operator} ??`, [this.getColumnName(...column1Parts), column2Name]);
 
         return this;
     }
@@ -595,10 +638,25 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
     }
 
     public whereExists() {
+        const typeOfSubQuery = arguments[0];
+        const functionToCall = arguments[1];
+
+        const that = this;
+        this.queryBuilder.whereExists(function() {
+            const subQuery = this;
+            functionToCall(new TypedQueryBuilder(typeOfSubQuery, that.knex, subQuery), that.getColumnName.bind(that));
+        });
+
+        return this;
+    }
+    public orWhereExists() {
         throw new NotImplementedError();
     }
 
     public whereNotExists() {
+        throw new NotImplementedError();
+    }
+    public orWhereNotExists() {
         throw new NotImplementedError();
     }
 

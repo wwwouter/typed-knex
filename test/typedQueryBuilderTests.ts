@@ -354,5 +354,20 @@ describe('TypedKnexQueryBuilder', () => {
     });
 
 
+    it('should create query with where exists', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .whereExists(UserSetting, (subQuery, parentColumn) => {
+
+                subQuery.whereColumns(['userId'], '=', parentColumn('id'));
+            });
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" where exists (select * from "userSettings" where "userSettings"."userId" = "users"."id")');
+
+        done();
+    });
+
 
 });
