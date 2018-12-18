@@ -359,12 +359,56 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(User)
             .whereExists(UserSetting, (subQuery, parentColumn) => {
-
                 subQuery.whereColumns(['userId'], '=', parentColumn('id'));
             });
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where exists (select * from "userSettings" where "userSettings"."userId" = "users"."id")');
+
+        done();
+    });
+
+    it('should create query with or where exists', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .where('name', 'name')
+            .orWhereExists(UserSetting, (subQuery, parentColumn) => {
+                subQuery.whereColumns(['userId'], '=', parentColumn('id'));
+            });
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" where "users"."name" = \'name\' or exists (select * from "userSettings" where "userSettings"."userId" = "users"."id")');
+
+        done();
+    });
+
+
+    it('should create query with where not exists', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .whereNotExists(UserSetting, (subQuery, parentColumn) => {
+                subQuery.whereColumns(['userId'], '=', parentColumn('id'));
+            });
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" where not exists (select * from "userSettings" where "userSettings"."userId" = "users"."id")');
+
+        done();
+    });
+
+    it('should create query with or where not exists', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .where('name', 'name')
+            .orWhereNotExists(UserSetting, (subQuery, parentColumn) => {
+                subQuery.whereColumns(['userId'], '=', parentColumn('id'));
+            });
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" where "users"."name" = \'name\' or not exists (select * from "userSettings" where "userSettings"."userId" = "users"."id")');
 
         done();
     });

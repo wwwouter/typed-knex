@@ -79,6 +79,11 @@ export interface ITypedQueryBuilder<ModelType, Row> {
 
     whereExists: IWhereExists<ModelType, Row>;
 
+    orWhereExists: IWhereExists<ModelType, Row>;
+    whereNotExists: IWhereExists<ModelType, Row>;
+    orWhereNotExists: IWhereExists<ModelType, Row>;
+
+
     limit(value: number): ITypedQueryBuilder<ModelType, Row>;
     offset(value: number): ITypedQueryBuilder<ModelType, Row>;
 
@@ -92,10 +97,6 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     countResult(): Promise<number>;
     delById(id: string): Promise<void>;
     update(id: string, item: Partial<ModelType>): Promise<void>;
-
-    orWhereExists(): void;
-    whereNotExists(): void;
-    orWhereNotExists(): void;
 
 
     whereRaw(): void;
@@ -637,27 +638,49 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
         return this;
     }
 
+
+    public callQueryCallbackFunction(functionName: string, typeOfSubQuery: any, functionToCall: any) {
+        const that = this;
+        ((this.queryBuilder as any)[functionName] as (callback: Knex.QueryCallback) => Knex.QueryBuilder)(function() {
+            const subQuery = this;
+            functionToCall(new TypedQueryBuilder(typeOfSubQuery, that.knex, subQuery), that.getColumnName.bind(that));
+        });
+    }
+
+
+
     public whereExists() {
         const typeOfSubQuery = arguments[0];
         const functionToCall = arguments[1];
 
-        const that = this;
-        this.queryBuilder.whereExists(function() {
-            const subQuery = this;
-            functionToCall(new TypedQueryBuilder(typeOfSubQuery, that.knex, subQuery), that.getColumnName.bind(that));
-        });
+        this.callQueryCallbackFunction('whereExists', typeOfSubQuery, functionToCall);
 
         return this;
     }
     public orWhereExists() {
-        throw new NotImplementedError();
+        const typeOfSubQuery = arguments[0];
+        const functionToCall = arguments[1];
+
+        this.callQueryCallbackFunction('orWhereExists', typeOfSubQuery, functionToCall);
+
+        return this;
     }
 
     public whereNotExists() {
-        throw new NotImplementedError();
+        const typeOfSubQuery = arguments[0];
+        const functionToCall = arguments[1];
+
+        this.callQueryCallbackFunction('whereNotExists', typeOfSubQuery, functionToCall);
+
+        return this;
     }
     public orWhereNotExists() {
-        throw new NotImplementedError();
+        const typeOfSubQuery = arguments[0];
+        const functionToCall = arguments[1];
+
+        this.callQueryCallbackFunction('orWhereNotExists', typeOfSubQuery, functionToCall);
+
+        return this;
     }
 
     public whereRaw() {
