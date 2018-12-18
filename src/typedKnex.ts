@@ -84,6 +84,9 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     orWhereNotExists: IWhereExists<ModelType, Row>;
 
 
+    groupBy: IGroupBy<ModelType, Row>;
+
+
     limit(value: number): ITypedQueryBuilder<ModelType, Row>;
     offset(value: number): ITypedQueryBuilder<ModelType, Row>;
 
@@ -140,8 +143,6 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     distinct(): void;
     clone(): void;
     beginTransaction(): Promise<Knex.Transaction>;
-    groupByColumn(): void;
-    groupByColumns(): void;
     groupByRaw(): void;
 
     // whereIn — .whereIn(column|columns, array|callback|builder)
@@ -247,6 +248,12 @@ export interface IWhereCompareTwoColumns<Model, Row> {
 //     return {} as any;
 // }
 
+export interface IGroupBy<Model, Row> {
+    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): ITypedQueryBuilder<Model, Row>;
+    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): ITypedQueryBuilder<Model, Row>;
+    <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): ITypedQueryBuilder<Model, Row>;
+    <K extends keyof Model>(key1: K): ITypedQueryBuilder<Model, Row>;
+}
 
 
 export interface ISelectRaw<Model, Row> {
@@ -871,12 +878,17 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
     }
 
 
-    public groupByColumn() {
-        throw new NotImplementedError();
+    public groupBy() {
+
+        // if (arguments.length === 1) {
+        this.queryBuilder.groupBy(this.getColumnName(...arguments));
+        // } else {
+
+        //     this.queryBuilder.select(this.getColumnName(...arguments) + ' as ' + this.getColumnSelectAlias(...arguments));
+        // }
+        return this;
     }
-    public groupByColumns() {
-        throw new NotImplementedError();
-    }
+
     public groupByRaw() {
         throw new NotImplementedError();
     }

@@ -428,4 +428,22 @@ describe('TypedKnexQueryBuilder', () => {
     });
 
 
+    it('should create query with group by', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .selectColumn('someValue')
+            .selectRaw('total', Number, 'SUM("numericValue")')
+            .groupBy('someValue');
+
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select "users"."someValue" as "someValue", (SUM("numericValue")) as "total" from "users" group by "users"."someValue"');
+
+        done();
+    });
+
+
+
+
 });
