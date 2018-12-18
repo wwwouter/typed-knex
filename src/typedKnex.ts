@@ -99,7 +99,8 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     update(id: string, item: Partial<ModelType>): Promise<void>;
 
 
-    whereRaw(): void;
+    whereRaw(sql: string, ...bindings: string[]): ITypedQueryBuilder<ModelType, Row>;
+
     having(): void;
     havingIn(): void;
     havingNotIn(): void;
@@ -204,7 +205,6 @@ export type TypeWithIndexerOf<T> = { [key: string]: T };
 export interface IJoinTable<Model, Row> {
     <NewPropertyType, NewPropertyKey extends keyof TypeWithIndexerOf<NewPropertyType>, L1K1 extends keyof AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, L2K1 extends keyof AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, L2K2 extends keyof AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>[L2K1]>(newPropertyKey: NewPropertyKey, newPropertyClass: new () => NewPropertyType, column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2]): ITypedQueryBuilder<AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, Row>;
 }
-
 
 
 export interface IJoinOnClause<Model> {
@@ -312,6 +312,9 @@ export interface IWhereBetween<Model, Row> {
 export interface IWhereExists<Model, Row> {
     <SubQueryModel>(subQueryModel: new () => SubQueryModel, code: (subQuery: ITypedQueryBuilder<SubQueryModel, {}>, parent: ISelectColumn<Model, Row>) => void): ITypedQueryBuilder<Model, Row>;
 }
+
+
+
 
 
 export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilder<ModelType, Row> {
@@ -683,8 +686,9 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
         return this;
     }
 
-    public whereRaw() {
-        throw new NotImplementedError();
+    public whereRaw(sql: string, ...bindings: string[]) {
+        this.queryBuilder.whereRaw(sql, bindings);
+        return this;
     }
 
 

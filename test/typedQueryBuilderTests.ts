@@ -414,4 +414,18 @@ describe('TypedKnexQueryBuilder', () => {
     });
 
 
+    it('should create query with where raw', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .whereRaw('?? = ??', 'users.id', 'users.name');
+
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" where "users"."id" = "users"."name"');
+
+        done();
+    });
+
+
 });
