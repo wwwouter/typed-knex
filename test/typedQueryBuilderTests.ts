@@ -444,6 +444,19 @@ describe('TypedKnexQueryBuilder', () => {
     });
 
 
+    it('should create query with having', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .having('numericValue', '>', 10);
+
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" having "users"."numericValue" > 10');
+
+        done();
+    });
+
 
 
 });

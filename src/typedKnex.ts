@@ -87,6 +87,8 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     groupBy: IGroupBy<ModelType, Row>;
 
 
+    having: IHaving<ModelType, Row>;
+
     limit(value: number): ITypedQueryBuilder<ModelType, Row>;
     offset(value: number): ITypedQueryBuilder<ModelType, Row>;
 
@@ -104,7 +106,6 @@ export interface ITypedQueryBuilder<ModelType, Row> {
 
     whereRaw(sql: string, ...bindings: string[]): ITypedQueryBuilder<ModelType, Row>;
 
-    having(): void;
     havingIn(): void;
     havingNotIn(): void;
     havingNull(): void;
@@ -151,6 +152,8 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     //  .orWhereNotIn
     // .orWhereBetween
     // .orWhereNotBetween
+
+    // https://github.com/tgriesser/knex/pull/2837/files: whereColumns
 }
 
 export type TransformAll<T, IT> = {
@@ -165,7 +168,7 @@ export type ObjectToPrimitive<T> =
     T extends Number ? number :
     T extends Boolean ? boolean : never;
 
-export type Operator = '=' | '!=';
+export type Operator = '=' | '!=' | '>' | '<';
 
 
 
@@ -291,6 +294,14 @@ export interface ISelectColumns<Model, Row> {
 export interface IFindById<Model, Row> {
     <Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterNonObjects<Model[K1]>>(id: string, key1: K1, keys2: K2[]): Promise<TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev | void>;
     <K extends FilterNonObjects<Model>>(id: string, keys: K[]): Promise<Pick<Model, K> & Row | void>;
+}
+
+
+export interface IHaving<Model, Row> {
+    <K extends FilterNonObjects<Model>>(key1: K, operator: Operator, value: Model[K]): ITypedQueryBuilder<Model, Row>;
+    <K1 extends keyof Model, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, key2: K2, operator: Operator, value: Model[K1][K2]): ITypedQueryBuilder<Model, Row>;
+    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends FilterNonObjects<Model[K1][K2]>>(key1: K1, key2: K2, key3: K3, operator: Operator, value: Model[K1][K2][K3]): ITypedQueryBuilder<Model, Row>;
+    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keysOperratorAndValue: any[]): ITypedQueryBuilder<Model, Row>;
 }
 
 export interface IWhere<Model, Row> {
@@ -879,13 +890,7 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
 
 
     public groupBy() {
-
-        // if (arguments.length === 1) {
         this.queryBuilder.groupBy(this.getColumnName(...arguments));
-        // } else {
-
-        //     this.queryBuilder.select(this.getColumnName(...arguments) + ' as ' + this.getColumnSelectAlias(...arguments));
-        // }
         return this;
     }
 
