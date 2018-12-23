@@ -730,7 +730,7 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
     }
 
     public havingNull() {
-        (this.queryBuilder as any).havingNull(this.getColumnName(...arguments));
+        this.queryBuilder.havingNull(this.getColumnName(...arguments));
         return this;
     }
 
