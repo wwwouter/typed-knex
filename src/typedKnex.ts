@@ -48,7 +48,10 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     orWhere: IWhere<ModelType, Row>;
     whereNot: IWhere<ModelType, Row>;
     selectColumns: ISelectColumns<ModelType, Row extends ModelType ? {} : Row>;
-    selectColumn: ISelectColumn<ModelType, Row extends ModelType ? {} : Row>;
+    selectColumn: ISelectWithFunctionColumn<ModelType, Row extends ModelType ? {} : Row>;
+
+    // selectColumnFun: ISelectFunColumn<ModelType, Row extends ModelType ? {} : Row>;
+
     orderBy: IKeysAsParametersReturnQueryBuider<ModelType, Row>;
     innerJoinColumn: IKeysAsParametersReturnQueryBuider<ModelType, Row>;
     leftOuterJoinColumn: IKeysAsParametersReturnQueryBuider<ModelType, Row>;
@@ -211,6 +214,7 @@ export interface IJoinTable<Model, Row> {
 }
 
 
+
 export interface IJoinOnClause<Model> {
     // <L1K1 extends keyof Model, L2K1 extends keyof Model, L2K2 extends keyof Model[L2K1]>(column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2]): IJoinOnClause<Model>;
     // <L1K1 extends keyof Model, L2K1 extends keyof Model, L2K2 extends keyof Model[L2K1]>(column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2]): IJoinOnClause<Model>;
@@ -268,6 +272,24 @@ export interface ISelectColumn<Model, Row> {
     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, Pick<Model[K1][K2], K3>>> & Row>;
     <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Row>;
     <K extends keyof Model>(key1: K): ITypedQueryBuilder<Model, Pick<Model, K> & Row>;
+}
+
+
+export interface IColumnFunction<Model, Row> {
+    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, TransformAll<Pick<Model[K1][K2], K3>, any>>> & Row;
+    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, Pick<Model[K1][K2], K3>>> & Row;
+    <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Row;
+    <K extends keyof Model>(key1: K): Pick<Model, K> & Row;
+}
+
+export interface ISelectWithFunctionColumn<Model, Row> {
+    // <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, TransformAll<Pick<Model[K1][K2], K3>, any>>> & Row>;
+    // <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, Pick<Model[K1][K2], K3>>> & Row>;
+    // <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Row>;
+    // <K extends keyof Model>(key1: K): ITypedQueryBuilder<Model, Pick<Model, K> & Row>;
+    // <K1 extends keyof Model, K2 extends keyof Model[K1]>(c: (c: (key1: K1, key2: K2) => void) => void): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Row>;
+    // <K extends keyof Model>(c: (c: (key1: K) => void) => void): ITypedQueryBuilder<Model, Pick<Model, K> & Row>;
+    <NewRow>(c: (c: IColumnFunction<Model, Row>) => NewRow): ITypedQueryBuilder<Model, NewRow>;
 }
 
 
@@ -450,13 +472,27 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
         return unflatten(items[0]);
     }
 
-    public selectColumn() {
-        if (arguments.length === 1) {
-            this.queryBuilder.select(this.getColumnName(arguments[0]) + ' as ' + arguments[0]);
-        } else {
+    // public selectColumn() {
+    //     if (arguments.length === 1) {
+    //         this.queryBuilder.select(this.getColumnName(arguments[0]) + ' as ' + arguments[0]);
+    //     } else {
 
-            this.queryBuilder.select(this.getColumnName(...arguments) + ' as ' + this.getColumnSelectAlias(...arguments));
+    //         this.queryBuilder.select(this.getColumnName(...arguments) + ' as ' + this.getColumnSelectAlias(...arguments));
+    //     }
+    //     return this as any;
+    // }
+
+    public selectColumn() {
+        let calledArguments = [] as string[];
+
+        function saveArguments(...args: string[]) {
+            calledArguments = args;
         }
+
+        arguments[0](saveArguments);
+
+        this.queryBuilder.select(this.getColumnName(...calledArguments) + ' as ' + this.getColumnSelectAlias(...calledArguments));
+
         return this as any;
     }
 
