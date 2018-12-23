@@ -5,59 +5,6 @@ import { User, UserSetting } from '../testEntities';
 
 
 
-// function  <Model, Prev extends {}, K1 extends FilterObjectsOnly<Model>, K2 extends FilterNonObjects<Model[K1]>> trans(newPropertyClass: new () => Model, key1: K1, keys2: K2[]): any { //ITypedQueryBuilder < Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev > {
-//     return {} as any;
-// }
-
-
-// function trans<Model, K1 extends keyof Model>(_m: new () => Model, _key1: K1): Pick<Model, K1> {
-//     return {} as any;
-// }
-
-// const a = trans(User, 'id');
-// console.log(a.id);
-// console.log(a.name);
-// console.log(a.NOOO);
-
-// const root = {
-//     id: ({} as any) as Pick<User, 'id'>,
-//     id2: ({} as any) as () => Pick<User, 'id'>,
-//     id3: { return: ({} as any) as () => Pick<User, 'id'> },
-//     category: {
-//         id3: { getColumn: ({} as any) as () => Pick<User, 'id'> },
-//         id: ({} as any) as Pick<UserCategory, 'id'>,
-//     },
-// };
-
-// // root.id()  vs root.id
-// // root.category.id.id
-// console.log('root.category.id.id: ', root.category.id.id);
-// root.id2();
-// // moet het returnen, zonder het te returnen ...
-
-// // function kan een wrap .. of unwrap doen ...
-
-// // offfff ... juist wel een function, maar dat om keren.
-
-// // root.id2;
-// console.log('root.id2: ', root.id2);
-// console.log(root.id3.return());
-// console.log(root.id3.return);
-// console.log(root.category.id3.getColumn());
-
-// volgorde mooist
-// - root.category.id
-// - root.category.id()
-// - root('category', 'id') (dit kan soort van ... is mooier dan zo maar overal '','','' ...)
-//      - select(c=>c('category','id'))
-//      - selectColumns(c=>[c('category','id'), c('id')])
-//      - where(c=>c('category','id'), 12)
-// - root.category.id.getColumn() (is lastig als je root.category.id kan typen .. least suprise)
-// - root.category.id.return (wel makkelijk in gebruik)
-
-
-
-
 describe('TypedKnexQueryBuilder', () => {
 
     it('should return select * from "users"', (done) => {
@@ -99,7 +46,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .where('name', 'user1');
+            .where(c => c('name'), 'user1');
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where "users"."name" = \'user1\'');
@@ -112,7 +59,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .whereNot('name', 'user1');
+            .whereNot(c => c('name'), 'user1');
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where not "users"."name" = \'user1\'');
@@ -151,7 +98,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .where('user', 'name', 'user1')
+            .where(c => c('user', 'name'), 'user1')
             .innerJoinColumn('user');
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "userSettings" inner join "users" as "user" on "user"."id" = "userSettings"."userId" where "user"."name" = \'user1\'');
@@ -218,7 +165,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .where('user', 'category', 'name', 'user1')
+            .where(c => c('user', 'category', 'name'), 'user1')
             .innerJoinColumn('user', 'category');
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "userSettings" inner join "userCategories" as "user_category" on "user_category"."id" = "user"."categoryId" where "user_category"."name" = \'user1\'');
@@ -231,7 +178,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .where('user', 'category', 'region', 'code', 2)
+            .where(c => c('user', 'category', 'region', 'code'), 2)
             .innerJoinColumn('user', 'category', 'region');
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "userSettings" inner join "regions" as "user_category_region" on "user_category_region"."id" = "user_category"."regionId" where "user_category_region"."code" = 2');
@@ -330,8 +277,8 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .where('name', 'user1')
-            .andWhere('name', 'user2');
+            .where(c => c('name'), 'user1')
+            .andWhere(c => c('name'), 'user2');
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where "users"."name" = \'user1\' and "users"."name" = \'user2\'');
@@ -344,8 +291,8 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .where('name', 'user1')
-            .orWhere('name', 'user2');
+            .where(c => c('name'), 'user1')
+            .orWhere(c => c('name'), 'user2');
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where "users"."name" = \'user1\' or "users"."name" = \'user2\'');
@@ -425,7 +372,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .where('name', 'name')
+            .where(c => c('name'), 'name')
             .orWhereExists(UserSetting, (subQuery, parentColumn) => {
                 subQuery.whereColumns(['userId'], '=', parentColumn('id'));
             });
@@ -455,7 +402,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .where('name', 'name')
+            .where(c => c('name'), 'name')
             .orWhereNotExists(UserSetting, (subQuery, parentColumn) => {
                 subQuery.whereColumns(['userId'], '=', parentColumn('id'));
             });

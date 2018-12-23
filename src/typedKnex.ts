@@ -275,21 +275,24 @@ export interface ISelectColumn<Model, Row> {
 }
 
 
-export interface IColumnFunction<Model, Row> {
+export interface IColumnFunctionReturnNewRow<Model, Row> {
     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, TransformAll<Pick<Model[K1][K2], K3>, any>>> & Row;
     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, Pick<Model[K1][K2], K3>>> & Row;
     <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Row;
     <K extends keyof Model>(key1: K): Pick<Model, K> & Row;
 }
 
+
+export interface IColumnFunctionReturnPropertyType<Model> {
+    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): any;
+    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): Model[K1][K2][K3];
+    <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): Model[K1][K2];
+    <K extends keyof Model>(key1: K): Model[K];
+}
+
+
 export interface ISelectWithFunctionColumn<Model, Row> {
-    // <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, TransformAll<Pick<Model[K1][K2], K3>, any>>> & Row>;
-    // <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, Pick<Model[K1][K2], K3>>> & Row>;
-    // <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Row>;
-    // <K extends keyof Model>(key1: K): ITypedQueryBuilder<Model, Pick<Model, K> & Row>;
-    // <K1 extends keyof Model, K2 extends keyof Model[K1]>(c: (c: (key1: K1, key2: K2) => void) => void): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Row>;
-    // <K extends keyof Model>(c: (c: (key1: K) => void) => void): ITypedQueryBuilder<Model, Pick<Model, K> & Row>;
-    <NewRow>(c: (c: IColumnFunction<Model, Row>) => NewRow): ITypedQueryBuilder<Model, NewRow>;
+    <NewRow>(c: (c: IColumnFunctionReturnNewRow<Model, Row>) => NewRow): ITypedQueryBuilder<Model, NewRow>;
 }
 
 
@@ -299,13 +302,6 @@ export interface IReferenceColumn<Model> {
     <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): IReferencedColumn;
     <K extends keyof Model>(key1: K): IReferencedColumn;
 }
-
-// export interface IOrderBy<Model, Row> {
-//     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): ITypedQueryBuilder<Model, Row>;
-//     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): ITypedQueryBuilder<Model, Row>;
-//     <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): ITypedQueryBuilder<Model, Row>;
-//     <K extends keyof Row>(key1: K): ITypedQueryBuilder<Model, Row>;
-// }
 
 
 export interface ISelectColumns<Model, Row> {
@@ -326,12 +322,12 @@ export interface IHaving<Model, Row> {
     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keysOperratorAndValue: any[]): ITypedQueryBuilder<Model, Row>;
 }
 
+
+
 export interface IWhere<Model, Row> {
-    <K extends FilterNonObjects<Model>>(key1: K, value: Model[K]): ITypedQueryBuilder<Model, Row>;
-    <K1 extends keyof Model, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, key2: K2, value: Model[K1][K2]): ITypedQueryBuilder<Model, Row>;
-    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends FilterNonObjects<Model[K1][K2]>>(key1: K1, key2: K2, key3: K3, value: Model[K1][K2][K3]): ITypedQueryBuilder<Model, Row>;
-    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keysAndValues: any[]): ITypedQueryBuilder<Model, Row>;
+    <PropertyType>(c: (c: IColumnFunctionReturnPropertyType<Model>) => PropertyType, value: PropertyType): ITypedQueryBuilder<Model, Row>;
 }
+
 
 export interface IWhereIn<Model, Row> {
     <K extends FilterNonObjects<Model>>(key1: K, value: Model[K][]): ITypedQueryBuilder<Model, Row>;
@@ -649,27 +645,43 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
         return this;
     }
 
+    public getArgumentsFromColumnFunction(f: any) {
+        let calledArguments = [] as string[];
+
+        function saveArguments(...args: string[]) {
+            calledArguments = args;
+        }
+
+        f(saveArguments);
+
+        return calledArguments;
+    }
+
     public where() {
-        const value = arguments[arguments.length - 1];
-        this.queryBuilder.where(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
+        const columnArguments = this.getArgumentsFromColumnFunction(arguments[0]);
+
+        this.queryBuilder.where(this.getColumnName(...columnArguments), arguments[1]);
         return this;
     }
 
     public whereNot() {
-        const value = arguments[arguments.length - 1];
-        this.queryBuilder.whereNot(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
+        const columnArguments = this.getArgumentsFromColumnFunction(arguments[0]);
+
+        this.queryBuilder.whereNot(this.getColumnName(...columnArguments), arguments[1]);
         return this;
     }
 
     public andWhere() {
-        const value = arguments[arguments.length - 1];
-        this.queryBuilder.andWhere(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
+        const columnArguments = this.getArgumentsFromColumnFunction(arguments[0]);
+
+        this.queryBuilder.andWhere(this.getColumnName(...columnArguments), arguments[1]);
         return this;
     }
 
     public orWhere() {
-        const value = arguments[arguments.length - 1];
-        this.queryBuilder.orWhere(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
+        const columnArguments = this.getArgumentsFromColumnFunction(arguments[0]);
+
+        this.queryBuilder.orWhere(this.getColumnName(...columnArguments), arguments[1]);
         return this;
     }
 
