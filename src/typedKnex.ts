@@ -292,7 +292,7 @@ export interface IColumnFunctionReturnPropertyType<Model> {
 
 
 export interface ISelectWithFunctionColumn<Model, Row> {
-    <NewRow>(c: (c: IColumnFunctionReturnNewRow<Model, Row>) => NewRow): ITypedQueryBuilder<Model, NewRow>;
+    <NewRow>(selectColumnFunction: (c: IColumnFunctionReturnNewRow<Model, Row>) => NewRow): ITypedQueryBuilder<Model, NewRow>;
 }
 
 
@@ -325,7 +325,7 @@ export interface IHaving<Model, Row> {
 
 
 export interface IWhere<Model, Row> {
-    <PropertyType>(c: (c: IColumnFunctionReturnPropertyType<Model>) => PropertyType, value: PropertyType): ITypedQueryBuilder<Model, Row>;
+    <PropertyType>(selectColumnFunction: (c: IColumnFunctionReturnPropertyType<Model>) => PropertyType, value: PropertyType): ITypedQueryBuilder<Model, Row>;
 }
 
 
