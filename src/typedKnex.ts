@@ -49,6 +49,7 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     whereNot: IWhere<ModelType, Row>;
     selectColumns: ISelectColumns<ModelType, Row>;
     selectColumn: ISelectWithFunctionColumn<ModelType, Row>;
+    // selectColumn<NewRow>(selectColumnFunction: (c: IColumnFunctionReturnNewRow<ModelType, Row>) => NewRow): ITypedQueryBuilder<ModelType, NewRow>; // : ISelectWithFunctionColumn<ModelType, Row>;
 
     // selectColumnFun: ISelectFunColumn<ModelType, Row extends ModelType ? {} : Row>;
 
