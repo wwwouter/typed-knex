@@ -168,7 +168,7 @@ export type ObjectToPrimitive<T> =
     T extends Number ? number :
     T extends Boolean ? boolean : never;
 
-export type Operator = '=' | '!=' | '>' | '<';
+export type Operator = '=' | '!=' | '>' | '<' | string;
 
 
 
