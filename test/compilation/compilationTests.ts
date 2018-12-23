@@ -27,7 +27,7 @@ describe('compile time typed-knex', function() {
                 const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
                 const result = await typedKnex
                     .query(User)
-                    .selectColumn('id')
+                    .selectColumn(c=>c('id'))
                     .firstItem();
 
                 console.log(result.id);
@@ -59,7 +59,7 @@ describe('compile time typed-knex', function() {
                 const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
                 const result = await typedKnex
                     .query(User)
-                    .selectColumn('id')
+                    .selectColumn(c=>c('id'))
                     .firstItem();
 
                 console.log(result.unknown);
