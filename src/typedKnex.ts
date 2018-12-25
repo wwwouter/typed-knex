@@ -54,7 +54,7 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     // selectColumnFun: ISelectFunColumn<ModelType, Row extends ModelType ? {} : Row>;
 
     orderBy: IKeysAsParametersReturnQueryBuider<ModelType, Row>;
-    innerJoinColumn: IKeysAsParametersReturnQueryBuider<ModelType, Row>;
+    innerJoinColumn: IKeyFunctionAsParametersReturnQueryBuider<ModelType, Row>;
     leftOuterJoinColumn: IKeysAsParametersReturnQueryBuider<ModelType, Row>;
 
     whereColumns: IWhereCompareTwoColumns<ModelType, Row>;
@@ -297,6 +297,27 @@ export interface ISelectWithFunctionColumn<Model, Row> {
 }
 
 
+export interface IKeyFunctionAsParametersReturnQueryBuider<Model, Row> {
+    (selectColumnFunction: (c: IColumnFunctionReturnNewRow<Model, Row>) => void): ITypedQueryBuilder<Model, Row>;
+}
+
+
+// export interface IKeysAsArguments<Model, Return> {
+
+//     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): Return;
+//     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): Return;
+//     <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): Return;
+//     <K extends keyof Model>(key1: K): Return;
+
+// }
+
+// // tslint:disable-next-line:no-empty-interfaces
+// export interface IKeyFunctionAsParametersReturnQueryBuider<Model, Row> extends IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> {
+// }
+
+
+
+
 export interface IReferenceColumn<Model> {
     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): IReferencedColumn;
     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): IReferencedColumn;
@@ -531,10 +552,10 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
     }
 
     public innerJoinColumn() {
-        return this.joinColumn('innerJoin', arguments);
+        return this.joinColumn('innerJoin', arguments[0]);
     }
     public leftOuterJoinColumn() {
-        return this.joinColumn('leftOuterJoin', arguments);
+        return this.joinColumn('leftOuterJoin', arguments[0]);
     }
 
     public innerJoinTable() {
@@ -951,7 +972,9 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
         f(this.queryBuilder);
     }
 
-    private joinColumn(joinType: 'innerJoin' | 'leftOuterJoin', args: any) {
+    private joinColumn(joinType: 'innerJoin' | 'leftOuterJoin', f: any) {
+
+        const args = this.getArgumentsFromColumnFunction(f);
 
         let firstColumnAlias = this.tableName;
         let firstColumnClass = this.tableClass;
