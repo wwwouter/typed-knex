@@ -276,11 +276,11 @@ export interface ISelectColumn<Model, Row> {
 }
 
 
-export interface IColumnFunctionReturnNewRow<Model, Row> {
-    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, TransformAll<Pick<Model[K1][K2], K3>, any>>> & Row;
-    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, Pick<Model[K1][K2], K3>>> & Row;
-    <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Row;
-    <K extends keyof Model>(key1: K): Pick<Model, K> & Row;
+export interface IColumnFunctionReturnNewRow<Model> {
+    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, TransformAll<Pick<Model[K1][K2], K3>, any>>>;
+    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, Pick<Model[K1][K2], K3>>>;
+    <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>>;
+    <K extends keyof Model>(key1: K): Pick<Model, K>;
 }
 
 
@@ -293,13 +293,13 @@ export interface IColumnFunctionReturnPropertyType<Model> {
 
 
 export interface ISelectWithFunctionColumn<Model, Row> {
-    <NewRow>(selectColumnFunction: (c: IColumnFunctionReturnNewRow<Model, Row>) => NewRow): ITypedQueryBuilder<Model, NewRow>;
+    <NewRow>(selectColumnFunction: (c: IColumnFunctionReturnNewRow<Model>) => NewRow): ITypedQueryBuilder<Model, Row & NewRow>;
 }
 
 
 export interface ISelectWithFunctionColumns<Model, Row> {
-    <NewRow1, NewRow2>(selectColumnFunction: [((c: IColumnFunctionReturnNewRow<Model, Row>) => NewRow1), ((c: IColumnFunctionReturnNewRow<Model, Row>) => NewRow2)]): ITypedQueryBuilder<Model, NewRow1 & NewRow2>;
-    <NewRow>(selectColumnFunction: [((c: IColumnFunctionReturnNewRow<Model, Row>) => NewRow)]): ITypedQueryBuilder<Model, NewRow>;
+    <NewRow1, NewRow2>(selectColumnFunction: [((c: IColumnFunctionReturnNewRow<Model>) => NewRow1), ((c: IColumnFunctionReturnNewRow<Model>) => NewRow2)]): ITypedQueryBuilder<Model, Row & NewRow1 & NewRow2>;
+    <NewRow>(selectColumnFunction: [((c: IColumnFunctionReturnNewRow<Model>) => NewRow)]): ITypedQueryBuilder<Model, Row & NewRow>;
 }
 
 
@@ -315,7 +315,7 @@ export interface ISelectColumns<Model, Row> {
 }
 
 export interface IKeyFunctionAsParametersReturnQueryBuider<Model, Row> {
-    (selectColumnFunction: (c: IColumnFunctionReturnNewRow<Model, Row>) => void): ITypedQueryBuilder<Model, Row>;
+    (selectColumnFunction: (c: IColumnFunctionReturnNewRow<Model>) => void): ITypedQueryBuilder<Model, Row>;
 }
 
 
