@@ -62,7 +62,7 @@ describe('compile time typed-knex', function() {
                     .selectColumn(c=>c('id'))
                     .firstItem();
 
-                console.log(result.unknown);
+                console.log(result.name);
 
             })();
         `);
@@ -72,6 +72,70 @@ describe('compile time typed-knex', function() {
         file.delete();
         done();
     });
+
+    it('should return type with properties from the selectColumns method', (done) => {
+
+
+        const file = project.createSourceFile(
+            'test/test.ts'
+            ,
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                const result = await typedKnex
+                    .query(User)
+                    .selectColumns([c=>c('id')])
+                    .firstItem();
+
+                console.log(result.id);
+
+            })();
+        `);
+
+        assert.equal(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
+
+
+    it('should error on calling property not used in selectColumns method', (done) => {
+
+
+        const file = project.createSourceFile(
+            'test/test.ts'
+            ,
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                const result = await typedKnex
+                    .query(User)
+                    .selectColumns([c=>c('id')])
+                    .firstItem();
+
+                console.log(result.name);
+
+            })();
+        `);
+
+        assert.notEqual(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
+
 
     it('should allow to call whereIn with type of property', (done) => {
 

@@ -191,9 +191,9 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .selectColumns(['id', 'name']);
+            .selectColumns([c => c('id'), c => c('name')]);
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select "users"."id", "users"."name" from "users"');
+        assert.equal(queryString, 'select "users"."id" as "id", "users"."name" as "name" from "users"');
 
         done();
     });
@@ -204,7 +204,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .selectColumns('user', ['id', 'name']);
+            .selectColumns([c => c('user', 'id'), c => c('user', 'name')]);
         const queryString = query.toQuery();
         assert.equal(queryString, 'select "user"."id" as "user.id", "user"."name" as "user.name" from "userSettings"');
 

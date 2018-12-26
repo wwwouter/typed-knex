@@ -47,8 +47,8 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     andWhere: IWhere<ModelType, Row>;
     orWhere: IWhere<ModelType, Row>;
     whereNot: IWhere<ModelType, Row>;
-    selectColumns: ISelectColumns<ModelType, Row>;
-    selectColumn: ISelectWithFunctionColumn<ModelType, Row>;
+    selectColumn: ISelectWithFunctionColumn<ModelType, Row extends ModelType ? {} : Row>;
+    selectColumns: ISelectWithFunctionColumns<ModelType, Row extends ModelType ? {} : Row>;
     // selectColumn<NewRow>(selectColumnFunction: (c: IColumnFunctionReturnNewRow<ModelType, Row>) => NewRow): ITypedQueryBuilder<ModelType, NewRow>; // : ISelectWithFunctionColumn<ModelType, Row>;
 
     // selectColumnFun: ISelectFunColumn<ModelType, Row extends ModelType ? {} : Row>;
@@ -297,9 +297,29 @@ export interface ISelectWithFunctionColumn<Model, Row> {
 }
 
 
+export interface ISelectWithFunctionColumns<Model, Row> {
+    <NewRow1, NewRow2>(selectColumnFunction: [((c: IColumnFunctionReturnNewRow<Model, Row>) => NewRow1), ((c: IColumnFunctionReturnNewRow<Model, Row>) => NewRow2)]): ITypedQueryBuilder<Model, NewRow1 & NewRow2>;
+    <NewRow>(selectColumnFunction: [((c: IColumnFunctionReturnNewRow<Model, Row>) => NewRow)]): ITypedQueryBuilder<Model, NewRow>;
+}
+
+
+// export interface ISelectColumns<Model, Row> {
+//     <Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, keys2: K2[]): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev>;
+//     <K extends FilterNonObjects<Model>>(keys: K[]): ITypedQueryBuilder<Model, Pick<Model, K> & Row>;
+// }
+
+
+export interface ISelectColumns<Model, Row> {
+    <Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, keys2: K2[]): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev>;
+    <K extends FilterNonObjects<Model>>(keys: K[]): ITypedQueryBuilder<Model, Pick<Model, K> & Row>;
+}
+
 export interface IKeyFunctionAsParametersReturnQueryBuider<Model, Row> {
     (selectColumnFunction: (c: IColumnFunctionReturnNewRow<Model, Row>) => void): ITypedQueryBuilder<Model, Row>;
 }
+
+
+
 
 
 // export interface IKeysAsArguments<Model, Return> {
@@ -326,10 +346,7 @@ export interface IReferenceColumn<Model> {
 }
 
 
-export interface ISelectColumns<Model, Row> {
-    <Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, keys2: K2[]): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev>;
-    <K extends FilterNonObjects<Model>>(keys: K[]): ITypedQueryBuilder<Model, Pick<Model, K> & Row>;
-}
+
 
 export interface IFindById<Model, Row> {
     <Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterNonObjects<Model[K1]>>(id: string, key1: K1, keys2: K2[]): Promise<TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev | void>;
@@ -515,15 +532,30 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
     }
 
     public selectColumns() {
-        const argumentsKeys = arguments[arguments.length - 1];
-        for (const key of argumentsKeys) {
-            if (arguments.length === 1) {
-                this.queryBuilder.select(this.getColumnName(key));
-            } else {
 
-                this.queryBuilder.select(this.getColumnName(arguments[0], key) + ' as ' + this.getColumnSelectAlias(arguments[0], key));
-            }
+        const functions = arguments[0];
+
+        for (const f of functions) {
+            (this.selectColumn as any)(f);
+            // const args = this.getArgumentsFromColumnFunction(f);
+
+            // if (args.length === 1) {
+            //     this.queryBuilder.select(this.getColumnName(key));
+            // } else {
+
+            //     this.queryBuilder.select(this.getColumnName(arguments[0], key) + ' as ' + this.getColumnSelectAlias(arguments[0], key));
+            // }
         }
+
+        // const argumentsKeys = arguments[arguments.length - 1];
+        // for (const key of argumentsKeys) {
+        //     if (arguments.length === 1) {
+        //         this.queryBuilder.select(this.getColumnName(key));
+        //     } else {
+
+        //         this.queryBuilder.select(this.getColumnName(arguments[0], key) + ' as ' + this.getColumnSelectAlias(arguments[0], key));
+        //     }
+        // }
         return this as any;
     }
 
