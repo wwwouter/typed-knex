@@ -283,6 +283,16 @@ export interface IColumnFunctionReturnNewRow<Model> {
     <K extends keyof Model>(key1: K): Pick<Model, K>;
 }
 
+export type Lit = string | number | boolean | undefined | null | void | {};
+export const tuple = <T extends Lit[]>(...args: T) => args;
+
+
+export type ListOfFunc<Model> = IColumnFunctionReturnNewRow<Model> | IColumnFunctionReturnNewRow<Model>;
+
+export function a(i: [string, string?]) {
+    return i;
+}
+
 
 export interface IColumnFunctionReturnPropertyType<Model> {
     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): any;
@@ -298,8 +308,28 @@ export interface ISelectWithFunctionColumn<Model, Row> {
 
 
 export interface ISelectWithFunctionColumns<Model, Row> {
-    <NewRow1, NewRow2>(selectColumnFunction: [((c: IColumnFunctionReturnNewRow<Model>) => NewRow1), ((c: IColumnFunctionReturnNewRow<Model>) => NewRow2)]): ITypedQueryBuilder<Model, Row & NewRow1 & NewRow2>;
-    <NewRow>(selectColumnFunction: [((c: IColumnFunctionReturnNewRow<Model>) => NewRow)]): ITypedQueryBuilder<Model, Row & NewRow>;
+    <R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16, R17, R18, R19>(selectColumnFunction: [
+        ((c: IColumnFunctionReturnNewRow<Model>) => R1),
+        ((c: IColumnFunctionReturnNewRow<Model>) => R2)?,
+        ((c: IColumnFunctionReturnNewRow<Model>) => R3)?,
+        ((c: IColumnFunctionReturnNewRow<Model>) => R4)?,
+        ((c: IColumnFunctionReturnNewRow<Model>) => R5)?,
+        ((c: IColumnFunctionReturnNewRow<Model>) => R6)?,
+        ((c: IColumnFunctionReturnNewRow<Model>) => R7)?,
+        ((c: IColumnFunctionReturnNewRow<Model>) => R8)?,
+        ((c: IColumnFunctionReturnNewRow<Model>) => R9)?,
+        ((c: IColumnFunctionReturnNewRow<Model>) => R10)?,
+        ((c: IColumnFunctionReturnNewRow<Model>) => R11)?,
+        ((c: IColumnFunctionReturnNewRow<Model>) => R12)?,
+        ((c: IColumnFunctionReturnNewRow<Model>) => R13)?,
+        ((c: IColumnFunctionReturnNewRow<Model>) => R14)?,
+        ((c: IColumnFunctionReturnNewRow<Model>) => R15)?,
+        ((c: IColumnFunctionReturnNewRow<Model>) => R16)?,
+        ((c: IColumnFunctionReturnNewRow<Model>) => R17)?,
+        ((c: IColumnFunctionReturnNewRow<Model>) => R18)?,
+        ((c: IColumnFunctionReturnNewRow<Model>) => R19)?
+    ]): ITypedQueryBuilder<Model, Row & R1 & R2 & R3 & R4 & R5 & R6 & R7 & R8 & R8 & R9 & R10 & R11 & R12 & R13 & R14 & R15 & R16 & R17 & R18 & R18 & R19>;
+    // <NewRow>(selectColumnFunction: [((c: IColumnFunctionReturnNewRow<Model>) => NewRow)]): ITypedQueryBuilder<Model, Row & NewRow>;
 }
 
 
