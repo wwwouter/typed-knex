@@ -399,11 +399,9 @@ export interface IWhere<Model, Row> {
 
 
 export interface IWhereIn<Model, Row> {
-    <K extends FilterNonObjects<Model>>(key1: K, value: Model[K][]): ITypedQueryBuilder<Model, Row>;
-    <K1 extends keyof Model, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, key2: K2, value: Model[K1][K2][]): ITypedQueryBuilder<Model, Row>;
-    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends FilterNonObjects<Model[K1][K2]>>(key1: K1, key2: K2, key3: K3, value: Model[K1][K2][K3][]): ITypedQueryBuilder<Model, Row>;
-    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keysAndValues: any[]): ITypedQueryBuilder<Model, Row>;
+    <PropertyType>(selectColumnFunction: (c: IColumnFunctionReturnPropertyType<Model>) => PropertyType, values: PropertyType[]): ITypedQueryBuilder<Model, Row>;
 }
+
 
 
 export interface IWhereBetween<Model, Row> {
@@ -769,14 +767,17 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
         return this;
     }
 
+
     public whereIn() {
-        const value = arguments[arguments.length - 1];
-        this.queryBuilder.whereIn(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
+        const columnArguments = this.getArgumentsFromColumnFunction(arguments[0]);
+        const value = arguments[1];
+        this.queryBuilder.whereIn(this.getColumnName(...columnArguments), value);
         return this;
     }
     public whereNotIn() {
-        const value = arguments[arguments.length - 1];
-        this.queryBuilder.whereNotIn(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
+        const columnArguments = this.getArgumentsFromColumnFunction(arguments[0]);
+        const value = arguments[1];
+        this.queryBuilder.whereNotIn(this.getColumnName(...columnArguments), value);
         return this;
     }
 
