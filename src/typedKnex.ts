@@ -392,12 +392,6 @@ export interface IFindById<Model, Row> {
 }
 
 
-export interface IHaving<Model, Row> {
-    <K extends FilterNonObjects<Model>>(key1: K, operator: Operator, value: Model[K]): ITypedQueryBuilder<Model, Row>;
-    <K1 extends keyof Model, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, key2: K2, operator: Operator, value: Model[K1][K2]): ITypedQueryBuilder<Model, Row>;
-    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends FilterNonObjects<Model[K1][K2]>>(key1: K1, key2: K2, key3: K3, operator: Operator, value: Model[K1][K2][K3]): ITypedQueryBuilder<Model, Row>;
-    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keysOperratorAndValue: any[]): ITypedQueryBuilder<Model, Row>;
-}
 
 
 
@@ -415,6 +409,16 @@ export interface IWhereBetween<Model, Row> {
     <PropertyType>(selectColumnFunction: (c: IColumnFunctionReturnPropertyType<Model>) => PropertyType, range: [PropertyType, PropertyType]): ITypedQueryBuilder<Model, Row>;
 }
 
+
+
+export interface IHaving<Model, Row> {
+    <PropertyType>(selectColumnFunction: (c: IColumnFunctionReturnPropertyType<Model>) => PropertyType, operator: Operator, value: PropertyType): ITypedQueryBuilder<Model, Row>;
+
+    // <K extends FilterNonObjects<Model>>(key1: K, operator: Operator, value: Model[K]): ITypedQueryBuilder<Model, Row>;
+    // <K1 extends keyof Model, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, key2: K2, operator: Operator, value: Model[K1][K2]): ITypedQueryBuilder<Model, Row>;
+    // <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends FilterNonObjects<Model[K1][K2]>>(key1: K1, key2: K2, key3: K3, operator: Operator, value: Model[K1][K2][K3]): ITypedQueryBuilder<Model, Row>;
+    // <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keysOperratorAndValue: any[]): ITypedQueryBuilder<Model, Row>;
+}
 
 
 
@@ -890,9 +894,9 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
 
 
     public having() {
-        const value = arguments[arguments.length - 1];
-        const operator = arguments[arguments.length - 2];
-        this.queryBuilder.having(this.getColumnNameFromArgumentsIgnoringLastTwoParameters(...arguments), operator, value);
+        const operator = arguments[1];
+        const value = arguments[2];
+        this.queryBuilder.having(this.getColumnNameFromFunction(arguments[0]), operator, value);
         return this;
     }
 
@@ -1129,12 +1133,6 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
 
     }
 
-
-    private getColumnNameFromArgumentsIgnoringLastTwoParameters(...keys: string[]): string {
-        const argumentsExceptLastTwo = keys.slice(0, -2);
-        return this.getColumnName(...argumentsExceptLastTwo);
-
-    }
 
     private getColumnName(...keys: string[]): string {
         if (keys.length === 1) {

@@ -449,7 +449,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .having('numericValue', '>', 10);
+            .having(c => c('numericValue'), '>', 10);
 
 
         const queryString = query.toQuery();
