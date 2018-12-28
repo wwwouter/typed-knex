@@ -403,13 +403,17 @@ export interface IWhereIn<Model, Row> {
 }
 
 
-
 export interface IWhereBetween<Model, Row> {
-    <K extends FilterNonObjects<Model>>(key1: K, range: [Model[K], Model[K]]): ITypedQueryBuilder<Model, Row>;
-    <K1 extends keyof Model, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, key2: K2, range: [Model[K1][K2], Model[K1][K2]]): ITypedQueryBuilder<Model, Row>;
-    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends FilterNonObjects<Model[K1][K2]>>(key1: K1, key2: K2, key3: K3, range: [Model[K1][K2][K3], Model[K1][K2][K3]]): ITypedQueryBuilder<Model, Row>;
-    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keysAndValues: any[]): ITypedQueryBuilder<Model, Row>;
+    <PropertyType>(selectColumnFunction: (c: IColumnFunctionReturnPropertyType<Model>) => PropertyType, range: [PropertyType, PropertyType]): ITypedQueryBuilder<Model, Row>;
 }
+
+
+// export interface IWhereBetween<Model, Row> {
+//     <K extends FilterNonObjects<Model>>(key1: K, range: [Model[K], Model[K]]): ITypedQueryBuilder<Model, Row>;
+//     <K1 extends keyof Model, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, key2: K2, range: [Model[K1][K2], Model[K1][K2]]): ITypedQueryBuilder<Model, Row>;
+//     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends FilterNonObjects<Model[K1][K2]>>(key1: K1, key2: K2, key3: K3, range: [Model[K1][K2][K3], Model[K1][K2][K3]]): ITypedQueryBuilder<Model, Row>;
+//     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keysAndValues: any[]): ITypedQueryBuilder<Model, Row>;
+// }
 
 
 export interface IWhereExists<Model, Row> {
@@ -770,25 +774,27 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
 
     public whereIn() {
         const columnArguments = this.getArgumentsFromColumnFunction(arguments[0]);
-        const value = arguments[1];
-        this.queryBuilder.whereIn(this.getColumnName(...columnArguments), value);
+        const range = arguments[1];
+        this.queryBuilder.whereIn(this.getColumnName(...columnArguments), range);
         return this;
     }
     public whereNotIn() {
         const columnArguments = this.getArgumentsFromColumnFunction(arguments[0]);
-        const value = arguments[1];
-        this.queryBuilder.whereNotIn(this.getColumnName(...columnArguments), value);
+        const range = arguments[1];
+        this.queryBuilder.whereNotIn(this.getColumnName(...columnArguments), range);
         return this;
     }
 
     public whereBetween() {
-        const value = arguments[arguments.length - 1];
-        this.queryBuilder.whereBetween(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
+        const columnArguments = this.getArgumentsFromColumnFunction(arguments[0]);
+        const value = arguments[1];
+        this.queryBuilder.whereBetween(this.getColumnName(...columnArguments), value);
         return this;
     }
     public whereNotBetween() {
-        const value = arguments[arguments.length - 1];
-        this.queryBuilder.whereNotBetween(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
+        const columnArguments = this.getArgumentsFromColumnFunction(arguments[0]);
+        const value = arguments[1];
+        this.queryBuilder.whereNotBetween(this.getColumnName(...columnArguments), value);
         return this;
     }
 
