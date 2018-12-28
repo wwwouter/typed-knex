@@ -88,7 +88,7 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     orWhereNotExists: IWhereExists<ModelType, Row>;
 
 
-    groupBy: IGroupBy<ModelType, Row>;
+    groupBy: IKeyFunctionAsParametersReturnQueryBuider<ModelType, Row>;
 
 
     having: IHaving<ModelType, Row>;
@@ -848,6 +848,7 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
 
 
 
+
     public whereExists() {
         const typeOfSubQuery = arguments[0];
         const functionToCall = arguments[1];
@@ -1068,7 +1069,7 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
 
 
     public groupBy() {
-        this.queryBuilder.groupBy(this.getColumnName(...arguments));
+        this.queryBuilder.groupBy(this.getColumnNameFromFunction(arguments[0]));
         return this;
     }
 
@@ -1078,6 +1079,11 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
 
     public useKnexQueryBuilder(f: (query: Knex.QueryBuilder) => void): void {
         f(this.queryBuilder);
+    }
+
+
+    private getColumnNameFromFunction(f: any) {
+        return this.getColumnName(...this.getArgumentsFromColumnFunction(f));
     }
 
     private joinColumn(joinType: 'innerJoin' | 'leftOuterJoin', f: any) {

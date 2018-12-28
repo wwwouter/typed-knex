@@ -435,7 +435,7 @@ describe('TypedKnexQueryBuilder', () => {
             .query(User)
             .selectColumn(c => c('someValue'))
             .selectRaw('total', Number, 'SUM("numericValue")')
-            .groupBy('someValue');
+            .groupBy(c => c('someValue'));
 
 
         const queryString = query.toQuery();
