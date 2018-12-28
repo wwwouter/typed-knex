@@ -359,7 +359,8 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(User)
             .whereExists(UserSetting, (subQuery, parentColumn) => {
-                subQuery.whereColumns(['userId'], '=', parentColumn('id'));
+
+                subQuery.whereColumn(c => c('userId'), '=', parentColumn('id'));
             });
 
         const queryString = query.toQuery();
@@ -374,7 +375,7 @@ describe('TypedKnexQueryBuilder', () => {
             .query(User)
             .where(c => c('name'), 'name')
             .orWhereExists(UserSetting, (subQuery, parentColumn) => {
-                subQuery.whereColumns(['userId'], '=', parentColumn('id'));
+                subQuery.whereColumn(c => c('userId'), '=', parentColumn('id'));
             });
 
         const queryString = query.toQuery();
@@ -389,7 +390,7 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(User)
             .whereNotExists(UserSetting, (subQuery, parentColumn) => {
-                subQuery.whereColumns(['userId'], '=', parentColumn('id'));
+                subQuery.whereColumn(c => c('userId'), '=', parentColumn('id'));
             });
 
         const queryString = query.toQuery();
@@ -404,7 +405,7 @@ describe('TypedKnexQueryBuilder', () => {
             .query(User)
             .where(c => c('name'), 'name')
             .orWhereNotExists(UserSetting, (subQuery, parentColumn) => {
-                subQuery.whereColumns(['userId'], '=', parentColumn('id'));
+                subQuery.whereColumn(c => c('userId'), '=', parentColumn('id'));
             });
 
         const queryString = query.toQuery();

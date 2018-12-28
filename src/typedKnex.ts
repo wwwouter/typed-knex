@@ -57,7 +57,7 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     innerJoinColumn: IKeyFunctionAsParametersReturnQueryBuider<ModelType, Row>;
     leftOuterJoinColumn: IKeysAsParametersReturnQueryBuider<ModelType, Row>;
 
-    whereColumns: IWhereCompareTwoColumns<ModelType, Row>;
+    whereColumn: IWhereCompareTwoColumns<ModelType, Row>;
 
     whereNull: IKeysAsParametersReturnQueryBuider<ModelType, Row>;
     whereNotNull: IKeysAsParametersReturnQueryBuider<ModelType, Row>;
@@ -157,7 +157,7 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     // .orWhereBetween
     // .orWhereNotBetween
 
-    // https://github.com/tgriesser/knex/pull/2837/files: whereColumns
+    // https://github.com/tgriesser/knex/pull/2837/files: whereColumn
 }
 
 export type TransformAll<T, IT> = {
@@ -236,17 +236,17 @@ export interface IJoinTableMultipleOnClauses<Model, Row> {
     <NewPropertyType, NewPropertyKey extends keyof TypeWithIndexerOf<NewPropertyType>>(newPropertyKey: NewPropertyKey, newPropertyClass: new () => NewPropertyType, on: (join: IJoinOnClause<AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>>) => void): ITypedQueryBuilder<AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, Row>;
 }
 
-export interface IWhereCompareTwoColumns<Model, Row> {
+// export interface IWhereCompareTwoColumns<Model, Row> {
 
-    // (): { Left: () : { RIght: IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> } };
+//     // (): { Left: () : { RIght: IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> } };
 
-    // (): { left: IKeysAsArguments<Model, { right: IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> }> };
-
-
-    <L1K1 extends keyof Model, L2K1 extends keyof Model, L2K2 extends keyof Model[L2K1]>(column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2] | IReferencedColumn): ITypedQueryBuilder<Model, Row>;
+//     // (): { left: IKeysAsArguments<Model, { right: IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> }> };
 
 
-}
+//     <L1K1 extends keyof Model, L2K1 extends keyof Model, L2K2 extends keyof Model[L2K1]>(column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2] | IReferencedColumn): ITypedQueryBuilder<Model, Row>;
+
+
+// }
 
 
 
@@ -301,6 +301,14 @@ export interface IColumnFunctionReturnPropertyType<Model> {
     <K extends keyof Model>(key1: K): Model[K];
 }
 
+
+
+export interface IColumnFunctionReturnColumnName<Model> {
+    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): string;
+    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): string;
+    <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): string;
+    <K extends keyof Model>(key1: K): string;
+}
 
 export interface ISelectWithFunctionColumn<Model, Row> {
     <NewRow>(selectColumnFunction: (c: IColumnFunctionReturnNewRow<Model>) => NewRow): ITypedQueryBuilder<Model, Row & NewRow>;
@@ -408,6 +416,25 @@ export interface IWhereBetween<Model, Row> {
 }
 
 
+
+
+export interface IWhereCompareTwoColumns<Model, Row> {
+
+
+    <PropertyType1, PropertyType2, Model2>(selectColumn1Function: (c: IColumnFunctionReturnPropertyType<Model>) => PropertyType1, operator: Operator, selectColumn2Function: ((c: IColumnFunctionReturnPropertyType<Model2>) => PropertyType2) | string): ITypedQueryBuilder<Model, Row>;
+
+    // (): { Left: () : { RIght: IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> } };
+
+    // (): { left: IKeysAsArguments<Model, { right: IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> }> };
+
+
+    // <L1K1 extends keyof Model, L2K1 extends keyof Model, L2K2 extends keyof Model[L2K1]>(column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2] | IReferencedColumn): ITypedQueryBuilder<Model, Row>;
+
+
+}
+
+
+
 // export interface IWhereBetween<Model, Row> {
 //     <K extends FilterNonObjects<Model>>(key1: K, range: [Model[K], Model[K]]): ITypedQueryBuilder<Model, Row>;
 //     <K1 extends keyof Model, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, key2: K2, range: [Model[K1][K2], Model[K1][K2]]): ITypedQueryBuilder<Model, Row>;
@@ -417,7 +444,7 @@ export interface IWhereBetween<Model, Row> {
 
 
 export interface IWhereExists<Model, Row> {
-    <SubQueryModel>(subQueryModel: new () => SubQueryModel, code: (subQuery: ITypedQueryBuilder<SubQueryModel, {}>, parent: ISelectColumn<Model, Row>) => void): ITypedQueryBuilder<Model, Row>;
+    <SubQueryModel>(subQueryModel: new () => SubQueryModel, code: (subQuery: ITypedQueryBuilder<SubQueryModel, {}>, parent: IColumnFunctionReturnColumnName<Model>) => void): ITypedQueryBuilder<Model, Row>;
 }
 
 
@@ -699,19 +726,31 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
 
 
 
-    public whereColumns() {
-        const column1Parts = arguments[0];
+    public whereColumn() {
+
+        const column1Name = this.getColumnName(...this.getArgumentsFromColumnFunction(arguments[0]));
+
+        // const column1Parts = arguments[0];
         const operator = arguments[1];
-        const column2Parts = arguments[2];
 
         let column2Name;
-        if (typeof (column2Parts) === 'string') {
-            column2Name = column2Parts;
+        if (typeof (arguments[2]) === 'string') {
+            column2Name = arguments[2];
         } else {
-            column2Name = this.getColumnName(...column2Parts);
+            column2Name = this.getColumnName(...this.getArgumentsFromColumnFunction(arguments[2]));
         }
 
-        this.queryBuilder.whereRaw(`?? ${operator} ??`, [this.getColumnName(...column1Parts), column2Name]);
+        // const column2Name = this.getColumnName(...this.getArgumentsFromColumnFunction(arguments[2]));
+        // const column2Parts = arguments[2];
+
+        // let column2Name;
+        // if (typeof (column2Parts) === 'string') {
+        //     column2Name = column2Parts;
+        // } else {
+        //     column2Name = this.getColumnName(...column2Parts);
+        // }
+
+        this.queryBuilder.whereRaw(`?? ${operator} ??`, [column1Name, column2Name]);
 
         return this;
     }
