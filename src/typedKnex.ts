@@ -49,9 +49,6 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     whereNot: IWhere<ModelType, Row>;
     selectColumn: ISelectWithFunctionColumn<ModelType, Row extends ModelType ? {} : Row>;
     selectColumns: ISelectWithFunctionColumns<ModelType, Row extends ModelType ? {} : Row>;
-    // selectColumn<NewRow>(selectColumnFunction: (c: IColumnFunctionReturnNewRow<ModelType, Row>) => NewRow): ITypedQueryBuilder<ModelType, NewRow>; // : ISelectWithFunctionColumn<ModelType, Row>;
-
-    // selectColumnFun: ISelectFunColumn<ModelType, Row extends ModelType ? {} : Row>;
 
     orderBy: IKeysAsParametersReturnQueryBuider<ModelType, Row>;
     innerJoinColumn: IKeyFunctionAsParametersReturnQueryBuider<ModelType, Row>;
@@ -93,6 +90,11 @@ export interface ITypedQueryBuilder<ModelType, Row> {
 
     having: IHaving<ModelType, Row>;
 
+
+
+    havingNull: IKeyFunctionAsParametersReturnQueryBuider<ModelType, Row>;
+    havingNotNull: IKeyFunctionAsParametersReturnQueryBuider<ModelType, Row>;
+
     limit(value: number): ITypedQueryBuilder<ModelType, Row>;
     offset(value: number): ITypedQueryBuilder<ModelType, Row>;
 
@@ -110,10 +112,9 @@ export interface ITypedQueryBuilder<ModelType, Row> {
 
     whereRaw(sql: string, ...bindings: string[]): ITypedQueryBuilder<ModelType, Row>;
 
+
     havingIn(): void;
     havingNotIn(): void;
-    havingNull(): void;
-    havingNotNull(): void;
     havingExists(): void;
     havingNotExists(): void;
     havingRaw(): void;
@@ -124,7 +125,7 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     returningColumn(): void;
     returningColumns(): void;
     transacting(trx: Knex.Transaction): void;
-    minColumn(): void;
+    minColumn(): void; // minus "COlumn"? of kunneh het er juist ook meerdere zijn, dat Columns op de plek zijn? => of knex aanhouden en beide accepteren? Komt ook terug in Row
     countColumn(): void;
     countDistinctColumn(): void;
     maxColumn(): void;
@@ -157,7 +158,6 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     // .orWhereBetween
     // .orWhereNotBetween
 
-    // https://github.com/tgriesser/knex/pull/2837/files: whereColumn
 }
 
 export type TransformAll<T, IT> = {
@@ -913,12 +913,12 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
     }
 
     public havingNull() {
-        (this.queryBuilder as any).havingNull(this.getColumnName(...arguments));
+        (this.queryBuilder as any).havingNull(this.getColumnNameFromFunction(arguments[0]));
         return this;
     }
 
     public havingNotNull() {
-        (this.queryBuilder as any).havingNotNull(this.getColumnName(...arguments));
+        (this.queryBuilder as any).havingNotNull(this.getColumnNameFromFunction(arguments[0]));
         return this;
     }
 

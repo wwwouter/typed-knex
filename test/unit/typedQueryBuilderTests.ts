@@ -460,4 +460,33 @@ describe('TypedKnexQueryBuilder', () => {
 
 
 
+    it('should create query with having null', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .havingNull(c => c('numericValue'));
+
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" having "users"."numericValue" is null');
+
+        done();
+    });
+
+
+    it('should create query with having not null', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .havingNotNull(c => c('numericValue'));
+
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" having "users"."numericValue" is not null');
+
+        done();
+    });
+
+
+
 });
