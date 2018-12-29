@@ -102,6 +102,10 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     havingNotExists: IWhereExists<ModelType, Row>;
 
 
+    havingBetween: IWhereBetween<ModelType, Row>;
+    havingNotBetween: IWhereBetween<ModelType, Row>;
+
+
     limit(value: number): ITypedQueryBuilder<ModelType, Row>;
     offset(value: number): ITypedQueryBuilder<ModelType, Row>;
 
@@ -121,8 +125,6 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     havingRaw(sql: string, ...bindings: string[]): ITypedQueryBuilder<ModelType, Row>;
 
 
-    havingBetween(): void;
-    havingNotBetween(): void;
     union(): void;
     unionAll(): void;
     returningColumn(): void;
@@ -831,15 +833,15 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
     }
 
     public whereBetween() {
-        const columnArguments = this.getArgumentsFromColumnFunction(arguments[0]);
+        // const columnArguments = this.getArgumentsFromColumnFunction(arguments[0]);
         const value = arguments[1];
-        this.queryBuilder.whereBetween(this.getColumnName(...columnArguments), value);
+        this.queryBuilder.whereBetween(this.getColumnNameFromFunction(arguments[0]), value);
         return this;
     }
     public whereNotBetween() {
-        const columnArguments = this.getArgumentsFromColumnFunction(arguments[0]);
+        // const columnArguments = this.getArgumentsFromColumnFunction(arguments[0]);
         const value = arguments[1];
-        this.queryBuilder.whereNotBetween(this.getColumnName(...columnArguments), value);
+        this.queryBuilder.whereNotBetween(this.getColumnNameFromFunction(arguments[0]), value);
         return this;
     }
 
@@ -950,14 +952,14 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
     }
 
     public havingBetween() {
-        const value = arguments[arguments.length - 1];
-        (this.queryBuilder as any).havingBetween(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
+        const value = arguments[1];
+        (this.queryBuilder as any).havingBetween(this.getColumnNameFromFunction(arguments[0]), value);
         return this;
     }
 
     public havingNotBetween() {
-        const value = arguments[arguments.length - 1];
-        (this.queryBuilder as any).havingNotBetween(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
+        const value = arguments[1];
+        (this.queryBuilder as any).havingNotBetween(this.getColumnNameFromFunction(arguments[0]), value);
         return this;
     }
 
