@@ -589,4 +589,42 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+
+    it('should create query with an union', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .selectColumn(c => c('id'))
+            .union(User, (subQuery) => {
+                subQuery
+                    .selectColumn(c => c('id'))
+                    .where(c => c('numericValue'), 12);
+            });
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select "users"."id" as "id" from "users" union select "users"."id" as "id" from "users" where "users"."numericValue" = 12');
+
+        done();
+    });
+
+
+    it('should create query with an union all', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .selectColumn(c => c('id'))
+            .unionAll(User, (subQuery) => {
+                subQuery
+                    .selectColumn(c => c('id'))
+                    .where(c => c('numericValue'), 12);
+            });
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select "users"."id" as "id" from "users" union all select "users"."id" as "id" from "users" where "users"."numericValue" = 12');
+
+        done();
+    });
+
+
+
 });

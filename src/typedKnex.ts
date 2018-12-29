@@ -105,6 +105,8 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     havingBetween: IWhereBetween<ModelType, Row>;
     havingNotBetween: IWhereBetween<ModelType, Row>;
 
+    union: IUnion<ModelType, Row>;
+    unionAll: IUnion<ModelType, Row>;
 
     limit(value: number): ITypedQueryBuilder<ModelType, Row>;
     offset(value: number): ITypedQueryBuilder<ModelType, Row>;
@@ -125,8 +127,6 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     havingRaw(sql: string, ...bindings: string[]): ITypedQueryBuilder<ModelType, Row>;
 
 
-    union(): void;
-    unionAll(): void;
     returningColumn(): void;
     returningColumns(): void;
     transacting(trx: Knex.Transaction): void;
@@ -443,6 +443,9 @@ export interface IWhereCompareTwoColumns<Model, Row> {
 
 
 
+
+
+
 // export interface IWhereBetween<Model, Row> {
 //     <K extends FilterNonObjects<Model>>(key1: K, range: [Model[K], Model[K]]): ITypedQueryBuilder<Model, Row>;
 //     <K1 extends keyof Model, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, key2: K2, range: [Model[K1][K2], Model[K1][K2]]): ITypedQueryBuilder<Model, Row>;
@@ -455,6 +458,11 @@ export interface IWhereExists<Model, Row> {
     <SubQueryModel>(subQueryModel: new () => SubQueryModel, code: (subQuery: ITypedQueryBuilder<SubQueryModel, {}>, parent: IColumnFunctionReturnColumnName<Model>) => void): ITypedQueryBuilder<Model, Row>;
 }
 
+
+
+export interface IUnion<Model, Row> {
+    <SubQueryModel>(subQueryModel: new () => SubQueryModel, code: (subQuery: ITypedQueryBuilder<SubQueryModel, {}>) => void): ITypedQueryBuilder<Model, Row>;
+}
 
 
 
@@ -965,11 +973,21 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
 
 
     public union() {
-        throw new NotImplementedError();
+        const typeOfSubQuery = arguments[0];
+        const functionToCall = arguments[1];
+
+        this.callQueryCallbackFunction('union', typeOfSubQuery, functionToCall);
+
+        return this;
     }
 
     public unionAll() {
-        throw new NotImplementedError();
+        const typeOfSubQuery = arguments[0];
+        const functionToCall = arguments[1];
+
+        this.callQueryCallbackFunction('unionAll', typeOfSubQuery, functionToCall);
+
+        return this;
     }
 
     public returningColumn() {
