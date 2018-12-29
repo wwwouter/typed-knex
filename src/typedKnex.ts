@@ -65,7 +65,7 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     leftOuterJoinTableOnFunction: IJoinTableMultipleOnClauses<ModelType, Row>;
 
 
-    selectRaw: ISelectRaw<ModelType, Row>;
+    selectRaw: ISelectRaw<ModelType, Row extends ModelType ? {} : Row>;
 
 
 
@@ -108,6 +108,8 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     union: IUnion<ModelType, Row>;
     unionAll: IUnion<ModelType, Row>;
 
+    minColumn: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
+
     limit(value: number): ITypedQueryBuilder<ModelType, Row>;
     offset(value: number): ITypedQueryBuilder<ModelType, Row>;
 
@@ -129,7 +131,6 @@ export interface ITypedQueryBuilder<ModelType, Row> {
 
     transacting(trx: Knex.Transaction): void;
 
-    minColumn(): void; // minus "COlumn"? of kunneh het er juist ook meerdere zijn, dat Columns op de plek zijn? => of knex aanhouden en beide accepteren? Komt ook terug in Row
     countColumn(): void;
     countDistinctColumn(): void;
     maxColumn(): void;
@@ -275,6 +276,10 @@ export interface ISelectRaw<Model, Row> {
     <TReturn extends Boolean | String | Number, TName extends keyof TypeWithIndexerOf<TReturn>>(name: TName, returnType: IConstructor<TReturn>, query: string): ITypedQueryBuilder<Model, Pick<TypeWithIndexerOf<ObjectToPrimitive<TReturn>>, TName> & Row>;
 }
 
+
+
+
+
 export interface ISelectColumn<Model, Row> {
     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, TransformAll<Pick<Model[K1][K2], K3>, any>>> & Row>;
     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, Pick<Model[K1][K2], K3>>> & Row>;
@@ -320,6 +325,12 @@ export interface IColumnFunctionReturnColumnName<Model> {
 export interface ISelectWithFunctionColumn<Model, Row> {
     <NewRow>(selectColumnFunction: (c: IColumnFunctionReturnNewRow<Model>) => NewRow): ITypedQueryBuilder<Model, Row & NewRow>;
 }
+
+export interface IDbFunctionWithAlias<Model, Row> {
+    <NewPropertyType, TName extends keyof TypeWithIndexerOf<NewPropertyType>>(selectColumnFunction: (c: IColumnFunctionReturnPropertyType<Model>) => NewPropertyType, name: TName): ITypedQueryBuilder<Model, Pick<TypeWithIndexerOf<ObjectToPrimitive<NewPropertyType>>, TName> & Row>;
+}
+
+
 
 
 export interface ISelectWithFunctionColumns<Model, Row> {
@@ -1007,7 +1018,14 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
 
 
     public minColumn() {
-        throw new NotImplementedError();
+        const name = arguments[1];
+        // const query = arguments[2];
+
+        // this.queryBuilder.select(this.knex.raw(`(${query}) as "${name}"`));
+        this.queryBuilder.min(`${this.getColumnNameWithoutAliasFromFunction(arguments[0])} as ${name}`);
+        return this as any;
+
+        // throw new NotImplementedError();
     }
 
     public countColumn() {
@@ -1128,6 +1146,11 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
         return this.getColumnName(...this.getArgumentsFromColumnFunction(f));
     }
 
+
+    private getColumnNameWithoutAliasFromFunction(f: any) {
+        return this.getColumnNameWithoutAlias(...this.getArgumentsFromColumnFunction(f));
+    }
+
     private joinColumn(joinType: 'innerJoin' | 'leftOuterJoin', f: any) {
 
         const args = this.getArgumentsFromColumnFunction(f);
@@ -1181,6 +1204,21 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
             for (let i = 1; i < keys.length; i++) {
                 columnName = columnAlias + '.' + keys[i];
                 columnAlias += '_' + keys[i];
+            }
+            return columnName;
+        }
+    }
+
+
+    private getColumnNameWithoutAlias(...keys: string[]): string {
+        if (keys.length === 1) {
+            return this.tableName + '.' + keys[0];
+        } else {
+            let columnName = keys[0];
+            // let columnAlias = keys[0];
+            for (let i = 1; i < keys.length; i++) {
+                columnName = columnName + '.' + keys[i];
+                // columnAlias += '_' + keys[i];
             }
             return columnName;
         }

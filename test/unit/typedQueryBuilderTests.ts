@@ -627,4 +627,19 @@ describe('TypedKnexQueryBuilder', () => {
 
 
 
+    it('should create query with min', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .minColumn(c => c('numericValue'), 'minNumericValue');
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select min("users"."numericValue") as "minNumericValue" from "users"');
+
+
+
+        done();
+    });
+
+
+
 });

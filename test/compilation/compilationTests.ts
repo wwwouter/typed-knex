@@ -338,4 +338,67 @@ describe('compile time typed-knex', function() {
         file.delete();
         done();
     });
+
+    it('should return type with properties from the minColumn method', (done) => {
+
+
+        const file = project.createSourceFile(
+            'test/test1.ts'
+            ,
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                const result = await typedKnex
+                    .query(User)
+                    .minColumn(c => c('numericValue'), 'minNumericValue')
+                    .firstItem();
+
+                console.log(result.minNumericValue);
+
+            })();
+        `);
+
+        assert.equal(project.getPreEmitDiagnostics().length, 0);
+        file.delete();
+
+        done();
+    });
+
+
+    it('should error on calling property not used in minColumn method', (done) => {
+
+
+        const file = project.createSourceFile(
+            'test/test2.ts'
+            ,
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                const result = await typedKnex
+                    .query(User)
+                    .minColumn(c => c('numericValue'), 'minNumericValue')
+                    .firstItem();
+
+                console.log(result.id);
+
+            })();
+        `);
+
+        assert.notEqual(project.getPreEmitDiagnostics().length, 0);
+        file.delete();
+
+        done();
+    });
 });
