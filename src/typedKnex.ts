@@ -140,9 +140,8 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     transacting(trx: Knex.Transaction): void;
 
 
-    increment(): void;
-    decrement(): void;
-    truncate(): void;
+    truncate(): Promise<void>;
+
     clearSelect(): void;
     clearWhere(): void;
     clearOrder(): void;
@@ -160,6 +159,8 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     // TBD
     // returningColumn(): void;
     // returningColumns(): void;
+    // increment(): void;
+    // decrement(): void;
 
 }
 
@@ -1055,8 +1056,8 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
     }
 
 
-    public truncate() {
-        this.queryBuilder.truncate();
+    public async truncate() {
+        await this.queryBuilder.truncate();
     }
 
     public clearSelect() {
