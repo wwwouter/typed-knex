@@ -95,6 +95,9 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     havingNull: IKeyFunctionAsParametersReturnQueryBuider<ModelType, Row>;
     havingNotNull: IKeyFunctionAsParametersReturnQueryBuider<ModelType, Row>;
 
+    havingIn: IWhereIn<ModelType, Row>;
+    havingNotIn: IWhereIn<ModelType, Row>;
+
     limit(value: number): ITypedQueryBuilder<ModelType, Row>;
     offset(value: number): ITypedQueryBuilder<ModelType, Row>;
 
@@ -113,8 +116,6 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     whereRaw(sql: string, ...bindings: string[]): ITypedQueryBuilder<ModelType, Row>;
 
 
-    havingIn(): void;
-    havingNotIn(): void;
     havingExists(): void;
     havingNotExists(): void;
     havingRaw(): void;
@@ -150,7 +151,6 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     clone(): void;
     beginTransaction(): Promise<Knex.Transaction>;
     groupByRaw(): void;
-
     // whereIn — .whereIn(column|columns, array|callback|builder)
     // orWhereIn
     // whereNotIn(column, array|callback|builder) /
@@ -901,14 +901,14 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
     }
 
     public havingIn() {
-        const value = arguments[arguments.length - 1];
-        this.queryBuilder.havingIn(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
+        const value = arguments[1];
+        this.queryBuilder.havingIn(this.getColumnNameFromFunction(arguments[0]), value);
         return this;
     }
 
     public havingNotIn() {
-        const value = arguments[arguments.length - 1];
-        this.queryBuilder.havingIn(this.getColumnNameFromArgumentsIgnoringLastParameter(...arguments), value);
+        const value = arguments[1];
+        (this.queryBuilder as any).havingNotIn(this.getColumnNameFromFunction(arguments[0]), value);
         return this;
     }
 

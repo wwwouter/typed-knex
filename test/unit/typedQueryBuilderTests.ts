@@ -488,5 +488,31 @@ describe('TypedKnexQueryBuilder', () => {
     });
 
 
+    it('should create query with having in', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .havingIn(c => c('name'), ['user1', 'user2']);
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" having "users"."name" in (\'user1\', \'user2\')');
+
+        done();
+    });
+
+    it('should create query with having not in', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .havingNotIn(c => c('name'), ['user1', 'user2']);
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" having "users"."name" not in (\'user1\', \'user2\')');
+
+        done();
+    });
+
 
 });
