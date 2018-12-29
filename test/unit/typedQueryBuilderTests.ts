@@ -722,7 +722,7 @@ describe('TypedKnexQueryBuilder', () => {
     });
 
 
-    it('should return select "id" from "users"', (done) => {
+    it('should clear select', (done) => {
 
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
@@ -736,7 +736,7 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with where on column of own table', (done) => {
+    it('should clear where', (done) => {
 
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
@@ -751,7 +751,7 @@ describe('TypedKnexQueryBuilder', () => {
     });
 
 
-    it('should create query with order by', (done) => {
+    it('should clear order', (done) => {
 
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
@@ -764,5 +764,20 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+
+
+    it('should create query with distinct', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .selectColumn(c => c('id'))
+            .distinct();
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select distinct "users"."id" as "id" from "users"');
+
+
+        done();
+    });
 
 });

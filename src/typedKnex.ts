@@ -146,8 +146,9 @@ export interface ITypedQueryBuilder<ModelType, Row> {
 
 
     truncate(): Promise<void>;
+    distinct(): ITypedQueryBuilder<ModelType, Row>;
 
-    distinct(): void;
+
     clone(): void;
     beginTransaction(): Promise<Knex.Transaction>;
     groupByRaw(): void;
@@ -1082,6 +1083,7 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
 
     public distinct() {
         this.queryBuilder.distinct();
+        return this as any;
     }
 
     public clone() {
