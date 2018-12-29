@@ -634,9 +634,78 @@ describe('TypedKnexQueryBuilder', () => {
             .minColumn(c => c('numericValue'), 'minNumericValue');
         const queryString = query.toQuery();
         assert.equal(queryString, 'select min("users"."numericValue") as "minNumericValue" from "users"');
+        done();
+    });
 
 
 
+    it('should create query with count', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .countColumn(c => c('numericValue'), 'countNumericValue');
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select count("users"."numericValue") as "countNumericValue" from "users"');
+        done();
+    });
+
+    it('should create query with countDistinct', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .countDistinctColumn(c => c('numericValue'), 'countDistinctNumericValue');
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select count(distinct "users"."numericValue") as "countDistinctNumericValue" from "users"');
+        done();
+    });
+
+    it('should create query with max', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .maxColumn(c => c('numericValue'), 'maxNumericValue');
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select max("users"."numericValue") as "maxNumericValue" from "users"');
+        done();
+    });
+
+    it('should create query with sum', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .sumColumn(c => c('numericValue'), 'sumNumericValue');
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select sum("users"."numericValue") as "sumNumericValue" from "users"');
+        done();
+    });
+
+    it('should create query with sumDistinct', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .sumDistinctColumn(c => c('numericValue'), 'sumDistinctNumericValue');
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select sum(distinct "users"."numericValue") as "sumDistinctNumericValue" from "users"');
+        done();
+    });
+
+    it('should create query with avg', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .avgColumn(c => c('numericValue'), 'avgNumericValue');
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select avg("users"."numericValue") as "avgNumericValue" from "users"');
+        done();
+    });
+
+    it('should create query with avgDistinct', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .avgDistinctColumn(c => c('numericValue'), 'avgDistinctNumericValue');
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select avg(distinct "users"."numericValue") as "avgDistinctNumericValue" from "users"');
         done();
     });
 

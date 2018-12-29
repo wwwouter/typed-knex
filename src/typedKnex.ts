@@ -110,6 +110,14 @@ export interface ITypedQueryBuilder<ModelType, Row> {
 
     minColumn: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
 
+    countColumn: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
+    countDistinctColumn: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
+    maxColumn: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
+    sumColumn: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
+    sumDistinctColumn: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
+    avgColumn: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
+    avgDistinctColumn: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
+
     limit(value: number): ITypedQueryBuilder<ModelType, Row>;
     offset(value: number): ITypedQueryBuilder<ModelType, Row>;
 
@@ -131,20 +139,7 @@ export interface ITypedQueryBuilder<ModelType, Row> {
 
     transacting(trx: Knex.Transaction): void;
 
-    countColumn(): void;
-    countDistinctColumn(): void;
-    maxColumn(): void;
-    sumColumn(): void;
-    sumDistinctColumn(): void;
-    avgColumn(): void;
-    avgDistinctColumn(): void;
-    minResult(): void;
-    countDistinctResult(): void;
-    maxResult(): void;
-    sumResult(): void;
-    sumDistinctResult(): void;
-    avgResult(): void;
-    avgDistinctResult(): void;
+
     increment(): void;
     decrement(): void;
     truncate(): void;
@@ -1016,72 +1011,36 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
         this.queryBuilder.transacting(trx);
     }
 
-
     public minColumn() {
-        const name = arguments[1];
-        // const query = arguments[2];
-
-        // this.queryBuilder.select(this.knex.raw(`(${query}) as "${name}"`));
-        this.queryBuilder.min(`${this.getColumnNameWithoutAliasFromFunction(arguments[0])} as ${name}`);
-        return this as any;
-
-        // throw new NotImplementedError();
+        return this.functionWithAlias('min', arguments[0], arguments[1]);
     }
 
     public countColumn() {
-        throw new NotImplementedError();
+        return this.functionWithAlias('count', arguments[0], arguments[1]);
     }
 
     public countDistinctColumn() {
-        throw new NotImplementedError();
+        return this.functionWithAlias('countDistinct', arguments[0], arguments[1]);
     }
 
     public maxColumn() {
-        throw new NotImplementedError();
+        return this.functionWithAlias('max', arguments[0], arguments[1]);
     }
 
     public sumColumn() {
-        throw new NotImplementedError();
+        return this.functionWithAlias('sum', arguments[0], arguments[1]);
     }
 
     public sumDistinctColumn() {
-        throw new NotImplementedError();
+        return this.functionWithAlias('sumDistinct', arguments[0], arguments[1]);
     }
 
     public avgColumn() {
-        throw new NotImplementedError();
+        return this.functionWithAlias('avg', arguments[0], arguments[1]);
     }
 
     public avgDistinctColumn() {
-        throw new NotImplementedError();
-    }
-
-    public minResult() {
-        throw new NotImplementedError();
-    }
-
-    public countDistinctResult() {
-        throw new NotImplementedError();
-    }
-
-    public maxResult() {
-        throw new NotImplementedError();
-    }
-
-    public sumResult() {
-        throw new NotImplementedError();
-    }
-
-    public sumDistinctResult() {
-        throw new NotImplementedError();
-    }
-
-    public avgResult() {
-        throw new NotImplementedError();
-    }
-
-    public avgDistinctResult() {
-        throw new NotImplementedError();
+        return this.functionWithAlias('avgDistinct', arguments[0], arguments[1]);
     }
 
     public increment() {
@@ -1140,6 +1099,13 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
     public useKnexQueryBuilder(f: (query: Knex.QueryBuilder) => void): void {
         f(this.queryBuilder);
     }
+
+
+    private functionWithAlias(knexFunctionName: string, f: any, aliasName: string) {
+        (this.queryBuilder as any)[knexFunctionName](`${this.getColumnNameWithoutAliasFromFunction(f)} as ${aliasName}`);
+        return this as any;
+    }
+
 
 
     private getColumnNameFromFunction(f: any) {
