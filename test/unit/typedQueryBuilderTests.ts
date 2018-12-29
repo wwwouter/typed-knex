@@ -709,6 +709,60 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+    it('should create query with order by', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .orderBy(c => c('id'));
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" order by "users"."id" asc');
+
+        done();
+    });
+
+
+    it('should return select "id" from "users"', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .selectColumn(c => c('id'))
+            .clearSelect();
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users"');
+
+
+        done();
+    });
+
+    it('should create query with where on column of own table', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .where(c => c('name'), 'user1')
+            .clearWhere();
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users"');
+
+        done();
+    });
+
+
+    it('should create query with order by', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .orderBy(c => c('id'))
+            .clearOrder();
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users"');
+
+        done();
+    });
 
 
 });

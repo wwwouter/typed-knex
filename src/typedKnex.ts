@@ -50,7 +50,7 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     selectColumn: ISelectWithFunctionColumn<ModelType, Row extends ModelType ? {} : Row>;
     selectColumns: ISelectWithFunctionColumns<ModelType, Row extends ModelType ? {} : Row>;
 
-    orderBy: IKeysAsParametersReturnQueryBuider<ModelType, Row>;
+    orderBy: IOrderBy<ModelType, Row>;
     innerJoinColumn: IKeyFunctionAsParametersReturnQueryBuider<ModelType, Row>;
     leftOuterJoinColumn: IKeysAsParametersReturnQueryBuider<ModelType, Row>;
 
@@ -118,6 +118,11 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     avgColumn: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
     avgDistinctColumn: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
 
+    clearSelect(): ITypedQueryBuilder<ModelType, ModelType>;
+    clearWhere(): ITypedQueryBuilder<ModelType, Row>;
+    clearOrder(): ITypedQueryBuilder<ModelType, Row>;
+
+
     limit(value: number): ITypedQueryBuilder<ModelType, Row>;
     offset(value: number): ITypedQueryBuilder<ModelType, Row>;
 
@@ -142,9 +147,6 @@ export interface ITypedQueryBuilder<ModelType, Row> {
 
     truncate(): Promise<void>;
 
-    clearSelect(): void;
-    clearWhere(): void;
-    clearOrder(): void;
     distinct(): void;
     clone(): void;
     beginTransaction(): Promise<Knex.Transaction>;
@@ -321,6 +323,11 @@ export interface IColumnFunctionReturnColumnName<Model> {
 export interface ISelectWithFunctionColumn<Model, Row> {
     <NewRow>(selectColumnFunction: (c: IColumnFunctionReturnNewRow<Model>) => NewRow): ITypedQueryBuilder<Model, Row & NewRow>;
 }
+
+export interface IOrderBy<Model, Row> {
+    <NewRow>(selectColumnFunction: (c: IColumnFunctionReturnNewRow<Model>) => NewRow, direction?: 'asc' | 'desc'): ITypedQueryBuilder<Model, Row>;
+}
+
 
 export interface IDbFunctionWithAlias<Model, Row> {
     <NewPropertyType, TName extends keyof TypeWithIndexerOf<NewPropertyType>>(selectColumnFunction: (c: IColumnFunctionReturnPropertyType<Model>) => NewPropertyType, name: TName): ITypedQueryBuilder<Model, Pick<TypeWithIndexerOf<ObjectToPrimitive<NewPropertyType>>, TName> & Row>;
@@ -646,12 +653,12 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
 
 
     public orderBy() {
-        if (arguments.length === 1) {
-            this.queryBuilder.orderBy(this.getColumnName(arguments[0]));
-        } else {
+        // if (arguments.length === 1) {
+        this.queryBuilder.orderBy(this.getColumnNameWithoutAliasFromFunction(arguments[0]), arguments[1]);
+        // } else {
 
-            this.queryBuilder.orderBy(this.getColumnSelectAlias(...arguments));
-        }
+        //     this.queryBuilder.orderBy(this.getColumnSelectAlias(...arguments));
+        // }
         return this as any;
     }
 
@@ -1062,12 +1069,15 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
 
     public clearSelect() {
         this.queryBuilder.clearSelect();
+        return this as any;
     }
     public clearWhere() {
         this.queryBuilder.clearWhere();
+        return this as any;
     }
     public clearOrder() {
         (this.queryBuilder as any).clearOrder();
+        return this as any;
     }
 
     public distinct() {

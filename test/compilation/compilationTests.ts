@@ -401,4 +401,37 @@ describe('compile time typed-knex', function() {
 
         done();
     });
+
+    it('should return all Model properties after clearSelect', (done) => {
+
+
+        const file = project.createSourceFile(
+            'test/test.ts'
+            ,
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                const result = await typedKnex
+                    .query(User)
+                    .selectColumn(c=>c('id'))
+                    .clearSelect()
+                    .firstItem();
+
+                    console.log(result.id);
+                    console.log(result.name);
+
+            })();
+        `);
+
+        assert.equal(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
 });
