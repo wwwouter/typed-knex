@@ -127,9 +127,8 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     havingRaw(sql: string, ...bindings: string[]): ITypedQueryBuilder<ModelType, Row>;
 
 
-    returningColumn(): void;
-    returningColumns(): void;
     transacting(trx: Knex.Transaction): void;
+
     minColumn(): void; // minus "COlumn"? of kunneh het er juist ook meerdere zijn, dat Columns op de plek zijn? => of knex aanhouden en beide accepteren? Komt ook terug in Row
     countColumn(): void;
     countDistinctColumn(): void;
@@ -161,6 +160,10 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     //  .orWhereNotIn
     // .orWhereBetween
     // .orWhereNotBetween
+
+    // TBD
+    // returningColumn(): void;
+    // returningColumns(): void;
 
 }
 
