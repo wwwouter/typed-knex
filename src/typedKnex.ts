@@ -98,6 +98,10 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     havingIn: IWhereIn<ModelType, Row>;
     havingNotIn: IWhereIn<ModelType, Row>;
 
+    havingExists: IWhereExists<ModelType, Row>;
+    havingNotExists: IWhereExists<ModelType, Row>;
+
+
     limit(value: number): ITypedQueryBuilder<ModelType, Row>;
     offset(value: number): ITypedQueryBuilder<ModelType, Row>;
 
@@ -116,8 +120,6 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     whereRaw(sql: string, ...bindings: string[]): ITypedQueryBuilder<ModelType, Row>;
 
 
-    havingExists(): void;
-    havingNotExists(): void;
     havingRaw(): void;
     havingBetween(): void;
     havingNotBetween(): void;
@@ -923,11 +925,21 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
     }
 
     public havingExists() {
-        throw new NotImplementedError();
+        const typeOfSubQuery = arguments[0];
+        const functionToCall = arguments[1];
+
+        this.callQueryCallbackFunction('havingExists', typeOfSubQuery, functionToCall);
+
+        return this;
     }
 
     public havingNotExists() {
-        throw new NotImplementedError();
+        const typeOfSubQuery = arguments[0];
+        const functionToCall = arguments[1];
+
+        this.callQueryCallbackFunction('havingNotExists', typeOfSubQuery, functionToCall);
+
+        return this;
     }
 
     public havingRaw() {

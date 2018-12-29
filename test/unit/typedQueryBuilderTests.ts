@@ -515,4 +515,35 @@ describe('TypedKnexQueryBuilder', () => {
     });
 
 
+
+    it('should create query with having exists', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .havingExists(UserSetting, (subQuery, parentColumn) => {
+
+                subQuery.whereColumn(c => c('userId'), '=', parentColumn('id'));
+            });
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" having exists (select * from "userSettings" where "userSettings"."userId" = "users"."id")');
+
+        done();
+    });
+
+    it('should create query with having not exists', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .havingNotExists(UserSetting, (subQuery, parentColumn) => {
+                subQuery.whereColumn(c => c('userId'), '=', parentColumn('id'));
+            });
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" having not exists (select * from "userSettings" where "userSettings"."userId" = "users"."id")');
+
+        done();
+    });
+
+
 });
