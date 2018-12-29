@@ -118,9 +118,9 @@ export interface ITypedQueryBuilder<ModelType, Row> {
 
 
     whereRaw(sql: string, ...bindings: string[]): ITypedQueryBuilder<ModelType, Row>;
+    havingRaw(sql: string, ...bindings: string[]): ITypedQueryBuilder<ModelType, Row>;
 
 
-    havingRaw(): void;
     havingBetween(): void;
     havingNotBetween(): void;
     union(): void;
@@ -942,8 +942,11 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
         return this;
     }
 
-    public havingRaw() {
-        throw new NotImplementedError();
+
+
+    public havingRaw(sql: string, ...bindings: string[]) {
+        this.queryBuilder.havingRaw(sql, bindings);
+        return this;
     }
 
     public havingBetween() {

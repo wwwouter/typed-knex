@@ -546,4 +546,19 @@ describe('TypedKnexQueryBuilder', () => {
     });
 
 
+
+    it('should create query with having raw', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .havingRaw('?? = ??', 'users.id', 'users.name');
+
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" having "users"."id" = "users"."name"');
+
+        done();
+    });
+
+
 });
