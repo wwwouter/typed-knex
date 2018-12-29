@@ -780,4 +780,28 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+
+
+
+    it('should clone and adjust only the clone', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+
+        const query = typedKnex
+            .query(User)
+            .selectColumn(c => c('id'));
+
+        const clonedQuery = query.clone();
+
+        clonedQuery
+            .selectColumn(c => c('name'));
+
+
+        assert.equal(query.toQuery(), 'select "users"."id" as "id" from "users"');
+        assert.equal(clonedQuery.toQuery(), 'select "users"."id" as "id", "users"."name" as "name" from "users"');
+
+
+        done();
+    });
+
 });

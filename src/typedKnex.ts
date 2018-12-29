@@ -149,7 +149,8 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     distinct(): ITypedQueryBuilder<ModelType, Row>;
 
 
-    clone(): void;
+    clone(): ITypedQueryBuilder<ModelType, Row>;
+
     beginTransaction(): Promise<Knex.Transaction>;
     groupByRaw(): void;
     // whereIn — .whereIn(column|columns, array|callback|builder)
@@ -1087,7 +1088,12 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
     }
 
     public clone() {
-        throw new NotImplementedError();
+
+        const queryBuilderClone = this.queryBuilder.clone();
+
+        const typedQueryBuilderClone = new TypedQueryBuilder<ModelType, Row>(this.tableClass, this.knex, queryBuilderClone);
+
+        return typedQueryBuilderClone as any;
     }
 
     public beginTransaction(): Promise<Knex.Transaction> {
