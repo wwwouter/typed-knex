@@ -152,7 +152,7 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     clone(): ITypedQueryBuilder<ModelType, Row>;
 
     beginTransaction(): Promise<Knex.Transaction>;
-    groupByRaw(): void;
+    groupByRaw(sql: string, ...bindings: string[]): ITypedQueryBuilder<ModelType, Row>;
     // whereIn — .whereIn(column|columns, array|callback|builder)
     // orWhereIn
     // whereNotIn(column, array|callback|builder) /
@@ -1111,8 +1111,10 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
         return this;
     }
 
-    public groupByRaw() {
-        throw new NotImplementedError();
+
+    public groupByRaw(sql: string, ...bindings: string[]) {
+        this.queryBuilder.groupByRaw(sql, bindings);
+        return this;
     }
 
     public useKnexQueryBuilder(f: (query: Knex.QueryBuilder) => void): void {

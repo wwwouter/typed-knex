@@ -804,4 +804,18 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+
+    it('should create query with groupby raw', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .groupByRaw('year WITH ROLLUP');
+
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" group by year WITH ROLLUP');
+
+        done();
+    });
+
 });
