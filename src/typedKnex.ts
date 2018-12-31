@@ -74,6 +74,9 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     whereIn: IWhereIn<ModelType, Row>;
     whereNotIn: IWhereIn<ModelType, Row>;
 
+    orWhereIn: IWhereIn<ModelType, Row>;
+    orWhereNotIn: IWhereIn<ModelType, Row>;
+
 
     whereBetween: IWhereBetween<ModelType, Row>;
     whereNotBetween: IWhereBetween<ModelType, Row>;
@@ -153,10 +156,8 @@ export interface ITypedQueryBuilder<ModelType, Row> {
 
     beginTransaction(): Promise<Knex.Transaction>;
     groupByRaw(sql: string, ...bindings: string[]): ITypedQueryBuilder<ModelType, Row>;
-    // whereIn — .whereIn(column|columns, array|callback|builder)
-    // orWhereIn
-    // whereNotIn(column, array|callback|builder) /
-    //  .orWhereNotIn
+
+
     // .orWhereBetween
     // .orWhereNotBetween
 
@@ -847,26 +848,32 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
 
 
     public whereIn() {
-        const columnArguments = this.getArgumentsFromColumnFunction(arguments[0]);
         const range = arguments[1];
-        this.queryBuilder.whereIn(this.getColumnName(...columnArguments), range);
+        this.queryBuilder.whereIn(this.getColumnNameFromFunction(arguments[0]), range);
         return this;
     }
     public whereNotIn() {
-        const columnArguments = this.getArgumentsFromColumnFunction(arguments[0]);
         const range = arguments[1];
-        this.queryBuilder.whereNotIn(this.getColumnName(...columnArguments), range);
+        this.queryBuilder.whereNotIn(this.getColumnNameFromFunction(arguments[0]), range);
+        return this;
+    }
+    public orWhereIn() {
+        const range = arguments[1];
+        this.queryBuilder.orWhereIn(this.getColumnNameFromFunction(arguments[0]), range);
+        return this;
+    }
+    public orWhereNotIn() {
+        const range = arguments[1];
+        this.queryBuilder.orWhereNotIn(this.getColumnNameFromFunction(arguments[0]), range);
         return this;
     }
 
     public whereBetween() {
-        // const columnArguments = this.getArgumentsFromColumnFunction(arguments[0]);
         const value = arguments[1];
         this.queryBuilder.whereBetween(this.getColumnNameFromFunction(arguments[0]), value);
         return this;
     }
     public whereNotBetween() {
-        // const columnArguments = this.getArgumentsFromColumnFunction(arguments[0]);
         const value = arguments[1];
         this.queryBuilder.whereNotBetween(this.getColumnNameFromFunction(arguments[0]), value);
         return this;

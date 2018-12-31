@@ -818,4 +818,34 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+
+    it('should create query with or where in', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .whereIn(c => c('name'), ['user1', 'user2'])
+            .orWhereIn(c => c('name'), ['user3', 'user4']);
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" where "users"."name" in (\'user1\', \'user2\') or "users"."name" in (\'user3\', \'user4\')');
+
+        done();
+    });
+
+    it('should create query with or where not in', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .whereNotIn(c => c('name'), ['user1', 'user2'])
+            .orWhereNotIn(c => c('name'), ['user3', 'user4']);
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" where "users"."name" not in (\'user1\', \'user2\') or "users"."name" not in (\'user3\', \'user4\')');
+
+        done();
+    });
+
+
 });
