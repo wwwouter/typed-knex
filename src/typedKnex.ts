@@ -80,6 +80,8 @@ export interface ITypedQueryBuilder<ModelType, Row> {
 
     whereBetween: IWhereBetween<ModelType, Row>;
     whereNotBetween: IWhereBetween<ModelType, Row>;
+    orWhereBetween: IWhereBetween<ModelType, Row>;
+    orWhereNotBetween: IWhereBetween<ModelType, Row>;
 
     whereExists: IWhereExists<ModelType, Row>;
 
@@ -156,10 +158,6 @@ export interface ITypedQueryBuilder<ModelType, Row> {
 
     beginTransaction(): Promise<Knex.Transaction>;
     groupByRaw(sql: string, ...bindings: string[]): ITypedQueryBuilder<ModelType, Row>;
-
-
-    // .orWhereBetween
-    // .orWhereNotBetween
 
     // TBD
     // returningColumn(): void;
@@ -876,6 +874,18 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
     public whereNotBetween() {
         const value = arguments[1];
         this.queryBuilder.whereNotBetween(this.getColumnNameFromFunction(arguments[0]), value);
+        return this;
+    }
+
+
+    public orWhereBetween() {
+        const value = arguments[1];
+        this.queryBuilder.orWhereBetween(this.getColumnNameFromFunction(arguments[0]), value);
+        return this;
+    }
+    public orWhereNotBetween() {
+        const value = arguments[1];
+        this.queryBuilder.orWhereNotBetween(this.getColumnNameFromFunction(arguments[0]), value);
         return this;
     }
 
