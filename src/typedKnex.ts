@@ -181,7 +181,7 @@ export type Operator = '=' | '!=' | '>' | '<' | string;
 
 
 
-export interface IConstructor<T> {
+interface IConstructor<T> {
     new(...args: any[]): T;
 }
 
@@ -190,7 +190,7 @@ export interface IConstructor<T> {
 
 export type AddPropertyWithType<Original, NewKey extends keyof TypeWithIndexerOf<NewKeyType>, NewKeyType> = Original & Pick<TypeWithIndexerOf<NewKeyType>, NewKey>;
 
-export interface IKeysAsArguments<Model, Return> {
+interface IKeysAsArguments<Model, Return> {
 
     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): Return;
     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): Return;
@@ -200,13 +200,13 @@ export interface IKeysAsArguments<Model, Return> {
 }
 
 // tslint:disable-next-line:no-empty-interfaces
-export interface IKeysAsParametersReturnQueryBuider<Model, Row> extends IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> {
+interface IKeysAsParametersReturnQueryBuider<Model, Row> extends IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> {
 }
 
-// export interface IJoinColumn<Model, Row> extends IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> {
+// interface IJoinColumn<Model, Row> extends IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> {
 
 // }
-// export interface IJoinColumn<Model, Row> {
+// interface IJoinColumn<Model, Row> {
 //     <K1 extends FilterObjectsOnly<Model>, K2 extends FilterObjectsOnly<Model[K1]>>(key1: K1, key2: K2, ...keys: string[]): ITypedQueryBuilder<Model, Row>;
 //     <K1 extends FilterObjectsOnly<Model>, K2 extends FilterObjectsOnly<Model[K1]>>(key1: K1, key2: K2): ITypedQueryBuilder<Model, Row>;
 //     <K extends FilterObjectsOnly<Model>>(key1: K): ITypedQueryBuilder<Model, Row>;
@@ -215,13 +215,13 @@ export interface IKeysAsParametersReturnQueryBuider<Model, Row> extends IKeysAsA
 
 export type TypeWithIndexerOf<T> = { [key: string]: T };
 
-export interface IJoinTable<Model, Row> {
+interface IJoinTable<Model, Row> {
     <NewPropertyType, NewPropertyKey extends keyof TypeWithIndexerOf<NewPropertyType>, L1K1 extends keyof AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, L2K1 extends keyof AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, L2K2 extends keyof AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>[L2K1]>(newPropertyKey: NewPropertyKey, newPropertyClass: new () => NewPropertyType, column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2]): ITypedQueryBuilder<AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, Row>;
 }
 
 
 
-export interface IJoinOnClause<Model> {
+interface IJoinOnClause<Model> {
     // <L1K1 extends keyof Model, L2K1 extends keyof Model, L2K2 extends keyof Model[L2K1]>(column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2]): IJoinOnClause<Model>;
     // <L1K1 extends keyof Model, L2K1 extends keyof Model, L2K2 extends keyof Model[L2K1]>(column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2]): IJoinOnClause<Model>;
     onColumns: <L1K1 extends keyof Model, L2K1 extends keyof Model, L2K2 extends keyof Model[L2K1]>(column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2]) => IJoinOnClause<Model>;
@@ -231,17 +231,17 @@ export interface IJoinOnClause<Model> {
 // interface
 
 
-// tslint:disable-next-line:no-empty-interfaces
-interface IReferencedColumn {
+// // tslint:disable-next-line:no-empty-interfaces
+// interface IReferencedColumn {
 
 
-}
-export interface IJoinTableMultipleOnClauses<Model, Row> {
+// }
+interface IJoinTableMultipleOnClauses<Model, Row> {
     // <NewPropertyType, NewPropertyKey extends keyof TypeWithIndexerOf<NewPropertyType>, L1K1 extends keyof AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, L2K1 extends keyof AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, L2K2 extends keyof AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>[L2K1]>(newPropertyKey: NewPropertyKey, newPropertyClass: new () => NewPropertyType, column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2]): ITypedQueryBuilder<AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, Row>;
     <NewPropertyType, NewPropertyKey extends keyof TypeWithIndexerOf<NewPropertyType>>(newPropertyKey: NewPropertyKey, newPropertyClass: new () => NewPropertyType, on: (join: IJoinOnClause<AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>>) => void): ITypedQueryBuilder<AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, Row>;
 }
 
-// export interface IWhereCompareTwoColumns<Model, Row> {
+// interface IWhereCompareTwoColumns<Model, Row> {
 
 //     // (): { Left: () : { RIght: IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> } };
 
@@ -261,15 +261,15 @@ export interface IJoinTableMultipleOnClauses<Model, Row> {
 //     return {} as any;
 // }
 
-export interface IGroupBy<Model, Row> {
-    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): ITypedQueryBuilder<Model, Row>;
-    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): ITypedQueryBuilder<Model, Row>;
-    <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): ITypedQueryBuilder<Model, Row>;
-    <K extends keyof Model>(key1: K): ITypedQueryBuilder<Model, Row>;
-}
+// interface IGroupBy<Model, Row> {
+//     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): ITypedQueryBuilder<Model, Row>;
+//     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): ITypedQueryBuilder<Model, Row>;
+//     <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): ITypedQueryBuilder<Model, Row>;
+//     <K extends keyof Model>(key1: K): ITypedQueryBuilder<Model, Row>;
+// }
 
 
-export interface ISelectRaw<Model, Row> {
+interface ISelectRaw<Model, Row> {
     <TReturn extends Boolean | String | Number, TName extends keyof TypeWithIndexerOf<TReturn>>(name: TName, returnType: IConstructor<TReturn>, query: string): ITypedQueryBuilder<Model, Pick<TypeWithIndexerOf<ObjectToPrimitive<TReturn>>, TName> & Row>;
 }
 
@@ -277,15 +277,15 @@ export interface ISelectRaw<Model, Row> {
 
 
 
-export interface ISelectColumn<Model, Row> {
-    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, TransformAll<Pick<Model[K1][K2], K3>, any>>> & Row>;
-    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, Pick<Model[K1][K2], K3>>> & Row>;
-    <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Row>;
-    <K extends keyof Model>(key1: K): ITypedQueryBuilder<Model, Pick<Model, K> & Row>;
-}
+// interface ISelectColumn<Model, Row> {
+//     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, TransformAll<Pick<Model[K1][K2], K3>, any>>> & Row>;
+//     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, Pick<Model[K1][K2], K3>>> & Row>;
+//     <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Row>;
+//     <K extends keyof Model>(key1: K): ITypedQueryBuilder<Model, Pick<Model, K> & Row>;
+// }
 
 
-export interface IColumnFunctionReturnNewRow<Model> {
+interface IColumnFunctionReturnNewRow<Model> {
     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, TransformAll<Pick<Model[K1][K2], K3>, any>>>;
     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, Pick<Model[K1][K2], K3>>>;
     <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>>;
@@ -303,7 +303,7 @@ export function a(i: [string, string?]) {
 }
 
 
-export interface IColumnFunctionReturnPropertyType<Model> {
+interface IColumnFunctionReturnPropertyType<Model> {
     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): any;
     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): Model[K1][K2][K3];
     <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): Model[K1][K2];
@@ -312,30 +312,30 @@ export interface IColumnFunctionReturnPropertyType<Model> {
 
 
 
-export interface IColumnFunctionReturnColumnName<Model> {
+interface IColumnFunctionReturnColumnName<Model> {
     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): string;
     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): string;
     <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): string;
     <K extends keyof Model>(key1: K): string;
 }
 
-export interface ISelectWithFunctionColumn<Model, Row> {
+interface ISelectWithFunctionColumn<Model, Row> {
     <NewRow>(selectColumnFunction: (c: IColumnFunctionReturnNewRow<Model>) => NewRow): ITypedQueryBuilder<Model, Row & NewRow>;
 }
 
-export interface IOrderBy<Model, Row> {
+interface IOrderBy<Model, Row> {
     <NewRow>(selectColumnFunction: (c: IColumnFunctionReturnNewRow<Model>) => NewRow, direction?: 'asc' | 'desc'): ITypedQueryBuilder<Model, Row>;
 }
 
 
-export interface IDbFunctionWithAlias<Model, Row> {
+interface IDbFunctionWithAlias<Model, Row> {
     <NewPropertyType, TName extends keyof TypeWithIndexerOf<NewPropertyType>>(selectColumnFunction: (c: IColumnFunctionReturnPropertyType<Model>) => NewPropertyType, name: TName): ITypedQueryBuilder<Model, Pick<TypeWithIndexerOf<ObjectToPrimitive<NewPropertyType>>, TName> & Row>;
 }
 
 
 
 
-export interface ISelectWithFunctionColumns<Model, Row> {
+interface ISelectWithFunctionColumns<Model, Row> {
     <R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16, R17, R18, R19>(selectColumnFunction: [
         ((c: IColumnFunctionReturnNewRow<Model>) => R1),
         ((c: IColumnFunctionReturnNewRow<Model>) => R2)?,
@@ -361,18 +361,18 @@ export interface ISelectWithFunctionColumns<Model, Row> {
 }
 
 
-// export interface ISelectColumns<Model, Row> {
+// interface ISelectColumns<Model, Row> {
 //     <Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, keys2: K2[]): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev>;
 //     <K extends FilterNonObjects<Model>>(keys: K[]): ITypedQueryBuilder<Model, Pick<Model, K> & Row>;
 // }
 
 
-export interface ISelectColumns<Model, Row> {
-    <Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, keys2: K2[]): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev>;
-    <K extends FilterNonObjects<Model>>(keys: K[]): ITypedQueryBuilder<Model, Pick<Model, K> & Row>;
-}
+// interface ISelectColumns<Model, Row> {
+//     <Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, keys2: K2[]): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev>;
+//     <K extends FilterNonObjects<Model>>(keys: K[]): ITypedQueryBuilder<Model, Pick<Model, K> & Row>;
+// }
 
-export interface IKeyFunctionAsParametersReturnQueryBuider<Model, Row> {
+interface IKeyFunctionAsParametersReturnQueryBuider<Model, Row> {
     (selectColumnFunction: (c: IColumnFunctionReturnNewRow<Model>) => void): ITypedQueryBuilder<Model, Row>;
 }
 
@@ -380,7 +380,7 @@ export interface IKeyFunctionAsParametersReturnQueryBuider<Model, Row> {
 
 
 
-// export interface IKeysAsArguments<Model, Return> {
+// interface IKeysAsArguments<Model, Return> {
 
 //     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): Return;
 //     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): Return;
@@ -390,23 +390,23 @@ export interface IKeyFunctionAsParametersReturnQueryBuider<Model, Row> {
 // }
 
 // // tslint:disable-next-line:no-empty-interfaces
-// export interface IKeyFunctionAsParametersReturnQueryBuider<Model, Row> extends IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> {
+// interface IKeyFunctionAsParametersReturnQueryBuider<Model, Row> extends IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> {
 // }
 
 
 
 
-export interface IReferenceColumn<Model> {
-    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): IReferencedColumn;
-    <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): IReferencedColumn;
-    <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): IReferencedColumn;
-    <K extends keyof Model>(key1: K): IReferencedColumn;
-}
+// interface IReferenceColumn<Model> {
+//     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): IReferencedColumn;
+//     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): IReferencedColumn;
+//     <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): IReferencedColumn;
+//     <K extends keyof Model>(key1: K): IReferencedColumn;
+// }
 
 
 
 
-export interface IFindById<Model, Row> {
+interface IFindById<Model, Row> {
     <Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterNonObjects<Model[K1]>>(id: string, key1: K1, keys2: K2[]): Promise<TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev | void>;
     <K extends FilterNonObjects<Model>>(id: string, keys: K[]): Promise<Pick<Model, K> & Row | void>;
 }
@@ -415,23 +415,23 @@ export interface IFindById<Model, Row> {
 
 
 
-export interface IWhere<Model, Row> {
+interface IWhere<Model, Row> {
     <PropertyType>(selectColumnFunction: (c: IColumnFunctionReturnPropertyType<Model>) => PropertyType, value: PropertyType): ITypedQueryBuilder<Model, Row>;
 }
 
 
-export interface IWhereIn<Model, Row> {
+interface IWhereIn<Model, Row> {
     <PropertyType>(selectColumnFunction: (c: IColumnFunctionReturnPropertyType<Model>) => PropertyType, values: PropertyType[]): ITypedQueryBuilder<Model, Row>;
 }
 
 
-export interface IWhereBetween<Model, Row> {
+interface IWhereBetween<Model, Row> {
     <PropertyType>(selectColumnFunction: (c: IColumnFunctionReturnPropertyType<Model>) => PropertyType, range: [PropertyType, PropertyType]): ITypedQueryBuilder<Model, Row>;
 }
 
 
 
-export interface IHaving<Model, Row> {
+interface IHaving<Model, Row> {
     <PropertyType>(selectColumnFunction: (c: IColumnFunctionReturnPropertyType<Model>) => PropertyType, operator: Operator, value: PropertyType): ITypedQueryBuilder<Model, Row>;
 
     // <K extends FilterNonObjects<Model>>(key1: K, operator: Operator, value: Model[K]): ITypedQueryBuilder<Model, Row>;
@@ -442,7 +442,7 @@ export interface IHaving<Model, Row> {
 
 
 
-export interface IWhereCompareTwoColumns<Model, Row> {
+interface IWhereCompareTwoColumns<Model, Row> {
 
 
     <PropertyType1, PropertyType2, Model2>(selectColumn1Function: (c: IColumnFunctionReturnPropertyType<Model>) => PropertyType1, operator: Operator, selectColumn2Function: ((c: IColumnFunctionReturnPropertyType<Model2>) => PropertyType2) | string): ITypedQueryBuilder<Model, Row>;
@@ -462,7 +462,7 @@ export interface IWhereCompareTwoColumns<Model, Row> {
 
 
 
-// export interface IWhereBetween<Model, Row> {
+// interface IWhereBetween<Model, Row> {
 //     <K extends FilterNonObjects<Model>>(key1: K, range: [Model[K], Model[K]]): ITypedQueryBuilder<Model, Row>;
 //     <K1 extends keyof Model, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, key2: K2, range: [Model[K1][K2], Model[K1][K2]]): ITypedQueryBuilder<Model, Row>;
 //     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends FilterNonObjects<Model[K1][K2]>>(key1: K1, key2: K2, key3: K3, range: [Model[K1][K2][K3], Model[K1][K2][K3]]): ITypedQueryBuilder<Model, Row>;
@@ -470,13 +470,13 @@ export interface IWhereCompareTwoColumns<Model, Row> {
 // }
 
 
-export interface IWhereExists<Model, Row> {
+interface IWhereExists<Model, Row> {
     <SubQueryModel>(subQueryModel: new () => SubQueryModel, code: (subQuery: ITypedQueryBuilder<SubQueryModel, {}>, parent: IColumnFunctionReturnColumnName<Model>) => void): ITypedQueryBuilder<Model, Row>;
 }
 
 
 
-export interface IUnion<Model, Row> {
+interface IUnion<Model, Row> {
     <SubQueryModel>(subQueryModel: new () => SubQueryModel, code: (subQuery: ITypedQueryBuilder<SubQueryModel, {}>) => void): ITypedQueryBuilder<Model, Row>;
 }
 

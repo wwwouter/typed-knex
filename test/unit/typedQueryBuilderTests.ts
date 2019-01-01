@@ -73,7 +73,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .innerJoin(c => c('user'));
+            .innerJoinColumn(c => c('user'));
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "userSettings" inner join "users" as "user" on "user"."id" = "userSettings"."userId"');
 
@@ -86,7 +86,7 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(UserSetting)
             .selectColumn(c => c('user', 'name'))
-            .innerJoin(c => c('user'));
+            .innerJoinColumn(c => c('user'));
         const queryString = query.toQuery();
         assert.equal(queryString, 'select "user"."name" as "user.name" from "userSettings" inner join "users" as "user" on "user"."id" = "userSettings"."userId"');
 
@@ -99,7 +99,7 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(UserSetting)
             .where(c => c('user', 'name'), 'user1')
-            .innerJoin(c => c('user'));
+            .innerJoinColumn(c => c('user'));
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "userSettings" inner join "users" as "user" on "user"."id" = "userSettings"."userId" where "user"."name" = \'user1\'');
 
@@ -111,8 +111,8 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .innerJoin(c => c('user'))
-            .innerJoin(c => c('user', 'category'));
+            .innerJoinColumn(c => c('user'))
+            .innerJoinColumn(c => c('user', 'category'));
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "userSettings" inner join "users" as "user" on "user"."id" = "userSettings"."userId" inner join "userCategories" as "user_category" on "user_category"."id" = "user"."categoryId"');
 
@@ -125,7 +125,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .innerJoin(c => c('user', 'category', 'region'));
+            .innerJoinColumn(c => c('user', 'category', 'region'));
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "userSettings" inner join "regions" as "user_category_region" on "user_category_region"."id" = "user_category"."regionId"');
 
@@ -139,7 +139,7 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(UserSetting)
             .selectColumn(c => c('user', 'category', 'name'))
-            .innerJoin(c => c('user', 'category'));
+            .innerJoinColumn(c => c('user', 'category'));
         const queryString = query.toQuery();
         assert.equal(queryString, 'select "user_category"."name" as "user.category.name" from "userSettings" inner join "userCategories" as "user_category" on "user_category"."id" = "user"."categoryId"');
 
@@ -152,7 +152,7 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(UserSetting)
             .selectColumn(c => c('user', 'category', 'region', 'code'))
-            .innerJoin(c => c('user', 'category', 'region'));
+            .innerJoinColumn(c => c('user', 'category', 'region'));
         const queryString = query.toQuery();
         assert.equal(queryString, 'select "user_category_region"."code" as "user.category.region.code" from "userSettings" inner join "regions" as "user_category_region" on "user_category_region"."id" = "user_category"."regionId"');
 
@@ -166,7 +166,7 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(UserSetting)
             .where(c => c('user', 'category', 'name'), 'user1')
-            .innerJoin(c => c('user', 'category'));
+            .innerJoinColumn(c => c('user', 'category'));
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "userSettings" inner join "userCategories" as "user_category" on "user_category"."id" = "user"."categoryId" where "user_category"."name" = \'user1\'');
 
@@ -179,7 +179,7 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(UserSetting)
             .where(c => c('user', 'category', 'region', 'code'), 2)
-            .innerJoin(c => c('user', 'category', 'region'));
+            .innerJoinColumn(c => c('user', 'category', 'region'));
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "userSettings" inner join "regions" as "user_category_region" on "user_category_region"."id" = "user_category"."regionId" where "user_category_region"."code" = 2');
 
