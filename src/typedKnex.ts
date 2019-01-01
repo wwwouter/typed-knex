@@ -140,7 +140,7 @@ export interface ITypedQueryBuilder<Model, Row> {
 
     insert(newObject: Partial<Model>): Promise<void>;
     countResult(): Promise<number>;
-    delById(id: string): Promise<void>;
+    delByPrimaryKey(id: string): Promise<void>;
     update(id: string, item: Partial<Model>): Promise<void>;
 
 
@@ -541,8 +541,10 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
         this.extraJoinedProperties = [];
     }
 
-    public async delById(id: string) {
-        await this.queryBuilder.del().where('id', id);
+    public async delByPrimaryKey(value: any) {
+        const primaryKeyColumnInfo = getPrimaryKeyColumn(this.tableClass);
+
+        await this.queryBuilder.del().where(primaryKeyColumnInfo.name, value);
     }
 
     public async insert(newObject: Partial<ModelType>) {
