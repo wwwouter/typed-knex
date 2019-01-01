@@ -9,15 +9,62 @@ interface IColumnData {
 }
 const tableColumns = new Map<Function, IColumnData[]>();
 
+const entities = [] as {
+    tableName: string;
+    entityClass: Function;
+}[];
 
+// export function Entity2(tableName: string) {
+
+//     return ((target: Function) => {
+//         console.log('target: ', target);
+//         return Reflect.metadata(tableyMetadataKey, { tableName: tableName });
+//     })(arguments);
+
+
+// }
+
+export function getEntities() {
+    return entities;
+}
 
 export function Entity(tableName: string) {
-    return Reflect.metadata(tableyMetadataKey, { tableName: tableName });
+
+    return ((target: Function) => {
+        Reflect.metadata(tableyMetadataKey, { tableName: tableName })(target);
+
+        entities.push({ tableName: tableName, entityClass: target });
+    });
 }
+
 
 export function getTableMetadata(tableClass: Function): { tableName: string } {
     return Reflect.getMetadata(tableyMetadataKey, tableClass);
 }
+
+
+// function registerEntity(target: any, propertyKey: string): void {
+
+//     Reflect.metadata(columnMetadataKey, { isColumn: true })(target);
+
+//     const columns = tableColumns.get(target.constructor) || [];
+
+//     let name = propertyKey;
+//     // console.log('name: ', name);
+//     let primary = false;
+//     // console.log('options: ', options);
+//     if (options) {
+//         if (options.name !== undefined) {
+//             name = options.name;
+//         }
+//         primary = options.primary === true;
+//     }
+
+//     columns.push({ name, primary, propertyKey });
+//     tableColumns.set(target.constructor, columns);
+// }
+
+
 
 const columnMetadataKey = Symbol('column');
 

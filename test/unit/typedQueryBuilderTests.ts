@@ -2,6 +2,7 @@ import { assert } from 'chai';
 import * as knex from 'knex';
 import { TypedKnex } from '../../src/typedKnex';
 import { User, UserSetting } from '../testEntities';
+import { getEntities } from '../../src';
 
 
 
@@ -892,6 +893,16 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+
+    it('should return metadata from Entities', (done) => {
+
+        const entities = getEntities();
+
+        assert.equal(entities.length, 4);
+        assert.exists(entities.find(i => i.tableName === 'users'));
+
+        done();
+    });
 
 
 });
