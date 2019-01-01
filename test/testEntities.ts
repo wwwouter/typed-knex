@@ -1,47 +1,47 @@
-import { column, table } from '../src/decorators';
+import { Column, Entity } from '../src/decorators';
 
 
-@table('regions')
+@Entity('regions')
 export class Region {
     public id!: string;
     public code: number;
 }
 
-@table('userCategories')
+@Entity('userCategories')
 export class UserCategory {
     public id!: string;
     public name!: string;
-    @column()
+    @Column()
     public region!: Region;
     public regionId!: string;
     public year!: number;
 }
 
 
-@table('users')
+@Entity('users')
 export class User {
     public id!: string;
     public name!: string;
     public numericValue: number;
     public someValue!: string;
-    @column()
+    @Column()
     public category!: UserCategory;
     public categoryId!: string;
-    @column()
+    @Column()
     public category2!: UserCategory;
 
 }
 
 
 
-@table('userSettings')
+@Entity('userSettings')
 export class UserSetting {
-    @column()
+    @Column()
     public id!: string;
-    @column()
+    @Column()
     public user!: User;
     public userId!: string;
-    @column()
+    @Column()
     public user2!: User;
     public user2Id!: string;
     public key!: string;

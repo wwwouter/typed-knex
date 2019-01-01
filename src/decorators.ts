@@ -4,11 +4,13 @@ const tableyMetadataKey = Symbol('table');
 
 interface IColumnData {
     name: string;
+    primary: boolean;
 }
 const tableColumns = new Map<Function, IColumnData[]>();
 
 
-export function table(tableName: string) {
+
+export function Entity(tableName: string) {
     return Reflect.metadata(tableyMetadataKey, { tableName: tableName });
 }
 
@@ -18,19 +20,46 @@ export function getTableMetadata(tableClass: Function): { tableName: string } {
 
 const columnMetadataKey = Symbol('column');
 
-export function column(): (target: object, propertyKey: string) => void {
+interface IColumnOptions {
+    /**
+     * Column name in the database.
+     */
+    name?: string;
+
+    /**
+     * Indicates if this column is a primary key.
+     */
+    primary?: boolean;
+}
+
+export function Column(options?: IColumnOptions): (target: object, propertyKey: string) => void {
+    return getRegisterColumn(options);
+}
+
+function getRegisterColumn(options?: IColumnOptions) {
+    function registerColumn(target: any, propertyKey: string): void {
+
+        Reflect.metadata(columnMetadataKey, { isColumn: true })(target);
+
+        const columns = tableColumns.get(target.constructor) || [];
+
+        let name = propertyKey;
+        let primary = false;
+        if (options) {
+            if (options.name !== undefined) {
+                name = options.name;
+            }
+            primary = options.primary === true;
+        }
+
+        columns.push({ name, primary });
+        tableColumns.set(target.constructor, columns);
+    }
+
     return registerColumn;
 }
 
 
-
-function registerColumn(target: any, propertyKey: string): void {
-    Reflect.metadata(columnMetadataKey, { isColumn: true })(target);
-
-    const columns = tableColumns.get(target.constructor) || [];
-    columns.push({ name: propertyKey });
-    tableColumns.set(target.constructor, columns);
-}
 
 export function getColumnInformation(target: Function, propertyKey: string): { columnClass: new () => any } {
     // console.log('target: ', target);

@@ -1,2 +1,2 @@
-export { column, table } from './decorators';
+export { Column, Entity } from './decorators';
 export { ITypedQueryBuilder, TypedKnex, registerBeforeInsertTransform, registerBeforeUpdateTransform } from './typedKnex';
