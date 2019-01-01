@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 import * as knex from 'knex';
+import { getEntities } from '../../src';
 import { TypedKnex } from '../../src/typedKnex';
 import { User, UserSetting } from '../testEntities';
-import { getEntities } from '../../src';
 
 
 
