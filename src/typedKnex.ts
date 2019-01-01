@@ -140,8 +140,12 @@ export interface ITypedQueryBuilder<Model, Row> {
 
     insert(newObject: Partial<Model>): Promise<void>;
     countResult(): Promise<number>;
-    delByPrimaryKey(id: string): Promise<void>;
-    update(id: string, item: Partial<Model>): Promise<void>;
+    delByPrimaryKey(primaryKeyValue: any): Promise<void>;
+    update(primaryKeyValue: any, item: Partial<Model>): Promise<void>;
+    updateItems(items: { primaryKeyValue: any, data: Partial<Model> }[]): Promise<void>;
+
+    insertItems(items: Partial<Model>[]): Promise<void>;
+
 
 
     whereRaw(sql: string, ...bindings: string[]): ITypedQueryBuilder<Model, Row>;
@@ -567,15 +571,20 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
         }
     }
 
-    public async update(id: string, item: Partial<ModelType>) {
+    public async update(primaryKeyValue: any, item: Partial<ModelType>) {
         if (beforeUpdateTransform) {
             item = beforeUpdateTransform(item, this);
         }
 
-        await this.queryBuilder.update(item).where('id', id);
+        const primaryKeyColumnInfo = getPrimaryKeyColumn(this.tableClass);
+
+        await this.queryBuilder.update(item).where(primaryKeyColumnInfo.name, primaryKeyValue);
     }
 
-    public async updateItems(items: { id: string, data: Partial<ModelType> }[]) {
+    public async updateItems(items: { primaryKeyValue: any, data: Partial<ModelType> }[]) {
+
+        const primaryKeyColumnInfo = getPrimaryKeyColumn(this.tableClass);
+
         items = [...items];
         while (items.length > 0) {
             const chunk = items.splice(0, 500);
@@ -587,7 +596,7 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
                     item.data = beforeUpdateTransform(item.data, this);
                 }
                 query.update(item.data);
-                sql += query.where('id', item.id).toString().replace('?', '\\?') + ';\n';
+                sql += query.where(primaryKeyColumnInfo.name, item.primaryKeyValue).toString().replace('?', '\\?') + ';\n';
             }
 
 
