@@ -15,7 +15,7 @@ export class UserCategory {
     public id!: string;
     @Column()
     public name!: string;
-    @Column()
+    @Column({ name: 'regionId' })
     public region!: Region;
     @Column()
     public regionId!: string;
@@ -34,11 +34,12 @@ export class User {
     public numericValue: number;
     @Column()
     public someValue!: string;
-    @Column()
+    @Column({ name: 'categoryId' })
     public category!: UserCategory;
     @Column()
     public categoryId!: string;
     @Column()
+    @Column({ name: 'category2Id' })
     public category2!: UserCategory;
 
 }
@@ -48,11 +49,11 @@ export class User {
 export class UserSetting {
     @Column({ primary: true })
     public id!: string;
-    @Column()
+    @Column({ name: 'userId' })
     public user!: User;
     @Column()
     public userId!: string;
-    @Column()
+    @Column({ name: 'user2Id' })
     public user2!: User;
     @Column()
     public user2Id!: string;

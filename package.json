@@ -15,7 +15,7 @@
     "build": "tsc -p tsconfig.json",
     "build:dist": "tsc --outDir dist",
     "prepublish": "npm run build:dist",
-    "mocha-unit": "npm run build && mocha \"build/test/unit/**/*Tests.js\"",
+    "mocha-unit": "npm run build && mocha --bail \"build/test/unit/**/*Tests.js\"",
     "mocha-all": "npm run build && mocha \"build/test/**/*Tests.js\""
   },
   "repository": {

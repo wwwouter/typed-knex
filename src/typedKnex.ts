@@ -1,7 +1,7 @@
 // tslint:disable:use-named-parameter
 import * as flat from 'flat';
 import * as Knex from 'knex';
-import { getColumnInformation, getColumnProperties, getTableMetadata } from './decorators';
+import { getColumnInformation, getColumnProperties, getPrimaryKeyColumn, getTableMetadata } from './decorators';
 
 export function unflatten(o: any): any {
     if (o instanceof Array) {
@@ -607,7 +607,7 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
         return await this.queryBuilder.select(columns as any).where(this.tableName + '.id', id).first();
     }
 
-    public async  countResult() {
+    public async countResult() {
         const query = this.queryBuilder.count();
         const result = await query;
         if (result.length === 0) {
@@ -1213,36 +1213,73 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
 
     private joinColumn(joinType: 'innerJoin' | 'leftOuterJoin', f: any) {
 
-        const args = this.getArgumentsFromColumnFunction(f);
 
-        let firstColumnAlias = this.tableName;
-        let firstColumnClass = this.tableClass;
-        let secondColumnAlias = args[0];
-        let secondColumnName = args[0];
-        let secondColumnClass = getColumnInformation(firstColumnClass, secondColumnAlias).columnClass;
 
-        for (let i = 1; i < args.length; i++) {
+
+        const columnToJoinArguments = this.getArgumentsFromColumnFunction(f);
+
+        const columnToJoinName = this.getColumnName(...columnToJoinArguments);
+
+        let secondColumnName = columnToJoinArguments[0];
+        let secondColumnAlias = columnToJoinArguments[0];
+        let secondColumnClass = getColumnInformation(this.tableClass, secondColumnName).columnClass;
+
+        for (let i = 1; i < columnToJoinArguments.length; i++) {
             const beforeSecondColumnAlias = secondColumnAlias;
             const beforeSecondColumnClass = secondColumnClass;
 
-            secondColumnName = args[i];
-            secondColumnAlias = beforeSecondColumnAlias + '_' + args[i];
-            secondColumnClass = getColumnInformation(beforeSecondColumnClass, args[i]).columnClass;
+            const columnInfo = getColumnInformation(beforeSecondColumnClass, columnToJoinArguments[i]);
+            secondColumnName = columnInfo.name;
+            secondColumnAlias = beforeSecondColumnAlias + '_' + columnInfo.propertyKey;
+            secondColumnClass = columnInfo.columnClass;
 
-            firstColumnAlias = beforeSecondColumnAlias;
-            firstColumnClass = beforeSecondColumnClass;
+            // firstColumnAlias = beforeSecondColumnAlias;
+            // firstColumnClass = beforeSecondColumnClass;
         }
+
         const tableToJoinName = getTableMetadata(secondColumnClass).tableName;
+        // const tableToJoinAlias = tableToJoinName.replace('.', '_');
         const tableToJoinAlias = secondColumnAlias;
-        const tableToJoinJoinColumnName = `${tableToJoinAlias}.id`;
-        const tableJoinedColumnName = `${firstColumnAlias}.${secondColumnName}Id`;
+        const tableToJoinJoinColumnName = `${tableToJoinAlias}.${getPrimaryKeyColumn(secondColumnClass).name}`;
 
         if (joinType === 'innerJoin') {
-            this.queryBuilder.innerJoin(`${tableToJoinName} as ${tableToJoinAlias}`, tableToJoinJoinColumnName, tableJoinedColumnName);
+            this.queryBuilder.innerJoin(`${tableToJoinName} as ${tableToJoinAlias}`, tableToJoinJoinColumnName, columnToJoinName);
         } else if (joinType === 'leftOuterJoin') {
-            this.queryBuilder.leftOuterJoin(`${tableToJoinName} as ${tableToJoinAlias}`, tableToJoinJoinColumnName, tableJoinedColumnName);
+            this.queryBuilder.leftOuterJoin(`${tableToJoinName} as ${tableToJoinAlias}`, tableToJoinJoinColumnName, columnToJoinName);
 
         }
+
+
+        // let firstColumnAlias = this.tableName;
+        // let firstColumnClass = this.tableClass;
+        // let secondColumnAlias = columnToJoinArguments[0];
+        // let secondColumnName = columnToJoinArguments[0];
+        // let secondColumnClass = getColumnInformation(firstColumnClass, secondColumnAlias).columnClass;
+
+        // for (let i = 1; i < columnToJoinArguments.length; i++) {
+        //     const beforeSecondColumnAlias = secondColumnAlias;
+        //     const beforeSecondColumnClass = secondColumnClass;
+
+        //     secondColumnName = columnToJoinArguments[i];
+        //     secondColumnAlias = beforeSecondColumnAlias + '_' + columnToJoinArguments[i];
+        //     secondColumnClass = getColumnInformation(beforeSecondColumnClass, columnToJoinArguments[i]).columnClass;
+
+        //     firstColumnAlias = beforeSecondColumnAlias;
+        //     firstColumnClass = beforeSecondColumnClass;
+        // }
+        // // tableToJoinJoinColumnName = getPrimaryKeyColumn(getColumnProperties);
+
+        // const tableToJoinName = getTableMetadata(secondColumnClass).tableName;
+        // const tableToJoinAlias = secondColumnAlias;
+        // const tableToJoinJoinColumnName = `${tableToJoinAlias}.${getPrimaryKeyColumn(secondColumnClass)}`;
+        // const tableJoinedColumnName = `${firstColumnAlias}.${secondColumnName}Id`;
+
+        // if (joinType === 'innerJoin') {
+        //     this.queryBuilder.innerJoin(`${tableToJoinName} as ${tableToJoinAlias}`, tableToJoinJoinColumnName, tableJoinedColumnName);
+        // } else if (joinType === 'leftOuterJoin') {
+        //     this.queryBuilder.leftOuterJoin(`${tableToJoinName} as ${tableToJoinAlias}`, tableToJoinJoinColumnName, tableJoinedColumnName);
+
+        // }
 
         return this;
 
@@ -1256,32 +1293,92 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
 
 
     private getColumnName(...keys: string[]): string {
+
+
+        const firstPartName = this.getColumnNameWithoutAlias(keys[0]);
+
         if (keys.length === 1) {
-            return this.tableName + '.' + keys[0];
+            return firstPartName;
         } else {
-            let columnName = keys[0];
-            let columnAlias = keys[0];
+
+            let currentColumnPart = getColumnInformation(this.tableClass, keys[0]);
+
+            let columnName = '';
+            let columnAlias = currentColumnPart.propertyKey;
+            let currentClass = currentColumnPart.columnClass;
             for (let i = 1; i < keys.length; i++) {
-                columnName = columnAlias + '.' + keys[i];
-                columnAlias += '_' + keys[i];
+
+                currentColumnPart = getColumnInformation(currentClass, keys[i]);
+
+                columnName = columnAlias + '.' + (keys.length - 1 === i ? currentColumnPart.name : currentColumnPart.propertyKey);
+                columnAlias += '_' + (keys.length - 1 === i ? currentColumnPart.name : currentColumnPart.propertyKey);
+                currentClass = currentColumnPart.columnClass;
             }
             return columnName;
         }
+
+
+        // let currentClass = this.tableClass;
+        // let result = this.tableName;
+        // for (let i = 0; i < keys.length; i++) {
+        //     const currentColumnPart = getColumnInformation(currentClass, keys[i]);
+        //     result += '.' + currentColumnPart.name;
+        //     currentClass = currentColumnPart.columnClass;
+        // }
+
+        // return result;
+
+        // if (keys.length === 1) {
+        //     return this.tableName + '.' + keys[0];
+        // } else {
+        //     let columnName = keys[0];
+        //     let columnAlias = keys[0];
+        //     for (let i = 1; i < keys.length; i++) {
+        //         columnName = columnAlias + '.' + keys[i];
+        //         columnAlias += '_' + keys[i];
+        //     }
+        //     return columnName;
+        // }
     }
 
 
     private getColumnNameWithoutAlias(...keys: string[]): string {
+
+
         if (keys.length === 1) {
-            return this.tableName + '.' + keys[0];
+            const columnInfo = getColumnInformation(this.tableClass, keys[0]);
+            return this.tableName + '.' + columnInfo.name;
         } else {
-            let columnName = keys[0];
-            // let columnAlias = keys[0];
+
+            // let currentClass = this.tableClass;
+            // let result = '';
+
+            let currentColumnPart = getColumnInformation(this.tableClass, keys[0]);
+
+            // let columnName = '';
+            let result = currentColumnPart.propertyKey;
+            let currentClass = currentColumnPart.columnClass;
+
             for (let i = 1; i < keys.length; i++) {
-                columnName = columnName + '.' + keys[i];
-                // columnAlias += '_' + keys[i];
+                currentColumnPart = getColumnInformation(currentClass, keys[i]);
+                result += '.' + (keys.length - 1 === i ? currentColumnPart.name : currentColumnPart.propertyKey);
+                currentClass = currentColumnPart.columnClass;
             }
-            return columnName;
+
+            return result;
         }
+
+        // if (keys.length === 1) {
+        //     return this.tableName + '.' + keys[0];
+        // } else {
+        //     let columnName = keys[0];
+        //     // let columnAlias = keys[0];
+        //     for (let i = 1; i < keys.length; i++) {
+        //         columnName = columnName + '.' + keys[i];
+        //         // columnAlias += '_' + keys[i];
+        //     }
+        //     return columnName;
+        // }
     }
 
     // private getColumnAlias(...keys: string[]): string {
