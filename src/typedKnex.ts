@@ -67,8 +67,6 @@ export interface ITypedQueryBuilder<ModelType, Row> {
 
     selectRaw: ISelectRaw<ModelType, Row extends ModelType ? {} : Row>;
 
-
-
     findById: IFindById<ModelType, Row>;
 
     whereIn: IWhereIn<ModelType, Row>;
@@ -113,15 +111,15 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     union: IUnion<ModelType, Row>;
     unionAll: IUnion<ModelType, Row>;
 
-    minColumn: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
+    min: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
 
-    countColumn: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
-    countDistinctColumn: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
-    maxColumn: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
-    sumColumn: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
-    sumDistinctColumn: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
-    avgColumn: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
-    avgDistinctColumn: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
+    count: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
+    countDistinct: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
+    max: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
+    sum: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
+    sumDistinct: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
+    avg: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
+    avgDistinct: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
 
     clearSelect(): ITypedQueryBuilder<ModelType, ModelType>;
     clearWhere(): ITypedQueryBuilder<ModelType, Row>;
@@ -1038,35 +1036,35 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
         this.queryBuilder.transacting(trx);
     }
 
-    public minColumn() {
+    public min() {
         return this.functionWithAlias('min', arguments[0], arguments[1]);
     }
 
-    public countColumn() {
+    public count() {
         return this.functionWithAlias('count', arguments[0], arguments[1]);
     }
 
-    public countDistinctColumn() {
+    public countDistinct() {
         return this.functionWithAlias('countDistinct', arguments[0], arguments[1]);
     }
 
-    public maxColumn() {
+    public max() {
         return this.functionWithAlias('max', arguments[0], arguments[1]);
     }
 
-    public sumColumn() {
+    public sum() {
         return this.functionWithAlias('sum', arguments[0], arguments[1]);
     }
 
-    public sumDistinctColumn() {
+    public sumDistinct() {
         return this.functionWithAlias('sumDistinct', arguments[0], arguments[1]);
     }
 
-    public avgColumn() {
+    public avg() {
         return this.functionWithAlias('avg', arguments[0], arguments[1]);
     }
 
-    public avgDistinctColumn() {
+    public avgDistinct() {
         return this.functionWithAlias('avgDistinct', arguments[0], arguments[1]);
     }
 
