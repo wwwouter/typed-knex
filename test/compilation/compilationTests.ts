@@ -339,7 +339,7 @@ describe('compile time typed-knex', function() {
         done();
     });
 
-    it('should return type with properties from the minColumn method', (done) => {
+    it('should return type with properties from the min method', (done) => {
 
 
         const file = project.createSourceFile(
@@ -356,7 +356,7 @@ describe('compile time typed-knex', function() {
                 const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
                 const result = await typedKnex
                     .query(User)
-                    .minColumn(c => c('numericValue'), 'minNumericValue')
+                    .min(c => c('numericValue'), 'minNumericValue')
                     .firstItem();
 
                 console.log(result.minNumericValue);
@@ -371,7 +371,7 @@ describe('compile time typed-knex', function() {
     });
 
 
-    it('should error on calling property not used in minColumn method', (done) => {
+    it('should error on calling property not used in min method', (done) => {
 
 
         const file = project.createSourceFile(
@@ -388,7 +388,7 @@ describe('compile time typed-knex', function() {
                 const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
                 const result = await typedKnex
                     .query(User)
-                    .minColumn(c => c('numericValue'), 'minNumericValue')
+                    .min(c => c('numericValue'), 'minNumericValue')
                     .firstItem();
 
                 console.log(result.id);
@@ -406,7 +406,7 @@ describe('compile time typed-knex', function() {
 
 
         const file = project.createSourceFile(
-            'test/test.ts'
+            'test/test3.ts'
             ,
             `
             import * as knex from 'knex';
@@ -428,6 +428,40 @@ describe('compile time typed-knex', function() {
 
             })();
         `);
+
+        assert.equal(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
+
+    it('should return correct type from findByColumn', (done) => {
+
+
+        const file = project.createSourceFile(
+            'test/test4.ts'
+            ,
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+
+                const item = await typedKnex
+                .query(User)
+                .findByColumn(c => c('numericValue'), 1, [c => c('name')]);
+
+                if (item !== undefined) {
+                    console.log(item.name);
+                }
+
+            })();
+        `);
+
 
         assert.equal(project.getPreEmitDiagnostics().length, 0);
 

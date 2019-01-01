@@ -875,6 +875,9 @@ describe('TypedKnexQueryBuilder', () => {
         assert.equal(queryString, 'select * from "users" where "users"."numericValue" not between 1 and 10 or "users"."numericValue" not between 100 and 1000');
 
         done();
+
     });
+
+
 
 });

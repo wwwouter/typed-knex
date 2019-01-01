@@ -67,7 +67,8 @@ export interface ITypedQueryBuilder<ModelType, Row> {
 
     selectRaw: ISelectRaw<ModelType, Row extends ModelType ? {} : Row>;
 
-    findById: IFindById<ModelType, Row>;
+    // findById: IFindById<ModelType, Row>;
+    findByColumn: IFindByColumn<ModelType, Row extends ModelType ? {} : Row>;
 
     whereIn: IWhereIn<ModelType, Row>;
     whereNotIn: IWhereIn<ModelType, Row>;
@@ -361,6 +362,37 @@ interface ISelectWithFunctionColumns<Model, Row> {
 }
 
 
+
+interface IFindByColumn<Model, Row> {
+    <PropertyType, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16, R17, R18, R19>(
+        whereColumnFunction: (c: IColumnFunctionReturnPropertyType<Model>) => PropertyType,
+        value: PropertyType,
+        selectColumnFunctions: [
+            ((c: IColumnFunctionReturnNewRow<Model>) => R1),
+            ((c: IColumnFunctionReturnNewRow<Model>) => R2)?,
+            ((c: IColumnFunctionReturnNewRow<Model>) => R3)?,
+            ((c: IColumnFunctionReturnNewRow<Model>) => R4)?,
+            ((c: IColumnFunctionReturnNewRow<Model>) => R5)?,
+            ((c: IColumnFunctionReturnNewRow<Model>) => R6)?,
+            ((c: IColumnFunctionReturnNewRow<Model>) => R7)?,
+            ((c: IColumnFunctionReturnNewRow<Model>) => R8)?,
+            ((c: IColumnFunctionReturnNewRow<Model>) => R9)?,
+            ((c: IColumnFunctionReturnNewRow<Model>) => R10)?,
+            ((c: IColumnFunctionReturnNewRow<Model>) => R11)?,
+            ((c: IColumnFunctionReturnNewRow<Model>) => R12)?,
+            ((c: IColumnFunctionReturnNewRow<Model>) => R13)?,
+            ((c: IColumnFunctionReturnNewRow<Model>) => R14)?,
+            ((c: IColumnFunctionReturnNewRow<Model>) => R15)?,
+            ((c: IColumnFunctionReturnNewRow<Model>) => R16)?,
+            ((c: IColumnFunctionReturnNewRow<Model>) => R17)?,
+            ((c: IColumnFunctionReturnNewRow<Model>) => R18)?,
+            ((c: IColumnFunctionReturnNewRow<Model>) => R19)?
+        ]
+    ): Promise<Row & R1 & R2 & R3 & R4 & R5 & R6 & R7 & R8 & R8 & R9 & R10 & R11 & R12 & R13 & R14 & R15 & R16 & R17 & R18 & R18 & R19 | void>; // ITypedQueryBuilder<Model, Row & R1 & R2 & R3 & R4 & R5 & R6 & R7 & R8 & R8 & R9 & R10 & R11 & R12 & R13 & R14 & R15 & R16 & R17 & R18 & R18 & R19>;
+}
+
+
+
 // interface ISelectColumns<Model, Row> {
 //     <Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, keys2: K2[]): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev>;
 //     <K extends FilterNonObjects<Model>>(keys: K[]): ITypedQueryBuilder<Model, Pick<Model, K> & Row>;
@@ -406,10 +438,10 @@ interface IKeyFunctionAsParametersReturnQueryBuider<Model, Row> {
 
 
 
-interface IFindById<Model, Row> {
-    <Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterNonObjects<Model[K1]>>(id: string, key1: K1, keys2: K2[]): Promise<TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev | void>;
-    <K extends FilterNonObjects<Model>>(id: string, keys: K[]): Promise<Pick<Model, K> & Row | void>;
-}
+// interface IFindById<Model, Row> {
+//     <Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterNonObjects<Model[K1]>>(id: string, key1: K1, keys2: K2[]): Promise<TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev | void>;
+//     <K extends FilterNonObjects<Model>>(id: string, keys: K[]): Promise<Pick<Model, K> & Row | void>;
+// }
 
 
 
@@ -812,6 +844,20 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
         f(saveArguments);
 
         return calledArguments;
+    }
+
+    public async findByColumn() {
+
+
+        const functions = arguments[2];
+
+        for (const f of functions) {
+            (this.selectColumn as any)(f);
+        }
+
+        this.queryBuilder.where(this.getColumnNameWithoutAliasFromFunction(arguments[0]), arguments[1]);
+
+        return await this.queryBuilder.first();
     }
 
     public where() {
