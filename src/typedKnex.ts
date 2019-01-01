@@ -42,93 +42,95 @@ class NotImplementedError extends Error {
 
 }
 
-export interface ITypedQueryBuilder<ModelType, Row> {
-    where: IWhere<ModelType, Row>;
-    andWhere: IWhere<ModelType, Row>;
-    orWhere: IWhere<ModelType, Row>;
-    whereNot: IWhere<ModelType, Row>;
-    selectColumn: ISelectWithFunctionColumn<ModelType, Row extends ModelType ? {} : Row>;
-    selectColumns: ISelectWithFunctionColumns<ModelType, Row extends ModelType ? {} : Row>;
+export interface ITypedQueryBuilder<Model, Row> {
+    where: IWhere<Model, Row>;
+    andWhere: IWhere<Model, Row>;
+    orWhere: IWhere<Model, Row>;
+    whereNot: IWhere<Model, Row>;
+    selectColumn: ISelectWithFunctionColumn<Model, Row extends Model ? {} : Row>;
+    selectColumns: ISelectWithFunctionColumns<Model, Row extends Model ? {} : Row>;
 
-    orderBy: IOrderBy<ModelType, Row>;
-    innerJoinColumn: IKeyFunctionAsParametersReturnQueryBuider<ModelType, Row>;
-    leftOuterJoinColumn: IKeysAsParametersReturnQueryBuider<ModelType, Row>;
+    orderBy: IOrderBy<Model, Row>;
+    innerJoinColumn: IKeyFunctionAsParametersReturnQueryBuider<Model, Row>;
+    leftOuterJoinColumn: IKeysAsParametersReturnQueryBuider<Model, Row>;
 
-    whereColumn: IWhereCompareTwoColumns<ModelType, Row>;
+    whereColumn: IWhereCompareTwoColumns<Model, Row>;
 
-    whereNull: IKeysAsParametersReturnQueryBuider<ModelType, Row>;
-    whereNotNull: IKeysAsParametersReturnQueryBuider<ModelType, Row>;
+    whereNull: IKeysAsParametersReturnQueryBuider<Model, Row>;
+    whereNotNull: IKeysAsParametersReturnQueryBuider<Model, Row>;
 
-    innerJoinTable: IJoinTable<ModelType, Row>;
-    leftOuterJoinTable: IJoinTable<ModelType, Row>;
+    innerJoinTable: IJoinTable<Model, Row>;
+    leftOuterJoinTable: IJoinTable<Model, Row>;
 
-    leftOuterJoinTableOnFunction: IJoinTableMultipleOnClauses<ModelType, Row>;
+    leftOuterJoinTableOnFunction: IJoinTableMultipleOnClauses<Model, Row>;
 
 
-    selectRaw: ISelectRaw<ModelType, Row extends ModelType ? {} : Row>;
+    selectRaw: ISelectRaw<Model, Row extends Model ? {} : Row>;
 
     // findById: IFindById<ModelType, Row>;
-    findByColumn: IFindByColumn<ModelType, Row extends ModelType ? {} : Row>;
+    findByColumn: IFindByColumn<Model, Row extends Model ? {} : Row>;
 
-    whereIn: IWhereIn<ModelType, Row>;
-    whereNotIn: IWhereIn<ModelType, Row>;
+    whereIn: IWhereIn<Model, Row>;
+    whereNotIn: IWhereIn<Model, Row>;
 
-    orWhereIn: IWhereIn<ModelType, Row>;
-    orWhereNotIn: IWhereIn<ModelType, Row>;
-
-
-    whereBetween: IWhereBetween<ModelType, Row>;
-    whereNotBetween: IWhereBetween<ModelType, Row>;
-    orWhereBetween: IWhereBetween<ModelType, Row>;
-    orWhereNotBetween: IWhereBetween<ModelType, Row>;
-
-    whereExists: IWhereExists<ModelType, Row>;
-
-    orWhereExists: IWhereExists<ModelType, Row>;
-    whereNotExists: IWhereExists<ModelType, Row>;
-    orWhereNotExists: IWhereExists<ModelType, Row>;
+    orWhereIn: IWhereIn<Model, Row>;
+    orWhereNotIn: IWhereIn<Model, Row>;
 
 
-    groupBy: IKeyFunctionAsParametersReturnQueryBuider<ModelType, Row>;
+    whereBetween: IWhereBetween<Model, Row>;
+    whereNotBetween: IWhereBetween<Model, Row>;
+    orWhereBetween: IWhereBetween<Model, Row>;
+    orWhereNotBetween: IWhereBetween<Model, Row>;
+
+    whereExists: IWhereExists<Model, Row>;
+
+    orWhereExists: IWhereExists<Model, Row>;
+    whereNotExists: IWhereExists<Model, Row>;
+    orWhereNotExists: IWhereExists<Model, Row>;
 
 
-    having: IHaving<ModelType, Row>;
+    whereParentheses: IWhereParentheses<Model, Row>;
+
+    groupBy: IKeyFunctionAsParametersReturnQueryBuider<Model, Row>;
+
+
+    having: IHaving<Model, Row>;
 
 
 
-    havingNull: IKeyFunctionAsParametersReturnQueryBuider<ModelType, Row>;
-    havingNotNull: IKeyFunctionAsParametersReturnQueryBuider<ModelType, Row>;
+    havingNull: IKeyFunctionAsParametersReturnQueryBuider<Model, Row>;
+    havingNotNull: IKeyFunctionAsParametersReturnQueryBuider<Model, Row>;
 
-    havingIn: IWhereIn<ModelType, Row>;
-    havingNotIn: IWhereIn<ModelType, Row>;
+    havingIn: IWhereIn<Model, Row>;
+    havingNotIn: IWhereIn<Model, Row>;
 
-    havingExists: IWhereExists<ModelType, Row>;
-    havingNotExists: IWhereExists<ModelType, Row>;
-
-
-    havingBetween: IWhereBetween<ModelType, Row>;
-    havingNotBetween: IWhereBetween<ModelType, Row>;
-
-    union: IUnion<ModelType, Row>;
-    unionAll: IUnion<ModelType, Row>;
-
-    min: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
-
-    count: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
-    countDistinct: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
-    max: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
-    sum: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
-    sumDistinct: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
-    avg: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
-    avgDistinct: IDbFunctionWithAlias<ModelType, Row extends ModelType ? {} : Row>;
-
-    clearSelect(): ITypedQueryBuilder<ModelType, ModelType>;
-    clearWhere(): ITypedQueryBuilder<ModelType, Row>;
-    clearOrder(): ITypedQueryBuilder<ModelType, Row>;
+    havingExists: IWhereExists<Model, Row>;
+    havingNotExists: IWhereExists<Model, Row>;
 
 
-    limit(value: number): ITypedQueryBuilder<ModelType, Row>;
-    offset(value: number): ITypedQueryBuilder<ModelType, Row>;
+    havingBetween: IWhereBetween<Model, Row>;
+    havingNotBetween: IWhereBetween<Model, Row>;
+
+    union: IUnion<Model, Row>;
+    unionAll: IUnion<Model, Row>;
+
+    min: IDbFunctionWithAlias<Model, Row extends Model ? {} : Row>;
+
+    count: IDbFunctionWithAlias<Model, Row extends Model ? {} : Row>;
+    countDistinct: IDbFunctionWithAlias<Model, Row extends Model ? {} : Row>;
+    max: IDbFunctionWithAlias<Model, Row extends Model ? {} : Row>;
+    sum: IDbFunctionWithAlias<Model, Row extends Model ? {} : Row>;
+    sumDistinct: IDbFunctionWithAlias<Model, Row extends Model ? {} : Row>;
+    avg: IDbFunctionWithAlias<Model, Row extends Model ? {} : Row>;
+    avgDistinct: IDbFunctionWithAlias<Model, Row extends Model ? {} : Row>;
+
+    clearSelect(): ITypedQueryBuilder<Model, Model>;
+    clearWhere(): ITypedQueryBuilder<Model, Row>;
+    clearOrder(): ITypedQueryBuilder<Model, Row>;
+
+
+    limit(value: number): ITypedQueryBuilder<Model, Row>;
+    offset(value: number): ITypedQueryBuilder<Model, Row>;
 
     firstItemOrNull(): Promise<Row | null>;
     firstItem(): Promise<Row>;
@@ -136,27 +138,27 @@ export interface ITypedQueryBuilder<ModelType, Row> {
     useKnexQueryBuilder(f: (query: Knex.QueryBuilder) => void): void;
     toQuery(): string;
 
-    insert(newObject: Partial<ModelType>): Promise<void>;
+    insert(newObject: Partial<Model>): Promise<void>;
     countResult(): Promise<number>;
     delById(id: string): Promise<void>;
-    update(id: string, item: Partial<ModelType>): Promise<void>;
+    update(id: string, item: Partial<Model>): Promise<void>;
 
 
-    whereRaw(sql: string, ...bindings: string[]): ITypedQueryBuilder<ModelType, Row>;
-    havingRaw(sql: string, ...bindings: string[]): ITypedQueryBuilder<ModelType, Row>;
+    whereRaw(sql: string, ...bindings: string[]): ITypedQueryBuilder<Model, Row>;
+    havingRaw(sql: string, ...bindings: string[]): ITypedQueryBuilder<Model, Row>;
 
 
     transacting(trx: Knex.Transaction): void;
 
 
     truncate(): Promise<void>;
-    distinct(): ITypedQueryBuilder<ModelType, Row>;
+    distinct(): ITypedQueryBuilder<Model, Row>;
 
 
-    clone(): ITypedQueryBuilder<ModelType, Row>;
+    clone(): ITypedQueryBuilder<Model, Row>;
 
     beginTransaction(): Promise<Knex.Transaction>;
-    groupByRaw(sql: string, ...bindings: string[]): ITypedQueryBuilder<ModelType, Row>;
+    groupByRaw(sql: string, ...bindings: string[]): ITypedQueryBuilder<Model, Row>;
 
     // TBD
     // returningColumn(): void;
@@ -506,7 +508,9 @@ interface IWhereExists<Model, Row> {
     <SubQueryModel>(subQueryModel: new () => SubQueryModel, code: (subQuery: ITypedQueryBuilder<SubQueryModel, {}>, parent: IColumnFunctionReturnColumnName<Model>) => void): ITypedQueryBuilder<Model, Row>;
 }
 
-
+interface IWhereParentheses<Model, Row> {
+    (code: (subQuery: ITypedQueryBuilder<Model, Row>) => void): ITypedQueryBuilder<Model, Row>;
+}
 
 interface IUnion<Model, Row> {
     <SubQueryModel>(subQueryModel: new () => SubQueryModel, code: (subQuery: ITypedQueryBuilder<SubQueryModel, {}>) => void): ITypedQueryBuilder<Model, Row>;
@@ -943,6 +947,14 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
     }
 
 
+    public whereParentheses() {
+        // const typeOfSubQuery = arguments[0];
+        // const functionToCall = arguments[1];
+
+        this.callQueryCallbackFunction('where', this.tableClass, arguments[0]);
+
+        return this;
+    }
 
 
     public whereExists() {

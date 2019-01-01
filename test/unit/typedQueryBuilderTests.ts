@@ -878,6 +878,20 @@ describe('TypedKnexQueryBuilder', () => {
 
     });
 
+    it('should create query with parentheses in where', (done) => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .whereParentheses(sub => sub.where(c => c('id'), '1').orWhere(c => c('id'), '2'))
+            .orWhere(c => c('name'), 'Tester');
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" where ("users"."id" = \'1\' or "users"."id" = \'2\') or "users"."name" = \'Tester\'');
+
+        done();
+    });
+
 
 
 });
