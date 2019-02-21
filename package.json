@@ -1,53 +1,53 @@
 {
-  "name": "@wwwouter/typed-knex",
-  "version": "1.5.0",
-  "description": "Makes knex better by working with TypeScript",
-  "dependencies": {
-    "flat": "4.1.0",
-    "reflect-metadata": "0.1.12"
-  },
-  "main": "./dist/src/index.js",
-  "typings": "dist/src/index",
-  "scripts": {
-    "test": "npm run mocha-all",
-    "build": "tsc -p tsconfig.json",
-    "build:dist": "tsc --outDir dist",
-    "prepublish": "npm run build:dist",
-    "mocha-unit": "npm run build && mocha --bail \"build/test/unit/**/*Tests.js\"",
-    "mocha-integration": "npm run build && mocha --bail \"build/test/integration/**/*Tests.js\"",
-    "mocha-all": "npm run build && mocha \"build/test/**/*Tests.js\""
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/wwwouter/typed-knex.git"
-  },
-  "keywords": [
-    "knex",
-    "typed",
-    "typescript",
-    "typeknex"
-  ],
-  "author": "W.Mooij",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/wwwouter/typed-knex/issues"
-  },
-  "homepage": "https://github.com/wwwouter/typed-knex#readme",
-  "devDependencies": {
-    "mocha": "5.2.0",
-    "@types/flat": "0.0.28",
-    "@types/chai": "4.1.7",
-    "@types/chai-as-promised": "7.1.0",
-    "@types/mocha": "5.2.5",
-    "@types/sqlite3": "^3.1.3",
-    "@wwwouter/tslint-contrib": "1.0.0",
-    "chai": "4.2.0",
-    "chai-as-promised": "7.1.1",
-    "knex": "0.16.3",
-    "ts-simple-ast": "20.0.0",
-    "tslint": "5.11.0",
-    "tslint-microsoft-contrib": "6.0.0",
-    "typescript": "3.2.2",
-    "sqlite3": "^4.0.4"
-  }
+    "name": "@wwwouter/typed-knex",
+    "version": "2.0.0-beta.0",
+    "description": "Makes knex better by working with TypeScript",
+    "dependencies": {
+        "flat": "4.1.0",
+        "reflect-metadata": "0.1.12"
+    },
+    "main": "./dist/src/index.js",
+    "typings": "dist/src/index",
+    "scripts": {
+        "test": "npm run mocha-all",
+        "build": "tsc -p tsconfig.json",
+        "build:dist": "tsc --outDir dist",
+        "prepublish": "npm run build:dist",
+        "mocha-unit": "npm run build && mocha --bail \"build/test/unit/**/*Tests.js\"",
+        "mocha-integration": "npm run build && mocha --bail \"build/test/integration/**/*Tests.js\"",
+        "mocha-all": "npm run build && mocha \"build/test/**/*Tests.js\""
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/wwwouter/typed-knex.git"
+    },
+    "keywords": [
+        "knex",
+        "typed",
+        "typescript",
+        "typeknex"
+    ],
+    "author": "W.Mooij",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/wwwouter/typed-knex/issues"
+    },
+    "homepage": "https://github.com/wwwouter/typed-knex#readme",
+    "devDependencies": {
+        "mocha": "5.2.0",
+        "@types/flat": "0.0.28",
+        "@types/chai": "4.1.7",
+        "@types/chai-as-promised": "7.1.0",
+        "@types/mocha": "5.2.5",
+        "@types/sqlite3": "^3.1.3",
+        "@wwwouter/tslint-contrib": "1.0.0",
+        "chai": "4.2.0",
+        "chai-as-promised": "7.1.1",
+        "knex": "0.16.3",
+        "ts-simple-ast": "20.0.0",
+        "tslint": "5.11.0",
+        "tslint-microsoft-contrib": "6.0.0",
+        "typescript": "3.2.2",
+        "sqlite3": "^4.0.4"
+    }
 }
