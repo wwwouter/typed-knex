@@ -492,19 +492,21 @@ type PickAndTransformLevel4<
 > = {
     [Level4Property in Level4Properties]: Level4Type[Level4Property] extends object
         ? any
-        : () => PickAndChangeType<
-              Level1Type,
-              Level1Property,
-              PickAndChangeType<
-                  Level2Type,
-                  Level2Property,
-                  PickAndChangeType<
-                      Level3Type,
-                      Level3Property,
-                      Pick<Level4Type, Level4Property>
-                  >
-              >
-          >
+        :
+              | null
+              | (() => PickAndChangeType<
+                    Level1Type,
+                    Level1Property,
+                    PickAndChangeType<
+                        Level2Type,
+                        Level2Property,
+                        PickAndChangeType<
+                            Level3Type,
+                            Level3Property,
+                            Pick<Level4Type, Level4Property>
+                        >
+                    >
+                >)
 };
 
 type PickAndTransformLevel3<
@@ -526,15 +528,17 @@ type PickAndTransformLevel3<
               Level3Type[Level3Property],
               keyof Level3Type[Level3Property]
           >
-        : () => PickAndChangeType<
-              Level1Type,
-              Level1Property,
-              PickAndChangeType<
-                  Level2Type,
-                  Level2Property,
-                  Pick<Level3Type, Level3Property>
-              >
-          >
+        :
+              | null
+              | (() => PickAndChangeType<
+                    Level1Type,
+                    Level1Property,
+                    PickAndChangeType<
+                        Level2Type,
+                        Level2Property,
+                        Pick<Level3Type, Level3Property>
+                    >
+                >)
 };
 
 type PickAndTransformLevel2<
@@ -552,11 +556,13 @@ type PickAndTransformLevel2<
               Level2Type[Level2Property],
               keyof Level2Type[Level2Property]
           >
-        : () => PickAndChangeType<
-              Level1Type,
-              Level1Property,
-              Pick<Level2Type, Level2Property>
-          > // { iets: P }> // Pick<T,K> // P = "category"
+        :
+              | null
+              | (() => PickAndChangeType<
+                    Level1Type,
+                    Level1Property,
+                    Pick<Level2Type, Level2Property>
+                >) // { iets: P }> // Pick<T,K> // P = "category"
 };
 
 type TransformPropsToFunctionsLevel1<Level1Type> = {
@@ -580,11 +586,11 @@ type RCO2 = TransformPropsToFunctionsLevel1<RCO>;
 
 const t6 = {} as RCO2;
 
-console.log(t6.user.catetgory().user.catetgory);
-console.log(t6.user.nogDieper.nogId().user.nogDieper.nogId);
-console.log(t6.user.nogDieper.nog2Dieper.nog2Id());
+console.log(t6.user.catetgory!().user.catetgory);
+console.log(t6.user.nogDieper.nogId!().user.nogDieper.nogId);
+console.log(t6.user.nogDieper.nog2Dieper.nog2Id!());
 console.log(
-    t6.user.nogDieper.nog2Dieper.nog2Id().user.nogDieper.nog2Dieper.nog2Id
+    t6.user.nogDieper.nog2Dieper.nog2Id!().user.nogDieper.nog2Dieper.nog2Id
 );
 console.log(t6.user.nogDieper.nog2Dieper.nog2Id);
 
