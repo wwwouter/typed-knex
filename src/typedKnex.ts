@@ -47,8 +47,8 @@ export interface ITypedQueryBuilder<Model, Row> {
     andWhere: IWhere<Model, Row>;
     orWhere: IWhere<Model, Row>;
     whereNot: IWhere<Model, Row>;
-    selectColumn: ISelectWithFunctionColumn<Model, Row extends Model ? {} : Row>;
-    selectColumns: ISelectWithFunctionColumns<Model, Row extends Model ? {} : Row>;
+    // selectColumn: ISelectWithFunctionColumn<Model, Row extends Model ? {} : Row>;
+    select: ISelectWithFunctionColumns<Model, Row extends Model ? {} : Row>;
 
     orderBy: IOrderBy<Model, Row>;
     innerJoinColumn: IKeyFunctionAsParametersReturnQueryBuider<Model, Row>;
@@ -326,9 +326,9 @@ interface IColumnFunctionReturnColumnName<Model> {
     <K extends keyof Model>(key1: K): string;
 }
 
-interface ISelectWithFunctionColumn<Model, Row> {
-    <NewRow>(selectColumnFunction: (c: IColumnFunctionReturnNewRow<Model>) => NewRow): ITypedQueryBuilder<Model, Row & NewRow>;
-}
+// interface ISelectWithFunctionColumn<Model, Row> {
+//     <NewRow>(selectColumnFunction: (c: IColumnFunctionReturnNewRow<Model>) => NewRow): ITypedQueryBuilder<Model, Row & NewRow>;
+// }
 
 interface IOrderBy<Model, Row> {
     <NewRow>(selectColumnFunction: (c: IColumnFunctionReturnNewRow<Model>) => NewRow, direction?: 'asc' | 'desc'): ITypedQueryBuilder<Model, Row>;
@@ -669,7 +669,7 @@ export class TypedQueryBuilder<ModelType, Row = {}> implements ITypedQueryBuilde
         return this as any;
     }
 
-    public selectColumns() {
+    public select() {
 
         const functions = arguments[0];
 

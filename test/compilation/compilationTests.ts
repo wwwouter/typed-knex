@@ -1,4 +1,3 @@
-
 // tslint:disable:no-multiline-string
 import { assert } from 'chai';
 import { Project } from 'ts-simple-ast';
@@ -7,15 +6,12 @@ describe('compile time typed-knex', function() {
     this.timeout(1000000);
 
     const project = new Project({
-        tsConfigFilePath: './tsconfig.json',
+        tsConfigFilePath: './tsconfig.json'
     });
 
-    it('should return type with properties from the selectColumn method', (done) => {
-
-
+    it('should return type with properties from the selectColumn method', done => {
         const file = project.createSourceFile(
-            'test/test.ts'
-            ,
+            'test/test.ts',
             `
             import * as knex from 'knex';
             import { TypedKnex } from '../src/typedKnex';
@@ -27,13 +23,14 @@ describe('compile time typed-knex', function() {
                 const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
                 const result = await typedKnex
                     .query(User)
-                    .selectColumn(c=>c('id'))
+                    .select([c=>c('id')])
                     .firstItem();
 
                 console.log(result.id);
 
             })();
-        `);
+        `
+        );
 
         assert.equal(project.getPreEmitDiagnostics().length, 0);
 
@@ -41,13 +38,9 @@ describe('compile time typed-knex', function() {
         done();
     });
 
-
-    it('should error on calling property not used in selectColumn method', (done) => {
-
-
+    it('should error on calling property not used in selectColumn method', done => {
         const file = project.createSourceFile(
-            'test/test.ts'
-            ,
+            'test/test.ts',
             `
             import * as knex from 'knex';
             import { TypedKnex } from '../src/typedKnex';
@@ -59,13 +52,14 @@ describe('compile time typed-knex', function() {
                 const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
                 const result = await typedKnex
                     .query(User)
-                    .selectColumn(c=>c('id'))
+                    .select([c=>c('id')])
                     .firstItem();
 
                 console.log(result.name);
 
             })();
-        `);
+        `
+        );
 
         assert.notEqual(project.getPreEmitDiagnostics().length, 0);
 
@@ -73,12 +67,9 @@ describe('compile time typed-knex', function() {
         done();
     });
 
-    it('should return type with properties from the selectColumns method', (done) => {
-
-
+    it('should return type with properties from the select method', done => {
         const file = project.createSourceFile(
-            'test/test.ts'
-            ,
+            'test/test.ts',
             `
             import * as knex from 'knex';
             import { TypedKnex } from '../src/typedKnex';
@@ -90,13 +81,14 @@ describe('compile time typed-knex', function() {
                 const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
                 const result = await typedKnex
                     .query(User)
-                    .selectColumns([c=>c('id')])
+                    .select([c=>c('id')])
                     .firstItem();
 
                 console.log(result.id);
 
             })();
-        `);
+        `
+        );
 
         assert.equal(project.getPreEmitDiagnostics().length, 0);
 
@@ -104,13 +96,9 @@ describe('compile time typed-knex', function() {
         done();
     });
 
-
-    it('should error on calling property not used in selectColumns method', (done) => {
-
-
+    it('should error on calling property not used in select method', done => {
         const file = project.createSourceFile(
-            'test/test.ts'
-            ,
+            'test/test.ts',
             `
             import * as knex from 'knex';
             import { TypedKnex } from '../src/typedKnex';
@@ -122,13 +110,14 @@ describe('compile time typed-knex', function() {
                 const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
                 const result = await typedKnex
                     .query(User)
-                    .selectColumns([c=>c('id')])
+                    .select([c=>c('id')])
                     .firstItem();
 
                 console.log(result.name);
 
             })();
-        `);
+        `
+        );
 
         assert.notEqual(project.getPreEmitDiagnostics().length, 0);
 
@@ -136,13 +125,9 @@ describe('compile time typed-knex', function() {
         done();
     });
 
-
-    it('should allow to call whereIn with type of property', (done) => {
-
-
+    it('should allow to call whereIn with type of property', done => {
         const file = project.createSourceFile(
-            'test/test.ts'
-            ,
+            'test/test.ts',
             `
             import * as knex from 'knex';
             import { TypedKnex } from '../src/typedKnex';
@@ -158,7 +143,8 @@ describe('compile time typed-knex', function() {
 
 
             })();
-        `);
+        `
+        );
 
         assert.notEqual(project.getPreEmitDiagnostics().length, 0);
 
@@ -166,12 +152,9 @@ describe('compile time typed-knex', function() {
         done();
     });
 
-    it('should error on calling whereIn with different type', (done) => {
-
-
+    it('should error on calling whereIn with different type', done => {
         const file = project.createSourceFile(
-            'test/test.ts'
-            ,
+            'test/test.ts',
             `
             import * as knex from 'knex';
             import { TypedKnex } from '../src/typedKnex';
@@ -185,7 +168,8 @@ describe('compile time typed-knex', function() {
                 .whereIn('name', [1]);
 
             })();
-        `);
+        `
+        );
 
         assert.notEqual(project.getPreEmitDiagnostics().length, 0);
 
@@ -193,12 +177,9 @@ describe('compile time typed-knex', function() {
         done();
     });
 
-    it('should allow to call whereBetween with type of property', (done) => {
-
-
+    it('should allow to call whereBetween with type of property', done => {
         const file = project.createSourceFile(
-            'test/test.ts'
-            ,
+            'test/test.ts',
             `
             import * as knex from 'knex';
             import { TypedKnex } from '../src/typedKnex';
@@ -214,7 +195,8 @@ describe('compile time typed-knex', function() {
 
 
             })();
-        `);
+        `
+        );
 
         assert.notEqual(project.getPreEmitDiagnostics().length, 0);
 
@@ -222,12 +204,9 @@ describe('compile time typed-knex', function() {
         done();
     });
 
-    it('should error on calling whereBetween with different type', (done) => {
-
-
+    it('should error on calling whereBetween with different type', done => {
         const file = project.createSourceFile(
-            'test/test.ts'
-            ,
+            'test/test.ts',
             `
             import * as knex from 'knex';
             import { TypedKnex } from '../src/typedKnex';
@@ -241,7 +220,8 @@ describe('compile time typed-knex', function() {
                 .whereBetween('numericValue', ['','']);
 
             })();
-        `);
+        `
+        );
 
         assert.notEqual(project.getPreEmitDiagnostics().length, 0);
 
@@ -249,13 +229,9 @@ describe('compile time typed-knex', function() {
         done();
     });
 
-
-    it('should error on calling whereBetween with array of more than 2', (done) => {
-
-
+    it('should error on calling whereBetween with array of more than 2', done => {
         const file = project.createSourceFile(
-            'test/test.ts'
-            ,
+            'test/test.ts',
             `
             import * as knex from 'knex';
             import { TypedKnex } from '../src/typedKnex';
@@ -269,7 +245,8 @@ describe('compile time typed-knex', function() {
                 .whereBetween('numericValue', [1,2,3]);
 
             })();
-        `);
+        `
+        );
 
         assert.notEqual(project.getPreEmitDiagnostics().length, 0);
 
@@ -277,12 +254,9 @@ describe('compile time typed-knex', function() {
         done();
     });
 
-    it('should allow property of parent query in where exists', (done) => {
-
-
+    it('should allow property of parent query in where exists', done => {
         const file = project.createSourceFile(
-            'test/test.ts'
-            ,
+            'test/test.ts',
             `
             import * as knex from 'knex';
             import { TypedKnex } from '../src/typedKnex';
@@ -300,7 +274,8 @@ describe('compile time typed-knex', function() {
 
 
             })();
-        `);
+        `
+        );
 
         assert.notEqual(project.getPreEmitDiagnostics().length, 0);
 
@@ -308,12 +283,9 @@ describe('compile time typed-knex', function() {
         done();
     });
 
-    it('should not allow unknown property of parent query in where exists', (done) => {
-
-
+    it('should not allow unknown property of parent query in where exists', done => {
         const file = project.createSourceFile(
-            'test/test.ts'
-            ,
+            'test/test.ts',
             `
             import * as knex from 'knex';
             import { TypedKnex } from '../src/typedKnex';
@@ -331,7 +303,8 @@ describe('compile time typed-knex', function() {
 
 
             })();
-        `);
+        `
+        );
 
         assert.notEqual(project.getPreEmitDiagnostics().length, 0);
 
@@ -339,12 +312,9 @@ describe('compile time typed-knex', function() {
         done();
     });
 
-    it('should return type with properties from the min method', (done) => {
-
-
+    it('should return type with properties from the min method', done => {
         const file = project.createSourceFile(
-            'test/test1.ts'
-            ,
+            'test/test1.ts',
             `
             import * as knex from 'knex';
             import { TypedKnex } from '../src/typedKnex';
@@ -362,7 +332,8 @@ describe('compile time typed-knex', function() {
                 console.log(result.minNumericValue);
 
             })();
-        `);
+        `
+        );
 
         assert.equal(project.getPreEmitDiagnostics().length, 0);
         file.delete();
@@ -370,13 +341,9 @@ describe('compile time typed-knex', function() {
         done();
     });
 
-
-    it('should error on calling property not used in min method', (done) => {
-
-
+    it('should error on calling property not used in min method', done => {
         const file = project.createSourceFile(
-            'test/test2.ts'
-            ,
+            'test/test2.ts',
             `
             import * as knex from 'knex';
             import { TypedKnex } from '../src/typedKnex';
@@ -394,7 +361,8 @@ describe('compile time typed-knex', function() {
                 console.log(result.id);
 
             })();
-        `);
+        `
+        );
 
         assert.notEqual(project.getPreEmitDiagnostics().length, 0);
         file.delete();
@@ -402,12 +370,9 @@ describe('compile time typed-knex', function() {
         done();
     });
 
-    it('should return all Model properties after clearSelect', (done) => {
-
-
+    it('should return all Model properties after clearSelect', done => {
         const file = project.createSourceFile(
-            'test/test3.ts'
-            ,
+            'test/test3.ts',
             `
             import * as knex from 'knex';
             import { TypedKnex } from '../src/typedKnex';
@@ -419,7 +384,7 @@ describe('compile time typed-knex', function() {
                 const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
                 const result = await typedKnex
                     .query(User)
-                    .selectColumn(c=>c('id'))
+                    .select([c=>c('id')])
                     .clearSelect()
                     .firstItem();
 
@@ -427,7 +392,8 @@ describe('compile time typed-knex', function() {
                     console.log(result.name);
 
             })();
-        `);
+        `
+        );
 
         assert.equal(project.getPreEmitDiagnostics().length, 0);
 
@@ -435,12 +401,9 @@ describe('compile time typed-knex', function() {
         done();
     });
 
-    it('should return correct type from findByColumn', (done) => {
-
-
+    it('should return correct type from findByColumn', done => {
         const file = project.createSourceFile(
-            'test/test4.ts'
-            ,
+            'test/test4.ts',
             `
             import * as knex from 'knex';
             import { TypedKnex } from '../src/typedKnex';
@@ -460,8 +423,8 @@ describe('compile time typed-knex', function() {
                 }
 
             })();
-        `);
-
+        `
+        );
 
         assert.equal(project.getPreEmitDiagnostics().length, 0);
 
