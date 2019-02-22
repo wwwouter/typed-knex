@@ -57,6 +57,8 @@ export interface ITypedQueryBuilder<Model, Row> {
     // selectColumn: ISelectWithFunctionColumn<Model, Row extends Model ? {} : Row>;
     select: ISelectWithFunctionColumns<Model, Row extends Model ? {} : Row>;
 
+    select2: ISelectWithFunctionColumns2<Model, Row extends Model ? {} : Row>;
+
     orderBy: IOrderBy<Model, Row>;
     innerJoinColumn: IKeyFunctionAsParametersReturnQueryBuider<Model, Row>;
     leftOuterJoinColumn: IKeysAsParametersReturnQueryBuider<Model, Row>;
@@ -492,21 +494,19 @@ type PickAndTransformLevel4<
 > = {
     [Level4Property in Level4Properties]: Level4Type[Level4Property] extends object
         ? any
-        :
-              | null
-              | (() => PickAndChangeType<
-                    Level1Type,
-                    Level1Property,
-                    PickAndChangeType<
-                        Level2Type,
-                        Level2Property,
-                        PickAndChangeType<
-                            Level3Type,
-                            Level3Property,
-                            Pick<Level4Type, Level4Property>
-                        >
-                    >
-                >)
+        : (() => PickAndChangeType<
+              Level1Type,
+              Level1Property,
+              PickAndChangeType<
+                  Level2Type,
+                  Level2Property,
+                  PickAndChangeType<
+                      Level3Type,
+                      Level3Property,
+                      Pick<Level4Type, Level4Property>
+                  >
+              >
+          >)
 };
 
 type PickAndTransformLevel3<
@@ -528,17 +528,15 @@ type PickAndTransformLevel3<
               Level3Type[Level3Property],
               keyof Level3Type[Level3Property]
           >
-        :
-              | null
-              | (() => PickAndChangeType<
-                    Level1Type,
-                    Level1Property,
-                    PickAndChangeType<
-                        Level2Type,
-                        Level2Property,
-                        Pick<Level3Type, Level3Property>
-                    >
-                >)
+        : (() => PickAndChangeType<
+              Level1Type,
+              Level1Property,
+              PickAndChangeType<
+                  Level2Type,
+                  Level2Property,
+                  Pick<Level3Type, Level3Property>
+              >
+          >)
 };
 
 type PickAndTransformLevel2<
@@ -556,13 +554,11 @@ type PickAndTransformLevel2<
               Level2Type[Level2Property],
               keyof Level2Type[Level2Property]
           >
-        :
-              | null
-              | (() => PickAndChangeType<
-                    Level1Type,
-                    Level1Property,
-                    Pick<Level2Type, Level2Property>
-                >) // { iets: P }> // Pick<T,K> // P = "category"
+        : (() => PickAndChangeType<
+              Level1Type,
+              Level1Property,
+              Pick<Level2Type, Level2Property>
+          >) // { iets: P }> // Pick<T,K> // P = "category"
 };
 
 type TransformPropsToFunctionsLevel1<Level1Type> = {
@@ -573,7 +569,7 @@ type TransformPropsToFunctionsLevel1<Level1Type> = {
               Level1Type[Level1Property],
               keyof Level1Type[Level1Property]
           > // Pick5<T[P], keyof T[P], Pick5<T[P],keyof T[P], T>>
-        : null | (() => Pick<Level1Type, Level1Property>)
+        : (() => Pick<Level1Type, Level1Property>)
 };
 
 // type TransformPropsToFunctions<T> = {
@@ -825,6 +821,113 @@ interface ISelectWithFunctionColumns<Model, Row> {
     >;
     // <NewRow>(selectColumnFunction: [((c: IColumnFunctionReturnNewRow<Model>) => NewRow)]): ITypedQueryBuilder<Model, Row & NewRow>;
 }
+
+interface ISelectWithFunctionColumns2<Model, Row> {
+    <
+        R1,
+        R2,
+        R3,
+        R4,
+        R5,
+        R6,
+        R7,
+        R8,
+        R9,
+        R10,
+        R11,
+        R12,
+        R13,
+        R14,
+        R15,
+        R16,
+        R17,
+        R18,
+        R19
+    >(
+        selectColumnFunction: [
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R1),
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R2)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R3)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R4)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R5)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R6)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R7)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R8)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R9)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R10)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R11)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R12)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R13)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R14)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R15)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R16)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R17)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R18)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R19)?
+        ]
+    ): ITypedQueryBuilder<
+        Model,
+        Row &
+            R1 &
+            R2 &
+            R3 &
+            R4 &
+            R5 &
+            R6 &
+            R7 &
+            R8 &
+            R8 &
+            R9 &
+            R10 &
+            R11 &
+            R12 &
+            R13 &
+            R14 &
+            R15 &
+            R16 &
+            R17 &
+            R18 &
+            R18 &
+            R19
+    >;
+    // <NewRow>(selectColumnFunction: [((c: IColumnFunctionReturnNewRow<Model>) => () => NewRow)]): ITypedQueryBuilder<Model, Row & NewRow>;
+}
+
+// interface IColumnFunctionReturnNewRow2<Model> {
+//     <
+//         K1 extends keyof Model,
+//         K2 extends keyof Model[K1],
+//         K3 extends keyof Model[K1][K2]
+//     >(
+//         key1: K1,
+//         key2: K2,
+//         key3: K3,
+//         ...keys: string[]
+//     ): TransformAll<
+//         Pick<Model, K1>,
+//         TransformAll<
+//             Pick<Model[K1], K2>,
+//             TransformAll<Pick<Model[K1][K2], K3>, any>
+//         >
+//     >;
+//     <
+//         K1 extends keyof Model,
+//         K2 extends keyof Model[K1],
+//         K3 extends keyof Model[K1][K2]
+//     >(
+//         key1: K1,
+//         key2: K2,
+//         key3: K3
+//     ): TransformAll<
+//         Pick<Model, K1>,
+//         TransformAll<Pick<Model[K1], K2>, Pick<Model[K1][K2], K3>>
+//     >;
+//     <K1 extends keyof Model, K2 extends keyof Model[K1]>(
+//         key1: K1,
+//         key2: K2
+//     ): TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>>;
+//     <K extends keyof Model>(key1: K): Pick<Model, K>;
+// }
 
 interface IFindByColumn<Model, Row> {
     <
@@ -1196,6 +1299,33 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     }
 
     public select() {
+        const functions = arguments[0];
+
+        for (const f of functions) {
+            (this.selectColumn as any)(f);
+            // const args = this.getArgumentsFromColumnFunction(f);
+
+            // if (args.length === 1) {
+            //     this.queryBuilder.select(this.getColumnName(key));
+            // } else {
+
+            //     this.queryBuilder.select(this.getColumnName(arguments[0], key) + ' as ' + this.getColumnSelectAlias(arguments[0], key));
+            // }
+        }
+
+        // const argumentsKeys = arguments[arguments.length - 1];
+        // for (const key of argumentsKeys) {
+        //     if (arguments.length === 1) {
+        //         this.queryBuilder.select(this.getColumnName(key));
+        //     } else {
+
+        //         this.queryBuilder.select(this.getColumnName(arguments[0], key) + ' as ' + this.getColumnSelectAlias(arguments[0], key));
+        //     }
+        // }
+        return this as any;
+    }
+
+    public select2() {
         const functions = arguments[0];
 
         for (const f of functions) {
