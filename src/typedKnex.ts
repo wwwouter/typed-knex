@@ -866,7 +866,9 @@ interface IColumnFunctionReturnPropertyType<Model> {
 
 interface IOrderBy<Model, Row> {
     <NewRow>(
-        selectColumnFunction: (c: IColumnFunctionReturnNewRow<Model>) => NewRow,
+        selectColumnFunction: (
+            c: TransformPropsToFunctionsLevel1<Model>
+        ) => () => NewRow,
         direction?: 'asc' | 'desc'
     ): ITypedQueryBuilder<Model, Row>;
 }
@@ -874,8 +876,8 @@ interface IOrderBy<Model, Row> {
 interface IDbFunctionWithAlias<Model, Row> {
     <NewPropertyType, TName extends keyof TypeWithIndexerOf<NewPropertyType>>(
         selectColumnFunction: (
-            c: IColumnFunctionReturnPropertyType<Model>
-        ) => NewPropertyType,
+            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
+        ) => () => NewPropertyType,
         name: TName
     ): ITypedQueryBuilder<
         Model,

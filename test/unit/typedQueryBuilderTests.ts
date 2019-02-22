@@ -669,7 +669,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .min(c => c('numericValue'), 'minNumericValue');
+            .min(c => c.numericValue, 'minNumericValue');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -682,7 +682,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .count(c => c('numericValue'), 'countNumericValue');
+            .count(c => c.numericValue, 'countNumericValue');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -695,7 +695,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .countDistinct(c => c('numericValue'), 'countDistinctNumericValue');
+            .countDistinct(c => c.numericValue, 'countDistinctNumericValue');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -708,7 +708,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .max(c => c('numericValue'), 'maxNumericValue');
+            .max(c => c.numericValue, 'maxNumericValue');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -721,7 +721,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .sum(c => c('numericValue'), 'sumNumericValue');
+            .sum(c => c.numericValue, 'sumNumericValue');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -734,7 +734,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .sumDistinct(c => c('numericValue'), 'sumDistinctNumericValue');
+            .sumDistinct(c => c.numericValue, 'sumDistinctNumericValue');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -747,7 +747,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .avg(c => c('numericValue'), 'avgNumericValue');
+            .avg(c => c.numericValue, 'avgNumericValue');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -760,7 +760,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .avgDistinct(c => c('numericValue'), 'avgDistinctNumericValue');
+            .avgDistinct(c => c.numericValue, 'avgDistinctNumericValue');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -771,7 +771,7 @@ describe('TypedKnexQueryBuilder', () => {
 
     it('should create query with order by', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).orderBy(c => c('id'));
+        const query = typedKnex.query(User).orderBy(c => c.id);
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -810,7 +810,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .orderBy(c => c('id'))
+            .orderBy(c => c.id)
             .clearOrder();
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users"');
