@@ -375,27 +375,27 @@ interface ISelectRaw<Model, Row> {
 //     ? boolean
 //     : never;
 
-class RCO {
-    id: string;
-    name: string;
-    no: boolean;
-    user: {
-        id: string;
-        name: string;
-        catetgory: string;
-        getal: number;
+// class RCO {
+//     id: string;
+//     name: string;
+//     no: boolean;
+//     user: {
+//         id: string;
+//         name: string;
+//         catetgory: string;
+//         getal: number;
 
-        nogDieper: {
-            nogId: string;
-            nogNr: number;
+//         nogDieper: {
+//             nogId: string;
+//             nogNr: number;
 
-            nog2Dieper: {
-                nog2Id: string;
-                nog2Nr: number;
-            };
-        };
-    };
-}
+//             nog2Dieper: {
+//                 nog2Id: string;
+//                 nog2Nr: number;
+//             };
+//         };
+//     };
+// }
 
 // type TransformOs<T> = { [Key in keyof T]: { Key: boolean } };
 // //     [K in keyof T]: T[K] extends object ? never : K
@@ -578,17 +578,17 @@ type TransformPropsToFunctionsLevel1<Level1Type> = {
 //         : () => Pick<T, P>
 // };
 
-type RCO2 = TransformPropsToFunctionsLevel1<RCO>;
+// type RCO2 = TransformPropsToFunctionsLevel1<RCO>;
 
-const t6 = {} as RCO2;
+// const t6 = {} as RCO2;
 
-console.log(t6.user.catetgory!().user.catetgory);
-console.log(t6.user.nogDieper.nogId!().user.nogDieper.nogId);
-console.log(t6.user.nogDieper.nog2Dieper.nog2Id!());
-console.log(
-    t6.user.nogDieper.nog2Dieper.nog2Id!().user.nogDieper.nog2Dieper.nog2Id
-);
-console.log(t6.user.nogDieper.nog2Dieper.nog2Id);
+// console.log(t6.user.catetgory!().user.catetgory);
+// console.log(t6.user.nogDieper.nogId!().user.nogDieper.nogId);
+// console.log(t6.user.nogDieper.nog2Dieper.nog2Id!());
+// console.log(
+//     t6.user.nogDieper.nog2Dieper.nog2Id!().user.nogDieper.nog2Dieper.nog2Id
+// );
+// console.log(t6.user.nogDieper.nog2Dieper.nog2Id);
 
 // //.t6.user.id;
 
@@ -1135,6 +1135,29 @@ interface IUnion<Model, Row> {
     ): ITypedQueryBuilder<Model, Row>;
 }
 
+function getProxyAndMemories() {
+    const memories = [] as string[];
+
+    function allGet(_target: any, name: any): any {
+        memories.push(name);
+        return new Proxy(
+            {},
+            {
+                get: allGet
+            }
+        );
+    }
+
+    const root = new Proxy(
+        {},
+        {
+            get: allGet
+        }
+    );
+
+    return { root, memories };
+}
+
 export class TypedQueryBuilder<ModelType, Row = {}>
     implements ITypedQueryBuilder<ModelType, Row> {
     public columns: { name: string }[];
@@ -1329,26 +1352,17 @@ export class TypedQueryBuilder<ModelType, Row = {}>
         const functions = arguments[0];
 
         for (const f of functions) {
-            (this.selectColumn as any)(f);
-            // const args = this.getArgumentsFromColumnFunction(f);
+            const { root, memories } = getProxyAndMemories();
 
-            // if (args.length === 1) {
-            //     this.queryBuilder.select(this.getColumnName(key));
-            // } else {
+            f(root);
 
-            //     this.queryBuilder.select(this.getColumnName(arguments[0], key) + ' as ' + this.getColumnSelectAlias(arguments[0], key));
-            // }
+            this.queryBuilder.select(
+                this.getColumnName(...memories) +
+                    ' as ' +
+                    this.getColumnSelectAlias(...memories)
+            );
         }
 
-        // const argumentsKeys = arguments[arguments.length - 1];
-        // for (const key of argumentsKeys) {
-        //     if (arguments.length === 1) {
-        //         this.queryBuilder.select(this.getColumnName(key));
-        //     } else {
-
-        //         this.queryBuilder.select(this.getColumnName(arguments[0], key) + ' as ' + this.getColumnSelectAlias(arguments[0], key));
-        //     }
-        // }
         return this as any;
     }
 

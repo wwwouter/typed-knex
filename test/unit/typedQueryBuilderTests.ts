@@ -23,6 +23,15 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+    it('should return select "id" from "users" TOO', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex.query(User).select2([c => c.id]);
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select "users"."id" as "id" from "users"');
+
+        done();
+    });
+
     it('should return camelCase correctly', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
