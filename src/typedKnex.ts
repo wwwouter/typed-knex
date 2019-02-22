@@ -1499,7 +1499,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
         const functions = arguments[0];
 
         for (const f of functions) {
-            const columnArguments = this.getArgumentsFromColumnFunction2(f);
+            const columnArguments = this.getArgumentsFromColumnFunction(f);
 
             this.queryBuilder.select(
                 this.getColumnName(...columnArguments) +
@@ -1650,7 +1650,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
 
     public whereColumn() {
         const column1Name = this.getColumnName(
-            ...this.getArgumentsFromColumnFunction2(arguments[0])
+            ...this.getArgumentsFromColumnFunction(arguments[0])
         );
 
         // const column1Parts = arguments[0];
@@ -1667,7 +1667,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
             column2Name = arguments[2].getColumnName; // parent this nodig ...
         } else {
             column2Name = this.getColumnName(
-                ...this.getArgumentsFromColumnFunction2(arguments[2])
+                ...this.getArgumentsFromColumnFunction(arguments[2])
             );
         }
 
@@ -1703,19 +1703,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
         return this;
     }
 
-    // public getArgumentsFromColumnFunction(f: any) {
-    //     let calledArguments = [] as string[];
-
-    //     function saveArguments(...args: string[]) {
-    //         calledArguments = args;
-    //     }
-
-    //     f(saveArguments);
-
-    //     return calledArguments;
-    // }
-
-    public getArgumentsFromColumnFunction2(f: any) {
+    public getArgumentsFromColumnFunction(f: any) {
         const { root, memories } = getProxyAndMemories();
 
         f(root);
@@ -1726,8 +1714,19 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     public async findByColumn() {
         const functions = arguments[2];
 
+        // for (const f of functions) {
+        //     (this.selectColumn as any)(f);
+
+        // }
+
         for (const f of functions) {
-            (this.selectColumn as any)(f);
+            const columnArguments = this.getArgumentsFromColumnFunction(f);
+
+            this.queryBuilder.select(
+                this.getColumnName(...columnArguments) +
+                    ' as ' +
+                    this.getColumnSelectAlias(...columnArguments)
+            );
         }
 
         this.queryBuilder.where(
@@ -1739,7 +1738,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     }
 
     public where() {
-        const columnArguments = this.getArgumentsFromColumnFunction2(
+        const columnArguments = this.getArgumentsFromColumnFunction(
             arguments[0]
         );
 
@@ -1751,7 +1750,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     }
 
     public whereNot() {
-        const columnArguments = this.getArgumentsFromColumnFunction2(
+        const columnArguments = this.getArgumentsFromColumnFunction(
             arguments[0]
         );
 
@@ -1763,7 +1762,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     }
 
     public andWhere() {
-        const columnArguments = this.getArgumentsFromColumnFunction2(
+        const columnArguments = this.getArgumentsFromColumnFunction(
             arguments[0]
         );
 
@@ -1775,7 +1774,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     }
 
     public orWhere() {
-        const columnArguments = this.getArgumentsFromColumnFunction2(
+        const columnArguments = this.getArgumentsFromColumnFunction(
             arguments[0]
         );
 
@@ -1789,7 +1788,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     public whereIn() {
         const range = arguments[1];
         this.queryBuilder.whereIn(
-            this.getColumnNameFromFunction2(arguments[0]),
+            this.getColumnNameFromFunction(arguments[0]),
             range
         );
         return this;
@@ -1797,7 +1796,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     public whereNotIn() {
         const range = arguments[1];
         this.queryBuilder.whereNotIn(
-            this.getColumnNameFromFunction2(arguments[0]),
+            this.getColumnNameFromFunction(arguments[0]),
             range
         );
         return this;
@@ -1805,7 +1804,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     public orWhereIn() {
         const range = arguments[1];
         this.queryBuilder.orWhereIn(
-            this.getColumnNameFromFunction2(arguments[0]),
+            this.getColumnNameFromFunction(arguments[0]),
             range
         );
         return this;
@@ -1813,7 +1812,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     public orWhereNotIn() {
         const range = arguments[1];
         this.queryBuilder.orWhereNotIn(
-            this.getColumnNameFromFunction2(arguments[0]),
+            this.getColumnNameFromFunction(arguments[0]),
             range
         );
         return this;
@@ -1822,7 +1821,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     public whereBetween() {
         const value = arguments[1];
         this.queryBuilder.whereBetween(
-            this.getColumnNameFromFunction2(arguments[0]),
+            this.getColumnNameFromFunction(arguments[0]),
             value
         );
         return this;
@@ -1830,7 +1829,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     public whereNotBetween() {
         const value = arguments[1];
         this.queryBuilder.whereNotBetween(
-            this.getColumnNameFromFunction2(arguments[0]),
+            this.getColumnNameFromFunction(arguments[0]),
             value
         );
         return this;
@@ -1839,7 +1838,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     public orWhereBetween() {
         const value = arguments[1];
         this.queryBuilder.orWhereBetween(
-            this.getColumnNameFromFunction2(arguments[0]),
+            this.getColumnNameFromFunction(arguments[0]),
             value
         );
         return this;
@@ -1847,7 +1846,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     public orWhereNotBetween() {
         const value = arguments[1];
         this.queryBuilder.orWhereNotBetween(
-            this.getColumnNameFromFunction2(arguments[0]),
+            this.getColumnNameFromFunction(arguments[0]),
             value
         );
         return this;
@@ -1941,7 +1940,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
         const operator = arguments[1];
         const value = arguments[2];
         this.queryBuilder.having(
-            this.getColumnNameFromFunction2(arguments[0]),
+            this.getColumnNameFromFunction(arguments[0]),
             operator,
             value
         );
@@ -1951,7 +1950,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     public havingIn() {
         const value = arguments[1];
         this.queryBuilder.havingIn(
-            this.getColumnNameFromFunction2(arguments[0]),
+            this.getColumnNameFromFunction(arguments[0]),
             value
         );
         return this;
@@ -1960,7 +1959,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     public havingNotIn() {
         const value = arguments[1];
         (this.queryBuilder as any).havingNotIn(
-            this.getColumnNameFromFunction2(arguments[0]),
+            this.getColumnNameFromFunction(arguments[0]),
             value
         );
         return this;
@@ -1968,14 +1967,14 @@ export class TypedQueryBuilder<ModelType, Row = {}>
 
     public havingNull() {
         (this.queryBuilder as any).havingNull(
-            this.getColumnNameFromFunction2(arguments[0])
+            this.getColumnNameFromFunction(arguments[0])
         );
         return this;
     }
 
     public havingNotNull() {
         (this.queryBuilder as any).havingNotNull(
-            this.getColumnNameFromFunction2(arguments[0])
+            this.getColumnNameFromFunction(arguments[0])
         );
         return this;
     }
@@ -2014,7 +2013,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     public havingBetween() {
         const value = arguments[1];
         (this.queryBuilder as any).havingBetween(
-            this.getColumnNameFromFunction2(arguments[0]),
+            this.getColumnNameFromFunction(arguments[0]),
             value
         );
         return this;
@@ -2023,7 +2022,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     public havingNotBetween() {
         const value = arguments[1];
         (this.queryBuilder as any).havingNotBetween(
-            this.getColumnNameFromFunction2(arguments[0]),
+            this.getColumnNameFromFunction(arguments[0]),
             value
         );
         return this;
@@ -2169,9 +2168,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     }
 
     public groupBy() {
-        this.queryBuilder.groupBy(
-            this.getColumnNameFromFunction2(arguments[0])
-        );
+        this.queryBuilder.groupBy(this.getColumnNameFromFunction(arguments[0]));
         return this;
     }
 
@@ -2251,21 +2248,18 @@ export class TypedQueryBuilder<ModelType, Row = {}>
         return this as any;
     }
 
-    // private getColumnNameFromFunction(f: any) {
-    //     return this.getColumnName(...this.getArgumentsFromColumnFunction(f));
-    // }
-    private getColumnNameFromFunction2(f: any) {
-        return this.getColumnName(...this.getArgumentsFromColumnFunction2(f));
+    private getColumnNameFromFunction(f: any) {
+        return this.getColumnName(...this.getArgumentsFromColumnFunction(f));
     }
 
     private getColumnNameWithoutAliasFromFunction(f: any) {
         return this.getColumnNameWithoutAlias(
-            ...this.getArgumentsFromColumnFunction2(f)
+            ...this.getArgumentsFromColumnFunction(f)
         );
     }
 
     private joinColumn(joinType: 'innerJoin' | 'leftOuterJoin', f: any) {
-        const columnToJoinArguments = this.getArgumentsFromColumnFunction2(f);
+        const columnToJoinArguments = this.getArgumentsFromColumnFunction(f);
 
         const columnToJoinName = this.getColumnName(...columnToJoinArguments);
 
