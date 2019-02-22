@@ -55,9 +55,9 @@ export interface ITypedQueryBuilder<Model, Row> {
     orWhere: IWhere<Model, Row>;
     whereNot: IWhere<Model, Row>;
     // selectColumn: ISelectWithFunctionColumn<Model, Row extends Model ? {} : Row>;
-    select: ISelectWithFunctionColumns<Model, Row extends Model ? {} : Row>;
+    select: ISelectWithFunctionColumns2<Model, Row extends Model ? {} : Row>;
 
-    select2: ISelectWithFunctionColumns2<Model, Row extends Model ? {} : Row>;
+    // select2: ISelectWithFunctionColumns2<Model, Row extends Model ? {} : Row>;
 
     orderBy: IOrderBy<Model, Row>;
     innerJoinColumn: IKeyFunctionAsParametersReturnQueryBuider<Model, Row>;
@@ -751,76 +751,76 @@ interface IDbFunctionWithAlias<Model, Row> {
     >;
 }
 
-interface ISelectWithFunctionColumns<Model, Row> {
-    <
-        R1,
-        R2,
-        R3,
-        R4,
-        R5,
-        R6,
-        R7,
-        R8,
-        R9,
-        R10,
-        R11,
-        R12,
-        R13,
-        R14,
-        R15,
-        R16,
-        R17,
-        R18,
-        R19
-    >(
-        selectColumnFunction: [
-            ((c: IColumnFunctionReturnNewRow<Model>) => R1),
-            ((c: IColumnFunctionReturnNewRow<Model>) => R2)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R3)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R4)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R5)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R6)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R7)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R8)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R9)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R10)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R11)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R12)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R13)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R14)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R15)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R16)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R17)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R18)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R19)?
-        ]
-    ): ITypedQueryBuilder<
-        Model,
-        Row &
-            R1 &
-            R2 &
-            R3 &
-            R4 &
-            R5 &
-            R6 &
-            R7 &
-            R8 &
-            R8 &
-            R9 &
-            R10 &
-            R11 &
-            R12 &
-            R13 &
-            R14 &
-            R15 &
-            R16 &
-            R17 &
-            R18 &
-            R18 &
-            R19
-    >;
-    // <NewRow>(selectColumnFunction: [((c: IColumnFunctionReturnNewRow<Model>) => NewRow)]): ITypedQueryBuilder<Model, Row & NewRow>;
-}
+// interface ISelectWithFunctionColumns<Model, Row> {
+//     <
+//         R1,
+//         R2,
+//         R3,
+//         R4,
+//         R5,
+//         R6,
+//         R7,
+//         R8,
+//         R9,
+//         R10,
+//         R11,
+//         R12,
+//         R13,
+//         R14,
+//         R15,
+//         R16,
+//         R17,
+//         R18,
+//         R19
+//     >(
+//         selectColumnFunction: [
+//             ((c: IColumnFunctionReturnNewRow<Model>) => R1),
+//             ((c: IColumnFunctionReturnNewRow<Model>) => R2)?,
+//             ((c: IColumnFunctionReturnNewRow<Model>) => R3)?,
+//             ((c: IColumnFunctionReturnNewRow<Model>) => R4)?,
+//             ((c: IColumnFunctionReturnNewRow<Model>) => R5)?,
+//             ((c: IColumnFunctionReturnNewRow<Model>) => R6)?,
+//             ((c: IColumnFunctionReturnNewRow<Model>) => R7)?,
+//             ((c: IColumnFunctionReturnNewRow<Model>) => R8)?,
+//             ((c: IColumnFunctionReturnNewRow<Model>) => R9)?,
+//             ((c: IColumnFunctionReturnNewRow<Model>) => R10)?,
+//             ((c: IColumnFunctionReturnNewRow<Model>) => R11)?,
+//             ((c: IColumnFunctionReturnNewRow<Model>) => R12)?,
+//             ((c: IColumnFunctionReturnNewRow<Model>) => R13)?,
+//             ((c: IColumnFunctionReturnNewRow<Model>) => R14)?,
+//             ((c: IColumnFunctionReturnNewRow<Model>) => R15)?,
+//             ((c: IColumnFunctionReturnNewRow<Model>) => R16)?,
+//             ((c: IColumnFunctionReturnNewRow<Model>) => R17)?,
+//             ((c: IColumnFunctionReturnNewRow<Model>) => R18)?,
+//             ((c: IColumnFunctionReturnNewRow<Model>) => R19)?
+//         ]
+//     ): ITypedQueryBuilder<
+//         Model,
+//         Row &
+//             R1 &
+//             R2 &
+//             R3 &
+//             R4 &
+//             R5 &
+//             R6 &
+//             R7 &
+//             R8 &
+//             R8 &
+//             R9 &
+//             R10 &
+//             R11 &
+//             R12 &
+//             R13 &
+//             R14 &
+//             R15 &
+//             R16 &
+//             R17 &
+//             R18 &
+//             R18 &
+//             R19
+//     >;
+//     // <NewRow>(selectColumnFunction: [((c: IColumnFunctionReturnNewRow<Model>) => NewRow)]): ITypedQueryBuilder<Model, Row & NewRow>;
+// }
 
 interface ISelectWithFunctionColumns2<Model, Row> {
     <
@@ -1321,34 +1321,34 @@ export class TypedQueryBuilder<ModelType, Row = {}>
         return this as any;
     }
 
+    // public select() {
+    //     const functions = arguments[0];
+
+    //     for (const f of functions) {
+    //         (this.selectColumn as any)(f);
+    //         // const args = this.getArgumentsFromColumnFunction(f);
+
+    //         // if (args.length === 1) {
+    //         //     this.queryBuilder.select(this.getColumnName(key));
+    //         // } else {
+
+    //         //     this.queryBuilder.select(this.getColumnName(arguments[0], key) + ' as ' + this.getColumnSelectAlias(arguments[0], key));
+    //         // }
+    //     }
+
+    //     // const argumentsKeys = arguments[arguments.length - 1];
+    //     // for (const key of argumentsKeys) {
+    //     //     if (arguments.length === 1) {
+    //     //         this.queryBuilder.select(this.getColumnName(key));
+    //     //     } else {
+
+    //     //         this.queryBuilder.select(this.getColumnName(arguments[0], key) + ' as ' + this.getColumnSelectAlias(arguments[0], key));
+    //     //     }
+    //     // }
+    //     return this as any;
+    // }
+
     public select() {
-        const functions = arguments[0];
-
-        for (const f of functions) {
-            (this.selectColumn as any)(f);
-            // const args = this.getArgumentsFromColumnFunction(f);
-
-            // if (args.length === 1) {
-            //     this.queryBuilder.select(this.getColumnName(key));
-            // } else {
-
-            //     this.queryBuilder.select(this.getColumnName(arguments[0], key) + ' as ' + this.getColumnSelectAlias(arguments[0], key));
-            // }
-        }
-
-        // const argumentsKeys = arguments[arguments.length - 1];
-        // for (const key of argumentsKeys) {
-        //     if (arguments.length === 1) {
-        //         this.queryBuilder.select(this.getColumnName(key));
-        //     } else {
-
-        //         this.queryBuilder.select(this.getColumnName(arguments[0], key) + ' as ' + this.getColumnSelectAlias(arguments[0], key));
-        //     }
-        // }
-        return this as any;
-    }
-
-    public select2() {
         const functions = arguments[0];
 
         for (const f of functions) {
