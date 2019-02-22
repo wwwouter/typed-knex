@@ -558,18 +558,84 @@ type PickAndTransformLevel2<
               Level1Type,
               Level1Property,
               Pick<Level2Type, Level2Property>
-          >) // { iets: P }> // Pick<T,K> // P = "category"
+          >)
 };
 
 type TransformPropsToFunctionsLevel1<Level1Type> = {
-    [Level1Property in keyof Level1Type]: Level1Type[Level1Property] extends object // ? PickAndTransform3<T[P], keyof T[P], Pick5<T[P],keyof T[P], T>> // () => Pick<T, P> // Pick5<T[P], keyof T[P], Pick5<T[P],keyof T[P], T>> //T = RCO, P = "user", T[P] = {id .. getal}, keyof T[P] ["id", .. , "getal"]
+    [Level1Property in keyof Level1Type]: Level1Type[Level1Property] extends object
         ? PickAndTransformLevel2<
               Level1Type,
               Level1Property,
               Level1Type[Level1Property],
               keyof Level1Type[Level1Property]
-          > // Pick5<T[P], keyof T[P], Pick5<T[P],keyof T[P], T>>
+          >
         : (() => Pick<Level1Type, Level1Property>)
+};
+
+type PickAndTransformLevel4ReturnProperyType<
+    Level1Type,
+    _Level1Property extends keyof Level1Type,
+    Level2Type,
+    _Level2Property extends keyof Level2Type,
+    Level3Type,
+    _Level3Property extends keyof Level3Type,
+    Level4Type,
+    Level4Properties extends keyof Level4Type
+> = {
+    [Level4Property in Level4Properties]: Level4Type[Level4Property] extends object
+        ? any
+        : (() => Level4Type[Level4Property])
+};
+
+type PickAndTransformLevel3ReturnProperyType<
+    Level1Type,
+    Level1Property extends keyof Level1Type,
+    Level2Type,
+    Level2Property extends keyof Level2Type,
+    Level3Type,
+    Level3Properties extends keyof Level3Type
+> = {
+    [Level3Property in Level3Properties]: Level3Type[Level3Property] extends object
+        ? PickAndTransformLevel4ReturnProperyType<
+              Level1Type,
+              Level1Property,
+              Level2Type,
+              Level2Property,
+              Level3Type,
+              Level3Property,
+              Level3Type[Level3Property],
+              keyof Level3Type[Level3Property]
+          >
+        : (() => Level3Type[Level3Property])
+};
+
+type PickAndTransformLevel2ReturnProperyType<
+    Level1Type,
+    Level1Property extends keyof Level1Type,
+    Level2Type,
+    Level2Properties extends keyof Level2Type
+> = {
+    [Level2Property in Level2Properties]: Level2Type[Level2Property] extends object
+        ? PickAndTransformLevel3ReturnProperyType<
+              Level1Type,
+              Level1Property,
+              Level2Type,
+              Level2Property,
+              Level2Type[Level2Property],
+              keyof Level2Type[Level2Property]
+          >
+        : (() => Level2Type[Level2Property])
+};
+
+type TransformPropsToFunctionsLevel1ReturnProperyType<Level1Type> = {
+    [Level1Property in keyof Level1Type]: Level1Type[Level1Property] extends object
+        ? PickAndTransformLevel2ReturnProperyType<
+              Level1Type,
+              Level1Property,
+              Level1Type[Level1Property],
+              keyof Level1Type[Level1Property]
+          >
+        : (() => Level1Type[Level1Property])
 };
 
 // type TransformPropsToFunctions<T> = {
@@ -1048,8 +1114,8 @@ interface IKeyFunctionAsParametersReturnQueryBuider<Model, Row> {
 interface IWhere<Model, Row> {
     <PropertyType>(
         selectColumnFunction: (
-            c: IColumnFunctionReturnPropertyType<Model>
-        ) => PropertyType,
+            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
+        ) => () => PropertyType,
         value: PropertyType
     ): ITypedQueryBuilder<Model, Row>;
 }
@@ -1352,14 +1418,12 @@ export class TypedQueryBuilder<ModelType, Row = {}>
         const functions = arguments[0];
 
         for (const f of functions) {
-            const { root, memories } = getProxyAndMemories();
-
-            f(root);
+            const columnArguments = this.getArgumentsFromColumnFunction2(f);
 
             this.queryBuilder.select(
-                this.getColumnName(...memories) +
+                this.getColumnName(...columnArguments) +
                     ' as ' +
-                    this.getColumnSelectAlias(...memories)
+                    this.getColumnSelectAlias(...columnArguments)
             );
         }
 
@@ -1564,6 +1628,14 @@ export class TypedQueryBuilder<ModelType, Row = {}>
         return calledArguments;
     }
 
+    public getArgumentsFromColumnFunction2(f: any) {
+        const { root, memories } = getProxyAndMemories();
+
+        f(root);
+
+        return memories;
+    }
+
     public async findByColumn() {
         const functions = arguments[2];
 
@@ -1580,7 +1652,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     }
 
     public where() {
-        const columnArguments = this.getArgumentsFromColumnFunction(
+        const columnArguments = this.getArgumentsFromColumnFunction2(
             arguments[0]
         );
 
@@ -1592,7 +1664,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     }
 
     public whereNot() {
-        const columnArguments = this.getArgumentsFromColumnFunction(
+        const columnArguments = this.getArgumentsFromColumnFunction2(
             arguments[0]
         );
 
@@ -1604,7 +1676,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     }
 
     public andWhere() {
-        const columnArguments = this.getArgumentsFromColumnFunction(
+        const columnArguments = this.getArgumentsFromColumnFunction2(
             arguments[0]
         );
 
@@ -1616,7 +1688,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     }
 
     public orWhere() {
-        const columnArguments = this.getArgumentsFromColumnFunction(
+        const columnArguments = this.getArgumentsFromColumnFunction2(
             arguments[0]
         );
 
