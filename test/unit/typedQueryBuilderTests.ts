@@ -65,9 +65,7 @@ describe('TypedKnexQueryBuilder', () => {
 
     it('should join a table', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex
-            .query(UserSetting)
-            .innerJoinColumn(c => c('user'));
+        const query = typedKnex.query(UserSetting).innerJoinColumn(c => c.user);
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -82,7 +80,7 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(UserSetting)
             .select([c => c.user.name])
-            .innerJoinColumn(c => c('user'));
+            .innerJoinColumn(c => c.user);
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -97,7 +95,7 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(UserSetting)
             .where(c => c.user.name, 'user1')
-            .innerJoinColumn(c => c('user'));
+            .innerJoinColumn(c => c.user);
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -111,8 +109,8 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .innerJoinColumn(c => c('user'))
-            .innerJoinColumn(c => c('user', 'category'));
+            .innerJoinColumn(c => c.user)
+            .innerJoinColumn(c => c.user.category);
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -126,7 +124,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .innerJoinColumn(c => c('user', 'category', 'region'));
+            .innerJoinColumn(c => c.user.category.region);
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -141,7 +139,7 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(UserSetting)
             .select([c => c.user.category.name])
-            .innerJoinColumn(c => c('user', 'category'));
+            .innerJoinColumn(c => c.user.category);
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -156,7 +154,7 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(UserSetting)
             .select([c => c.user.category.region.code])
-            .innerJoinColumn(c => c('user', 'category', 'region'));
+            .innerJoinColumn(c => c.user.category.region);
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -171,7 +169,7 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(UserSetting)
             .where(c => c.user.category.name, 'user1')
-            .innerJoinColumn(c => c('user', 'category'));
+            .innerJoinColumn(c => c.user.category);
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -186,7 +184,7 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(UserSetting)
             .where(c => c.user.category.region.code, 2)
-            .innerJoinColumn(c => c('user', 'category', 'region'));
+            .innerJoinColumn(c => c.user.category.region);
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -320,7 +318,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .whereIn(c => c('name'), ['user1', 'user2']);
+            .whereIn(c => c.name, ['user1', 'user2']);
 
         const queryString = query.toQuery();
         assert.equal(
@@ -335,7 +333,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .whereNotIn(c => c('name'), ['user1', 'user2']);
+            .whereNotIn(c => c.name, ['user1', 'user2']);
 
         const queryString = query.toQuery();
         assert.equal(
@@ -350,7 +348,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .whereBetween(c => c('numericValue'), [1, 10]);
+            .whereBetween(c => c.numericValue, [1, 10]);
 
         const queryString = query.toQuery();
         assert.equal(
@@ -365,7 +363,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .whereNotBetween(c => c('numericValue'), [1, 10]);
+            .whereNotBetween(c => c.numericValue, [1, 10]);
 
         const queryString = query.toQuery();
         assert.equal(
@@ -381,7 +379,7 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(User)
             .whereExists(UserSetting, (subQuery, parentColumn) => {
-                subQuery.whereColumn(c => c('userId'), '=', parentColumn('id'));
+                subQuery.whereColumn(c => c.userId, '=', parentColumn.id);
             });
 
         const queryString = query.toQuery();
@@ -399,8 +397,11 @@ describe('TypedKnexQueryBuilder', () => {
             .query(User)
             .where(c => c.name, 'name')
             .orWhereExists(UserSetting, (subQuery, parentColumn) => {
-                subQuery.whereColumn(c => c('userId'), '=', parentColumn('id'));
+                subQuery.whereColumn(c => c.userId, '=', parentColumn.id);
             });
+        // .orWhereExists(UserSetting, (subQuery, parentColumn) => {
+        //     subQuery.whereColumn(c => c.userId, '=', parentColumn.id);
+        // });
 
         const queryString = query.toQuery();
         assert.equal(
@@ -416,7 +417,7 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(User)
             .whereNotExists(UserSetting, (subQuery, parentColumn) => {
-                subQuery.whereColumn(c => c('userId'), '=', parentColumn('id'));
+                subQuery.whereColumn(c => c.userId, '=', parentColumn.id);
             });
 
         const queryString = query.toQuery();
@@ -434,7 +435,7 @@ describe('TypedKnexQueryBuilder', () => {
             .query(User)
             .where(c => c.name, 'name')
             .orWhereNotExists(UserSetting, (subQuery, parentColumn) => {
-                subQuery.whereColumn(c => c('userId'), '=', parentColumn('id'));
+                subQuery.whereColumn(c => c.userId, '=', parentColumn.id);
             });
 
         const queryString = query.toQuery();
@@ -467,7 +468,7 @@ describe('TypedKnexQueryBuilder', () => {
             .query(User)
             .select([c => c.someValue])
             .selectRaw('total', Number, 'SUM("numericValue")')
-            .groupBy(c => c('someValue'));
+            .groupBy(c => c.someValue);
 
         const queryString = query.toQuery();
         assert.equal(
@@ -482,7 +483,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .having(c => c('numericValue'), '>', 10);
+            .having(c => c.numericValue, '>', 10);
 
         const queryString = query.toQuery();
         assert.equal(
@@ -495,7 +496,7 @@ describe('TypedKnexQueryBuilder', () => {
 
     it('should create query with having null', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).havingNull(c => c('numericValue'));
+        const query = typedKnex.query(User).havingNull(c => c.numericValue);
 
         const queryString = query.toQuery();
         assert.equal(
@@ -508,9 +509,7 @@ describe('TypedKnexQueryBuilder', () => {
 
     it('should create query with having not null', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex
-            .query(User)
-            .havingNotNull(c => c('numericValue'));
+        const query = typedKnex.query(User).havingNotNull(c => c.numericValue);
 
         const queryString = query.toQuery();
         assert.equal(
@@ -525,7 +524,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .havingIn(c => c('name'), ['user1', 'user2']);
+            .havingIn(c => c.name, ['user1', 'user2']);
 
         const queryString = query.toQuery();
         assert.equal(
@@ -540,7 +539,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .havingNotIn(c => c('name'), ['user1', 'user2']);
+            .havingNotIn(c => c.name, ['user1', 'user2']);
 
         const queryString = query.toQuery();
         assert.equal(
@@ -556,7 +555,7 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(User)
             .havingExists(UserSetting, (subQuery, parentColumn) => {
-                subQuery.whereColumn(c => c('userId'), '=', parentColumn('id'));
+                subQuery.whereColumn(c => c.userId, '=', parentColumn.id);
             });
 
         const queryString = query.toQuery();
@@ -573,7 +572,7 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(User)
             .havingNotExists(UserSetting, (subQuery, parentColumn) => {
-                subQuery.whereColumn(c => c('userId'), '=', parentColumn('id'));
+                subQuery.whereColumn(c => c.userId, '=', parentColumn.id);
             });
 
         const queryString = query.toQuery();
@@ -604,7 +603,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .havingBetween(c => c('numericValue'), [1, 10]);
+            .havingBetween(c => c.numericValue, [1, 10]);
 
         const queryString = query.toQuery();
         assert.equal(
@@ -619,7 +618,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .havingNotBetween(c => c('numericValue'), [1, 10]);
+            .havingNotBetween(c => c.numericValue, [1, 10]);
 
         const queryString = query.toQuery();
         assert.equal(
@@ -872,8 +871,8 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .whereIn(c => c('name'), ['user1', 'user2'])
-            .orWhereIn(c => c('name'), ['user3', 'user4']);
+            .whereIn(c => c.name, ['user1', 'user2'])
+            .orWhereIn(c => c.name, ['user3', 'user4']);
 
         const queryString = query.toQuery();
         assert.equal(
@@ -888,8 +887,8 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .whereNotIn(c => c('name'), ['user1', 'user2'])
-            .orWhereNotIn(c => c('name'), ['user3', 'user4']);
+            .whereNotIn(c => c.name, ['user1', 'user2'])
+            .orWhereNotIn(c => c.name, ['user3', 'user4']);
 
         const queryString = query.toQuery();
         assert.equal(
@@ -904,8 +903,8 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .whereBetween(c => c('numericValue'), [1, 10])
-            .orWhereBetween(c => c('numericValue'), [100, 1000]);
+            .whereBetween(c => c.numericValue, [1, 10])
+            .orWhereBetween(c => c.numericValue, [100, 1000]);
 
         const queryString = query.toQuery();
         assert.equal(
@@ -920,8 +919,8 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .whereNotBetween(c => c('numericValue'), [1, 10])
-            .orWhereNotBetween(c => c('numericValue'), [100, 1000]);
+            .whereNotBetween(c => c.numericValue, [1, 10])
+            .orWhereNotBetween(c => c.numericValue, [100, 1000]);
 
         const queryString = query.toQuery();
         assert.equal(

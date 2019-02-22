@@ -638,6 +638,72 @@ type TransformPropsToFunctionsLevel1ReturnProperyType<Level1Type> = {
         : (() => Level1Type[Level1Property])
 };
 
+type PickAndTransformLevel4ReturnProperyName<
+    Level1Type,
+    _Level1Property extends keyof Level1Type,
+    Level2Type,
+    _Level2Property extends keyof Level2Type,
+    Level3Type,
+    _Level3Property extends keyof Level3Type,
+    Level4Type,
+    Level4Properties extends keyof Level4Type
+> = {
+    [Level4Property in Level4Properties]: Level4Type[Level4Property] extends object
+        ? any
+        : (() => Level4Property)
+};
+
+type PickAndTransformLevel3ReturnProperyName<
+    Level1Type,
+    Level1Property extends keyof Level1Type,
+    Level2Type,
+    Level2Property extends keyof Level2Type,
+    Level3Type,
+    Level3Properties extends keyof Level3Type
+> = {
+    [Level3Property in Level3Properties]: Level3Type[Level3Property] extends object
+        ? PickAndTransformLevel4ReturnProperyName<
+              Level1Type,
+              Level1Property,
+              Level2Type,
+              Level2Property,
+              Level3Type,
+              Level3Property,
+              Level3Type[Level3Property],
+              keyof Level3Type[Level3Property]
+          >
+        : (() => Level3Property)
+};
+
+type PickAndTransformLevel2ReturnProperyName<
+    Level1Type,
+    Level1Property extends keyof Level1Type,
+    Level2Type,
+    Level2Properties extends keyof Level2Type
+> = {
+    [Level2Property in Level2Properties]: Level2Type[Level2Property] extends object
+        ? PickAndTransformLevel3ReturnProperyName<
+              Level1Type,
+              Level1Property,
+              Level2Type,
+              Level2Property,
+              Level2Type[Level2Property],
+              keyof Level2Type[Level2Property]
+          >
+        : (() => Level2Property)
+};
+
+type TransformPropsToFunctionsLevel1ReturnProperyName<Level1Type> = {
+    [Level1Property in keyof Level1Type]: Level1Type[Level1Property] extends object
+        ? PickAndTransformLevel2ReturnProperyName<
+              Level1Type,
+              Level1Property,
+              Level1Type[Level1Property],
+              keyof Level1Type[Level1Property]
+          >
+        : (() => Level1Property)
+};
+
 // type TransformPropsToFunctions<T> = {
 //     [P in keyof T]: T[P] extends object // ? PickAndTransform3<T[P], keyof T[P], Pick5<T[P],keyof T[P], T>> // () => Pick<T, P> // Pick5<T[P], keyof T[P], Pick5<T[P],keyof T[P], T>> //T = RCO, P = "user", T[P] = {id .. getal}, keyof T[P] ["id", .. , "getal"]
 //         ? PickAndTransform4<T, P, T[P], keyof T[P]> // Pick5<T[P], keyof T[P], Pick5<T[P],keyof T[P], T>>
@@ -767,32 +833,32 @@ interface IColumnFunctionReturnPropertyType<Model> {
     <K extends keyof Model>(key1: K): Model[K];
 }
 
-interface IColumnFunctionReturnColumnName<Model> {
-    <
-        K1 extends keyof Model,
-        K2 extends keyof Model[K1],
-        K3 extends keyof Model[K1][K2]
-    >(
-        key1: K1,
-        key2: K2,
-        key3: K3,
-        ...keys: string[]
-    ): string;
-    <
-        K1 extends keyof Model,
-        K2 extends keyof Model[K1],
-        K3 extends keyof Model[K1][K2]
-    >(
-        key1: K1,
-        key2: K2,
-        key3: K3
-    ): string;
-    <K1 extends keyof Model, K2 extends keyof Model[K1]>(
-        key1: K1,
-        key2: K2
-    ): string;
-    <K extends keyof Model>(key1: K): string;
-}
+// interface IColumnFunctionReturnColumnName<Model> {
+//     <
+//         K1 extends keyof Model,
+//         K2 extends keyof Model[K1],
+//         K3 extends keyof Model[K1][K2]
+//     >(
+//         key1: K1,
+//         key2: K2,
+//         key3: K3,
+//         ...keys: string[]
+//     ): string;
+//     <
+//         K1 extends keyof Model,
+//         K2 extends keyof Model[K1],
+//         K3 extends keyof Model[K1][K2]
+//     >(
+//         key1: K1,
+//         key2: K2,
+//         key3: K3
+//     ): string;
+//     <K1 extends keyof Model, K2 extends keyof Model[K1]>(
+//         key1: K1,
+//         key2: K2
+//     ): string;
+//     <K extends keyof Model>(key1: K): string;
+// }
 
 // interface ISelectWithFunctionColumn<Model, Row> {
 //     <NewRow>(selectColumnFunction: (c: IColumnFunctionReturnNewRow<Model>) => NewRow): ITypedQueryBuilder<Model, Row & NewRow>;
@@ -1082,7 +1148,9 @@ interface IFindByColumn<Model, Row> {
 
 interface IKeyFunctionAsParametersReturnQueryBuider<Model, Row> {
     (
-        selectColumnFunction: (c: IColumnFunctionReturnNewRow<Model>) => void
+        selectColumnFunction: (
+            c: TransformPropsToFunctionsLevel1<Model>
+        ) => void
     ): ITypedQueryBuilder<Model, Row>;
 }
 
@@ -1123,8 +1191,8 @@ interface IWhere<Model, Row> {
 interface IWhereIn<Model, Row> {
     <PropertyType>(
         selectColumnFunction: (
-            c: IColumnFunctionReturnPropertyType<Model>
-        ) => PropertyType,
+            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
+        ) => () => PropertyType,
         values: PropertyType[]
     ): ITypedQueryBuilder<Model, Row>;
 }
@@ -1132,8 +1200,8 @@ interface IWhereIn<Model, Row> {
 interface IWhereBetween<Model, Row> {
     <PropertyType>(
         selectColumnFunction: (
-            c: IColumnFunctionReturnPropertyType<Model>
-        ) => PropertyType,
+            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
+        ) => () => PropertyType,
         range: [PropertyType, PropertyType]
     ): ITypedQueryBuilder<Model, Row>;
 }
@@ -1141,8 +1209,8 @@ interface IWhereBetween<Model, Row> {
 interface IHaving<Model, Row> {
     <PropertyType>(
         selectColumnFunction: (
-            c: IColumnFunctionReturnPropertyType<Model>
-        ) => PropertyType,
+            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
+        ) => () => PropertyType,
         operator: Operator,
         value: PropertyType
     ): ITypedQueryBuilder<Model, Row>;
@@ -1154,14 +1222,14 @@ interface IHaving<Model, Row> {
 }
 
 interface IWhereCompareTwoColumns<Model, Row> {
-    <PropertyType1, PropertyType2, Model2>(
+    <PropertyType1, _PropertyType2, Model2>(
         selectColumn1Function: (
-            c: IColumnFunctionReturnPropertyType<Model>
-        ) => PropertyType1,
+            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
+        ) => () => PropertyType1,
         operator: Operator,
-        selectColumn2Function:
-            | ((c: IColumnFunctionReturnPropertyType<Model2>) => PropertyType2)
-            | string
+        selectColumn2Function: (
+            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model2>
+        ) => any // () => PropertyType2
     ): ITypedQueryBuilder<Model, Row>;
 
     // (): { Left: () : { RIght: IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> } };
@@ -1183,7 +1251,7 @@ interface IWhereExists<Model, Row> {
         subQueryModel: new () => SubQueryModel,
         code: (
             subQuery: ITypedQueryBuilder<SubQueryModel, {}>,
-            parent: IColumnFunctionReturnColumnName<Model>
+            parent: TransformPropsToFunctionsLevel1ReturnProperyName<Model>
         ) => void
     ): ITypedQueryBuilder<Model, Row>;
 }
@@ -1201,11 +1269,22 @@ interface IUnion<Model, Row> {
     ): ITypedQueryBuilder<Model, Row>;
 }
 
-function getProxyAndMemories() {
+function getProxyAndMemories<ModelType, Row>(
+    typedQueryBuilder?: TypedQueryBuilder<ModelType, Row>
+) {
     const memories = [] as string[];
 
     function allGet(_target: any, name: any): any {
-        memories.push(name);
+        if (name === 'memories') {
+            return memories;
+        }
+        if (name === 'getColumnName') {
+            return typedQueryBuilder!.getColumnName(...memories);
+        }
+        // console.log('typeof name: ', typeof name);
+        if (typeof name === 'string') {
+            memories.push(name);
+        }
         return new Proxy(
             {},
             {
@@ -1569,18 +1648,24 @@ export class TypedQueryBuilder<ModelType, Row = {}>
 
     public whereColumn() {
         const column1Name = this.getColumnName(
-            ...this.getArgumentsFromColumnFunction(arguments[0])
+            ...this.getArgumentsFromColumnFunction2(arguments[0])
         );
 
         // const column1Parts = arguments[0];
         const operator = arguments[1];
 
         let column2Name;
+        // console.log('arguments[2]: ', arguments[2]);
+        // console.log('arguments[2].mem: ', arguments[2].memories);
+        // console.log('arguments[3]: ', arguments[3]);
         if (typeof arguments[2] === 'string') {
             column2Name = arguments[2];
+        } else if (arguments[2].memories != undefined) {
+            // column2Name = arguments[2];
+            column2Name = arguments[2].getColumnName; // parent this nodig ...
         } else {
             column2Name = this.getColumnName(
-                ...this.getArgumentsFromColumnFunction(arguments[2])
+                ...this.getArgumentsFromColumnFunction2(arguments[2])
             );
         }
 
@@ -1616,17 +1701,17 @@ export class TypedQueryBuilder<ModelType, Row = {}>
         return this;
     }
 
-    public getArgumentsFromColumnFunction(f: any) {
-        let calledArguments = [] as string[];
+    // public getArgumentsFromColumnFunction(f: any) {
+    //     let calledArguments = [] as string[];
 
-        function saveArguments(...args: string[]) {
-            calledArguments = args;
-        }
+    //     function saveArguments(...args: string[]) {
+    //         calledArguments = args;
+    //     }
 
-        f(saveArguments);
+    //     f(saveArguments);
 
-        return calledArguments;
-    }
+    //     return calledArguments;
+    // }
 
     public getArgumentsFromColumnFunction2(f: any) {
         const { root, memories } = getProxyAndMemories();
@@ -1702,7 +1787,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     public whereIn() {
         const range = arguments[1];
         this.queryBuilder.whereIn(
-            this.getColumnNameFromFunction(arguments[0]),
+            this.getColumnNameFromFunction2(arguments[0]),
             range
         );
         return this;
@@ -1710,7 +1795,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     public whereNotIn() {
         const range = arguments[1];
         this.queryBuilder.whereNotIn(
-            this.getColumnNameFromFunction(arguments[0]),
+            this.getColumnNameFromFunction2(arguments[0]),
             range
         );
         return this;
@@ -1718,7 +1803,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     public orWhereIn() {
         const range = arguments[1];
         this.queryBuilder.orWhereIn(
-            this.getColumnNameFromFunction(arguments[0]),
+            this.getColumnNameFromFunction2(arguments[0]),
             range
         );
         return this;
@@ -1726,7 +1811,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     public orWhereNotIn() {
         const range = arguments[1];
         this.queryBuilder.orWhereNotIn(
-            this.getColumnNameFromFunction(arguments[0]),
+            this.getColumnNameFromFunction2(arguments[0]),
             range
         );
         return this;
@@ -1735,7 +1820,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     public whereBetween() {
         const value = arguments[1];
         this.queryBuilder.whereBetween(
-            this.getColumnNameFromFunction(arguments[0]),
+            this.getColumnNameFromFunction2(arguments[0]),
             value
         );
         return this;
@@ -1743,7 +1828,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     public whereNotBetween() {
         const value = arguments[1];
         this.queryBuilder.whereNotBetween(
-            this.getColumnNameFromFunction(arguments[0]),
+            this.getColumnNameFromFunction2(arguments[0]),
             value
         );
         return this;
@@ -1752,7 +1837,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     public orWhereBetween() {
         const value = arguments[1];
         this.queryBuilder.orWhereBetween(
-            this.getColumnNameFromFunction(arguments[0]),
+            this.getColumnNameFromFunction2(arguments[0]),
             value
         );
         return this;
@@ -1760,7 +1845,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     public orWhereNotBetween() {
         const value = arguments[1];
         this.queryBuilder.orWhereNotBetween(
-            this.getColumnNameFromFunction(arguments[0]),
+            this.getColumnNameFromFunction2(arguments[0]),
             value
         );
         return this;
@@ -1776,9 +1861,12 @@ export class TypedQueryBuilder<ModelType, Row = {}>
             callback: Knex.QueryCallback
         ) => Knex.QueryBuilder)(function() {
             const subQuery = this;
+            const { root, memories } = getProxyAndMemories(that);
+
             functionToCall(
                 new TypedQueryBuilder(typeOfSubQuery, that.knex, subQuery),
-                that.getColumnName.bind(that)
+                root, //  that.getColumnName.bind(that)
+                memories
             );
         });
     }
@@ -1851,7 +1939,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
         const operator = arguments[1];
         const value = arguments[2];
         this.queryBuilder.having(
-            this.getColumnNameFromFunction(arguments[0]),
+            this.getColumnNameFromFunction2(arguments[0]),
             operator,
             value
         );
@@ -1861,7 +1949,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     public havingIn() {
         const value = arguments[1];
         this.queryBuilder.havingIn(
-            this.getColumnNameFromFunction(arguments[0]),
+            this.getColumnNameFromFunction2(arguments[0]),
             value
         );
         return this;
@@ -1870,7 +1958,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     public havingNotIn() {
         const value = arguments[1];
         (this.queryBuilder as any).havingNotIn(
-            this.getColumnNameFromFunction(arguments[0]),
+            this.getColumnNameFromFunction2(arguments[0]),
             value
         );
         return this;
@@ -1878,14 +1966,14 @@ export class TypedQueryBuilder<ModelType, Row = {}>
 
     public havingNull() {
         (this.queryBuilder as any).havingNull(
-            this.getColumnNameFromFunction(arguments[0])
+            this.getColumnNameFromFunction2(arguments[0])
         );
         return this;
     }
 
     public havingNotNull() {
         (this.queryBuilder as any).havingNotNull(
-            this.getColumnNameFromFunction(arguments[0])
+            this.getColumnNameFromFunction2(arguments[0])
         );
         return this;
     }
@@ -1924,7 +2012,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     public havingBetween() {
         const value = arguments[1];
         (this.queryBuilder as any).havingBetween(
-            this.getColumnNameFromFunction(arguments[0]),
+            this.getColumnNameFromFunction2(arguments[0]),
             value
         );
         return this;
@@ -1933,7 +2021,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     public havingNotBetween() {
         const value = arguments[1];
         (this.queryBuilder as any).havingNotBetween(
-            this.getColumnNameFromFunction(arguments[0]),
+            this.getColumnNameFromFunction2(arguments[0]),
             value
         );
         return this;
@@ -2079,7 +2167,9 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     }
 
     public groupBy() {
-        this.queryBuilder.groupBy(this.getColumnNameFromFunction(arguments[0]));
+        this.queryBuilder.groupBy(
+            this.getColumnNameFromFunction2(arguments[0])
+        );
         return this;
     }
 
@@ -2090,6 +2180,62 @@ export class TypedQueryBuilder<ModelType, Row = {}>
 
     public useKnexQueryBuilder(f: (query: Knex.QueryBuilder) => void): void {
         f(this.queryBuilder);
+    }
+
+    public getColumnName(...keys: string[]): string {
+        const firstPartName = this.getColumnNameWithoutAlias(keys[0]);
+
+        if (keys.length === 1) {
+            return firstPartName;
+        } else {
+            let currentColumnPart = getColumnInformation(
+                this.tableClass,
+                keys[0]
+            );
+
+            let columnName = '';
+            let columnAlias = currentColumnPart.propertyKey;
+            let currentClass = currentColumnPart.columnClass;
+            for (let i = 1; i < keys.length; i++) {
+                currentColumnPart = getColumnInformation(currentClass, keys[i]);
+
+                columnName =
+                    columnAlias +
+                    '.' +
+                    (keys.length - 1 === i
+                        ? currentColumnPart.name
+                        : currentColumnPart.propertyKey);
+                columnAlias +=
+                    '_' +
+                    (keys.length - 1 === i
+                        ? currentColumnPart.name
+                        : currentColumnPart.propertyKey);
+                currentClass = currentColumnPart.columnClass;
+            }
+            return columnName;
+        }
+
+        // let currentClass = this.tableClass;
+        // let result = this.tableName;
+        // for (let i = 0; i < keys.length; i++) {
+        //     const currentColumnPart = getColumnInformation(currentClass, keys[i]);
+        //     result += '.' + currentColumnPart.name;
+        //     currentClass = currentColumnPart.columnClass;
+        // }
+
+        // return result;
+
+        // if (keys.length === 1) {
+        //     return this.tableName + '.' + keys[0];
+        // } else {
+        //     let columnName = keys[0];
+        //     let columnAlias = keys[0];
+        //     for (let i = 1; i < keys.length; i++) {
+        //         columnName = columnAlias + '.' + keys[i];
+        //         columnAlias += '_' + keys[i];
+        //     }
+        //     return columnName;
+        // }
     }
 
     private functionWithAlias(
@@ -2103,18 +2249,21 @@ export class TypedQueryBuilder<ModelType, Row = {}>
         return this as any;
     }
 
-    private getColumnNameFromFunction(f: any) {
-        return this.getColumnName(...this.getArgumentsFromColumnFunction(f));
+    // private getColumnNameFromFunction(f: any) {
+    //     return this.getColumnName(...this.getArgumentsFromColumnFunction(f));
+    // }
+    private getColumnNameFromFunction2(f: any) {
+        return this.getColumnName(...this.getArgumentsFromColumnFunction2(f));
     }
 
     private getColumnNameWithoutAliasFromFunction(f: any) {
         return this.getColumnNameWithoutAlias(
-            ...this.getArgumentsFromColumnFunction(f)
+            ...this.getArgumentsFromColumnFunction2(f)
         );
     }
 
     private joinColumn(joinType: 'innerJoin' | 'leftOuterJoin', f: any) {
-        const columnToJoinArguments = this.getArgumentsFromColumnFunction(f);
+        const columnToJoinArguments = this.getArgumentsFromColumnFunction2(f);
 
         const columnToJoinName = this.getColumnName(...columnToJoinArguments);
 
@@ -2202,62 +2351,6 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     ): string {
         const argumentsExceptLast = keys.slice(0, -1);
         return this.getColumnName(...argumentsExceptLast);
-    }
-
-    private getColumnName(...keys: string[]): string {
-        const firstPartName = this.getColumnNameWithoutAlias(keys[0]);
-
-        if (keys.length === 1) {
-            return firstPartName;
-        } else {
-            let currentColumnPart = getColumnInformation(
-                this.tableClass,
-                keys[0]
-            );
-
-            let columnName = '';
-            let columnAlias = currentColumnPart.propertyKey;
-            let currentClass = currentColumnPart.columnClass;
-            for (let i = 1; i < keys.length; i++) {
-                currentColumnPart = getColumnInformation(currentClass, keys[i]);
-
-                columnName =
-                    columnAlias +
-                    '.' +
-                    (keys.length - 1 === i
-                        ? currentColumnPart.name
-                        : currentColumnPart.propertyKey);
-                columnAlias +=
-                    '_' +
-                    (keys.length - 1 === i
-                        ? currentColumnPart.name
-                        : currentColumnPart.propertyKey);
-                currentClass = currentColumnPart.columnClass;
-            }
-            return columnName;
-        }
-
-        // let currentClass = this.tableClass;
-        // let result = this.tableName;
-        // for (let i = 0; i < keys.length; i++) {
-        //     const currentColumnPart = getColumnInformation(currentClass, keys[i]);
-        //     result += '.' + currentColumnPart.name;
-        //     currentClass = currentColumnPart.columnClass;
-        // }
-
-        // return result;
-
-        // if (keys.length === 1) {
-        //     return this.tableName + '.' + keys[0];
-        // } else {
-        //     let columnName = keys[0];
-        //     let columnAlias = keys[0];
-        //     for (let i = 1; i < keys.length; i++) {
-        //         columnName = columnAlias + '.' + keys[i];
-        //         columnAlias += '_' + keys[i];
-        //     }
-        //     return columnName;
-        // }
     }
 
     private getColumnNameWithoutAlias(...keys: string[]): string {
