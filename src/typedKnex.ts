@@ -806,32 +806,32 @@ export function a(i: [string, string?]) {
     return i;
 }
 
-interface IColumnFunctionReturnPropertyType<Model> {
-    <
-        K1 extends keyof Model,
-        K2 extends keyof Model[K1],
-        K3 extends keyof Model[K1][K2]
-    >(
-        key1: K1,
-        key2: K2,
-        key3: K3,
-        ...keys: string[]
-    ): any;
-    <
-        K1 extends keyof Model,
-        K2 extends keyof Model[K1],
-        K3 extends keyof Model[K1][K2]
-    >(
-        key1: K1,
-        key2: K2,
-        key3: K3
-    ): Model[K1][K2][K3];
-    <K1 extends keyof Model, K2 extends keyof Model[K1]>(
-        key1: K1,
-        key2: K2
-    ): Model[K1][K2];
-    <K extends keyof Model>(key1: K): Model[K];
-}
+// interface IColumnFunctionReturnPropertyType<Model> {
+//     <
+//         K1 extends keyof Model,
+//         K2 extends keyof Model[K1],
+//         K3 extends keyof Model[K1][K2]
+//     >(
+//         key1: K1,
+//         key2: K2,
+//         key3: K3,
+//         ...keys: string[]
+//     ): any;
+//     <
+//         K1 extends keyof Model,
+//         K2 extends keyof Model[K1],
+//         K3 extends keyof Model[K1][K2]
+//     >(
+//         key1: K1,
+//         key2: K2,
+//         key3: K3
+//     ): Model[K1][K2][K3];
+//     <K1 extends keyof Model, K2 extends keyof Model[K1]>(
+//         key1: K1,
+//         key2: K2
+//     ): Model[K1][K2];
+//     <K extends keyof Model>(key1: K): Model[K];
+// }
 
 // interface IColumnFunctionReturnColumnName<Model> {
 //     <
@@ -1087,29 +1087,29 @@ interface IFindByColumn<Model, Row> {
         R19
     >(
         whereColumnFunction: (
-            c: IColumnFunctionReturnPropertyType<Model>
-        ) => PropertyType,
+            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
+        ) => () => PropertyType,
         value: PropertyType,
         selectColumnFunctions: [
-            ((c: IColumnFunctionReturnNewRow<Model>) => R1),
-            ((c: IColumnFunctionReturnNewRow<Model>) => R2)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R3)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R4)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R5)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R6)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R7)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R8)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R9)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R10)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R11)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R12)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R13)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R14)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R15)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R16)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R17)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R18)?,
-            ((c: IColumnFunctionReturnNewRow<Model>) => R19)?
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R1),
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R2)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R3)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R4)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R5)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R6)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R7)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R8)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R9)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R10)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R11)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R12)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R13)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R14)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R15)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R16)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R17)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R18)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R19)?
         ]
     ): Promise<
         | Row &

@@ -326,7 +326,7 @@ describe('compile time typed-knex', function() {
                 const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
                 const result = await typedKnex
                     .query(User)
-                    .min(c => c('numericValue'), 'minNumericValue')
+                    .min(c => c.numericValue, 'minNumericValue')
                     .firstItem();
 
                 console.log(result.minNumericValue);
@@ -416,7 +416,7 @@ describe('compile time typed-knex', function() {
 
                 const item = await typedKnex
                 .query(User)
-                .findByColumn(c => c('numericValue'), 1, [c => c('name')]);
+                .findByColumn(c => c.numericValue, 1, [c => c.name]);
 
                 if (item !== undefined) {
                     console.log(item.name);
