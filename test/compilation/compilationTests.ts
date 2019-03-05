@@ -431,4 +431,35 @@ describe('compile time typed-knex', function() {
         file.delete();
         done();
     });
+
+    it('should return correct type from findByPrimaryKey', done => {
+        const file = project.createSourceFile(
+            'test/test4.ts',
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+
+                const item = await typedKnex
+                .query(User)
+                .findByPrimaryKey("id", [c => c.name]);
+
+                if (item !== undefined) {
+                    console.log(item.name);
+                }
+
+            })();
+        `
+        );
+
+        assert.equal(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
 });

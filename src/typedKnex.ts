@@ -90,6 +90,7 @@ export interface ITypedQueryBuilder<Model, Row> {
 
     // findById: IFindById<ModelType, Row>;
     findByColumn: IFindByColumn<Model, Row extends Model ? {} : Row>;
+    findByPrimaryKey: IFindByPrimaryKey<Model, Row extends Model ? {} : Row>;
 
     whereIn: IWhereIn<Model, Row>;
     whereNotIn: IWhereIn<Model, Row>;
@@ -582,6 +583,12 @@ type TransformPropsToFunctionsLevel1<Level1Type> = {
               Level1Type[Level1Property],
               keyof Level1Type[Level1Property]
           >
+        : (() => Pick<Level1Type, Level1Property>)
+};
+
+type TransformPropsToFunctionsOnlyLevel1<Level1Type> = {
+    [Level1Property in keyof Level1Type]: Level1Type[Level1Property] extends object
+        ? never
         : (() => Pick<Level1Type, Level1Property>)
 };
 
@@ -1148,7 +1155,78 @@ interface IFindByColumn<Model, Row> {
               R18 &
               R19
         | void
-    >; // ITypedQueryBuilder<Model, Row & R1 & R2 & R3 & R4 & R5 & R6 & R7 & R8 & R8 & R9 & R10 & R11 & R12 & R13 & R14 & R15 & R16 & R17 & R18 & R18 & R19>;
+    >;
+}
+
+interface IFindByPrimaryKey<Model, Row> {
+    <
+        R1,
+        R2,
+        R3,
+        R4,
+        R5,
+        R6,
+        R7,
+        R8,
+        R9,
+        R10,
+        R11,
+        R12,
+        R13,
+        R14,
+        R15,
+        R16,
+        R17,
+        R18,
+        R19
+    >(
+        primaryKeyValue: any,
+        selectColumnFunctions: [
+            ((c: TransformPropsToFunctionsOnlyLevel1<Model>) => () => R1),
+            ((c: TransformPropsToFunctionsOnlyLevel1<Model>) => () => R2)?,
+            ((c: TransformPropsToFunctionsOnlyLevel1<Model>) => () => R3)?,
+            ((c: TransformPropsToFunctionsOnlyLevel1<Model>) => () => R4)?,
+            ((c: TransformPropsToFunctionsOnlyLevel1<Model>) => () => R5)?,
+            ((c: TransformPropsToFunctionsOnlyLevel1<Model>) => () => R6)?,
+            ((c: TransformPropsToFunctionsOnlyLevel1<Model>) => () => R7)?,
+            ((c: TransformPropsToFunctionsOnlyLevel1<Model>) => () => R8)?,
+            ((c: TransformPropsToFunctionsOnlyLevel1<Model>) => () => R9)?,
+            ((c: TransformPropsToFunctionsOnlyLevel1<Model>) => () => R10)?,
+            ((c: TransformPropsToFunctionsOnlyLevel1<Model>) => () => R11)?,
+            ((c: TransformPropsToFunctionsOnlyLevel1<Model>) => () => R12)?,
+            ((c: TransformPropsToFunctionsOnlyLevel1<Model>) => () => R13)?,
+            ((c: TransformPropsToFunctionsOnlyLevel1<Model>) => () => R14)?,
+            ((c: TransformPropsToFunctionsOnlyLevel1<Model>) => () => R15)?,
+            ((c: TransformPropsToFunctionsOnlyLevel1<Model>) => () => R16)?,
+            ((c: TransformPropsToFunctionsOnlyLevel1<Model>) => () => R17)?,
+            ((c: TransformPropsToFunctionsOnlyLevel1<Model>) => () => R18)?,
+            ((c: TransformPropsToFunctionsOnlyLevel1<Model>) => () => R19)?
+        ]
+    ): Promise<
+        | Row &
+              R1 &
+              R2 &
+              R3 &
+              R4 &
+              R5 &
+              R6 &
+              R7 &
+              R8 &
+              R8 &
+              R9 &
+              R10 &
+              R11 &
+              R12 &
+              R13 &
+              R14 &
+              R15 &
+              R16 &
+              R17 &
+              R18 &
+              R18 &
+              R19
+        | void
+    >;
 }
 
 // interface ISelectColumns<Model, Row> {
@@ -1746,6 +1824,27 @@ export class TypedQueryBuilder<ModelType, Row = {}>
             this.getColumnNameWithoutAliasFromFunction(arguments[0]),
             arguments[1]
         );
+
+        return await this.queryBuilder.first();
+    }
+
+    public async findByPrimaryKey() {
+        const primaryKeyColumnInfo = getPrimaryKeyColumn(this.tableClass);
+
+        const primaryKeyValue = arguments[0];
+        const functions = arguments[1];
+
+        for (const f of functions) {
+            const columnArguments = this.getArgumentsFromColumnFunction(f);
+
+            this.queryBuilder.select(
+                this.getColumnName(...columnArguments) +
+                    ' as ' +
+                    this.getColumnSelectAlias(...columnArguments)
+            );
+        }
+
+        this.queryBuilder.where(primaryKeyColumnInfo.name, primaryKeyValue);
 
         return await this.queryBuilder.first();
     }
