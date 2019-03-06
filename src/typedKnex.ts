@@ -4,7 +4,6 @@ import * as Knex from 'knex';
 import {
     getColumnInformation,
     getColumnProperties,
-    getEntities,
     getPrimaryKeyColumn,
     getTableMetadata
 } from './decorators';
@@ -23,17 +22,17 @@ export class TypedKnex {
         return new TypedQueryBuilder<T, T>(tableClass, this.knex);
     }
 
-    public queryByName<T>(tableClassName: string): ITypedQueryBuilder<T, T> {
-        const e = getEntities().find(
-            i => i.entityClass.name === tableClassName
-        );
-        if (e === undefined) {
-            throw new Error(
-                `Cannot find class with name '${tableClassName}', are you sure it exists and is being called?`
-            );
-        }
-        return new TypedQueryBuilder<T, T>(e.entityClass as any, this.knex);
-    }
+    // public queryByName<T>(tableClassName: string): ITypedQueryBuilder<T, T> {
+    //     const e = getEntities().find(
+    //         i => i.entityClass.name === tableClassName
+    //     );
+    //     if (e === undefined) {
+    //         throw new Error(
+    //             `Cannot find class with name '${tableClassName}', are you sure it exists and is being called?`
+    //         );
+    //     }
+    //     return new TypedQueryBuilder<T, T>(e.entityClass as any, this.knex);
+    // }
 }
 
 let beforeInsertTransform = undefined as
