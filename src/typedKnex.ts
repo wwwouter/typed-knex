@@ -73,7 +73,7 @@ export interface ITypedQueryBuilder<Model, Row> {
 
     orderBy: IOrderBy<Model, Row>;
     innerJoinColumn: IKeyFunctionAsParametersReturnQueryBuider<Model, Row>;
-    leftOuterJoinColumn: IKeysAsParametersReturnQueryBuider<Model, Row>;
+    leftOuterJoinColumn: IKeyFunctionAsParametersReturnQueryBuider<Model, Row>;
 
     whereColumn: IWhereCompareTwoColumns<Model, Row>;
 

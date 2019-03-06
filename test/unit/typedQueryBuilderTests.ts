@@ -983,4 +983,18 @@ describe('TypedKnexQueryBuilder', () => {
 
         done();
     });
+
+    it('should left outer join a table', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(UserSetting)
+            .leftOuterJoinColumn(i => i.user);
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select * from "userSettings" left outer join "users" as "user" on "user"."id" = "userSettings"."userId"'
+        );
+
+        done();
+    });
 });
