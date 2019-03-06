@@ -22,6 +22,16 @@ export class TypedKnex {
         return new TypedQueryBuilder<T, T>(tableClass, this.knex);
     }
 
+    public beginTransaction(): Promise<Knex.Transaction> {
+        return new Promise(resolve => {
+            this.knex
+                .transaction(tr => resolve(tr))
+                // If this error is not caught here, it will throw, resulting in an unhandledRejection
+                // tslint:disable-next-line:no-empty
+                .catch(_e => {});
+        });
+    }
+
     // public queryByName<T>(tableClassName: string): ITypedQueryBuilder<T, T> {
     //     const e = getEntities().find(
     //         i => i.entityClass.name === tableClassName
@@ -171,14 +181,14 @@ export interface ITypedQueryBuilder<Model, Row> {
         ...bindings: string[]
     ): ITypedQueryBuilder<Model, Row>;
 
-    transacting(trx: Knex.Transaction): void;
+    transacting(trx: Knex.Transaction): ITypedQueryBuilder<Model, Row>;
 
     truncate(): Promise<void>;
     distinct(): ITypedQueryBuilder<Model, Row>;
 
     clone(): ITypedQueryBuilder<Model, Row>;
 
-    beginTransaction(): Promise<Knex.Transaction>;
+    // beginTransaction(): Promise<Knex.Transaction>;
     groupByRaw(
         sql: string,
         ...bindings: string[]
@@ -1439,6 +1449,8 @@ export class TypedQueryBuilder<ModelType, Row = {}>
         propertyType: new () => any;
     }[];
 
+    private transaction?: Knex.Transaction;
+
     constructor(
         private tableClass: new () => ModelType,
         private knex: Knex,
@@ -1478,7 +1490,11 @@ export class TypedQueryBuilder<ModelType, Row = {}>
 
         while (items.length > 0) {
             const chunk = items.splice(0, 500);
-            await this.knex.from(this.tableName).insert(chunk);
+            const query = this.knex.from(this.tableName).insert(chunk);
+            if (this.transaction !== undefined) {
+                query.transacting(this.transaction);
+            }
+            await query;
         }
     }
 
@@ -1517,7 +1533,11 @@ export class TypedQueryBuilder<ModelType, Row = {}>
                         .replace('?', '\\?') + ';\n';
             }
 
-            await this.knex.raw(sql);
+            const finalQuery = this.knex.raw(sql);
+            if (this.transaction !== undefined) {
+                finalQuery.transacting(this.transaction);
+            }
+            await finalQuery;
         }
     }
 
@@ -2212,6 +2232,10 @@ export class TypedQueryBuilder<ModelType, Row = {}>
 
     public transacting(trx: Knex.Transaction) {
         this.queryBuilder.transacting(trx);
+
+        this.transaction = trx;
+
+        return this;
     }
 
     public min() {
@@ -2307,16 +2331,6 @@ export class TypedQueryBuilder<ModelType, Row = {}>
         );
 
         return typedQueryBuilderClone as any;
-    }
-
-    public beginTransaction(): Promise<Knex.Transaction> {
-        return new Promise(resolve => {
-            this.knex
-                .transaction(tr => resolve(tr))
-                // If this error is not caught here, it will throw, resulting in an unhandledRejection
-                // tslint:disable-next-line:no-empty
-                .catch(_e => {});
-        });
     }
 
     public groupBy() {
