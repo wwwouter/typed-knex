@@ -957,4 +957,30 @@ describe('TypedKnexQueryBuilder', () => {
 
         done();
     });
+
+    it('should create query with where null', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex.query(User).whereNull(c => c.name);
+
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select * from "users" where "users"."name" is null'
+        );
+
+        done();
+    });
+
+    it('should create query with where not null', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex.query(User).whereNotNull(c => c.name);
+
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select * from "users" where "users"."name" is not null'
+        );
+
+        done();
+    });
 });

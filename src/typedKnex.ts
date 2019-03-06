@@ -77,8 +77,8 @@ export interface ITypedQueryBuilder<Model, Row> {
 
     whereColumn: IWhereCompareTwoColumns<Model, Row>;
 
-    whereNull: IKeysAsParametersReturnQueryBuider<Model, Row>;
-    whereNotNull: IKeysAsParametersReturnQueryBuider<Model, Row>;
+    whereNull: IColumnParamaterNoRowTransformation<Model, Row>;
+    whereNotNull: IColumnParamaterNoRowTransformation<Model, Row>;
 
     innerJoinTable: IJoinTable<Model, Row>;
     leftOuterJoinTable: IJoinTable<Model, Row>;
@@ -250,6 +250,14 @@ interface IKeysAsArguments<Model, Return> {
 // tslint:disable-next-line:no-empty-interfaces
 interface IKeysAsParametersReturnQueryBuider<Model, Row>
     extends IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> {}
+
+interface IColumnParamaterNoRowTransformation<Model, Row> {
+    <PropertyType1>(
+        selectColumn1Function: (
+            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
+        ) => () => PropertyType1
+    ): ITypedQueryBuilder<Model, Row>;
+}
 
 // interface IJoinColumn<Model, Row> extends IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> {
 
@@ -1323,12 +1331,6 @@ interface IWhereCompareTwoColumns<Model, Row> {
             c: TransformPropsToFunctionsLevel1ReturnProperyType<Model2>
         ) => any // () => PropertyType2
     ): ITypedQueryBuilder<Model, Row>;
-
-    // (): { Left: () : { RIght: IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> } };
-
-    // (): { left: IKeysAsArguments<Model, { right: IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> }> };
-
-    // <L1K1 extends keyof Model, L2K1 extends keyof Model, L2K2 extends keyof Model[L2K1]>(column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2] | IReferencedColumn): ITypedQueryBuilder<Model, Row>;
 }
 
 // interface IWhereBetween<Model, Row> {
@@ -1784,12 +1786,20 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     }
 
     public whereNull() {
-        this.queryBuilder.whereNull(this.getColumnName(...arguments));
+        const columnArguments = this.getArgumentsFromColumnFunction(
+            arguments[0]
+        );
+
+        this.queryBuilder.whereNull(this.getColumnName(...columnArguments));
         return this;
     }
 
     public whereNotNull() {
-        this.queryBuilder.whereNotNull(this.getColumnName(...arguments));
+        const columnArguments = this.getArgumentsFromColumnFunction(
+            arguments[0]
+        );
+
+        this.queryBuilder.whereNotNull(this.getColumnName(...columnArguments));
         return this;
     }
 
