@@ -1003,7 +1003,17 @@ interface ISelectWithFunctionColumns2<Model, Row> {
         R16,
         R17,
         R18,
-        R19
+        R19,
+        R20,
+        R21,
+        R22,
+        R23,
+        R24,
+        R25,
+        R26,
+        R27,
+        R28,
+        R29
     >(
         selectColumnFunction: [
             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R1),
@@ -1024,7 +1034,17 @@ interface ISelectWithFunctionColumns2<Model, Row> {
             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R16)?,
             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R17)?,
             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R18)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R19)?
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R19)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R20)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R21)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R22)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R23)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R24)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R25)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R26)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R27)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R28)?,
+            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R29)?
         ]
     ): ITypedQueryBuilder<
         Model,
@@ -1049,7 +1069,18 @@ interface ISelectWithFunctionColumns2<Model, Row> {
             R17 &
             R18 &
             R18 &
-            R19
+            R19 &
+            R20 &
+            R21 &
+            R22 &
+            R23 &
+            R24 &
+            R25 &
+            R26 &
+            R27 &
+            R28 &
+            R28 &
+            R29
     >;
     // <NewRow>(selectColumnFunction: [((c: IColumnFunctionReturnNewRow<Model>) => () => NewRow)]): ITypedQueryBuilder<Model, Row & NewRow>;
 }
