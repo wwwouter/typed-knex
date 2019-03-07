@@ -31,18 +31,6 @@ export class TypedKnex {
                 .catch(_e => {});
         });
     }
-
-    // public queryByName<T>(tableClassName: string): ITypedQueryBuilder<T, T> {
-    //     const e = getEntities().find(
-    //         i => i.entityClass.name === tableClassName
-    //     );
-    //     if (e === undefined) {
-    //         throw new Error(
-    //             `Cannot find class with name '${tableClassName}', are you sure it exists and is being called?`
-    //         );
-    //     }
-    //     return new TypedQueryBuilder<T, T>(e.entityClass as any, this.knex);
-    // }
 }
 
 let beforeInsertTransform = undefined as
@@ -97,7 +85,6 @@ export interface ITypedQueryBuilder<Model, Row> {
 
     selectRaw: ISelectRaw<Model, Row extends Model ? {} : Row>;
 
-    // findById: IFindById<ModelType, Row>;
     findByColumn: IFindByColumn<Model, Row extends Model ? {} : Row>;
     findByPrimaryKey: IFindByPrimaryKey<Model, Row extends Model ? {} : Row>;
 
