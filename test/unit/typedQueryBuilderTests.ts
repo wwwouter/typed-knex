@@ -997,4 +997,17 @@ describe('TypedKnexQueryBuilder', () => {
 
         done();
     });
+    // it('should stay commented out', async done => {
+    //     const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+
+    //     const item = await typedKnex
+    //         .query(User)
+    //         .findByPrimaryKey('id', [c => c.categoryId]);
+
+    //     if (item !== undefined) {
+    //         console.log(item);
+    //     }
+
+    //     done();
+    // });
 });

@@ -201,14 +201,31 @@ export interface ITypedQueryBuilder<Model, Row> {
     // decrement(): void;
 }
 
-export type TransformAll<T, IT> = { [Key in keyof T]: IT };
+type TransformAll<T, IT> = { [Key in keyof T]: IT };
 
-export type FilterObjectsOnly<T> = {
-    [K in keyof T]: T[K] extends object ? K : never
-}[keyof T];
-export type FilterNonObjects<T> = {
+// type FilterObjectsOnly<T> = {
+//     [K in keyof T]: T[K] extends object ? K : never
+// }[keyof T];
+
+type ReturnNonObjectsNamesOnly<T> = {
     [K in keyof T]: T[K] extends object ? never : K
 }[keyof T];
+
+// type RemoveObjectsFrom<T, K extends ReturnNonObjectsNamesOnly<T>> = { [P in K]: [T[P]] };?
+type RemoveObjectsFrom<T> = { [P in ReturnNonObjectsNamesOnly<T>]: [T[P]] };
+
+// class A{
+//     public a: string;
+//     public b: string;
+//     public c: String;
+// }
+
+// // type AR = RemoveObjectsFrom<A, ReturnNonObjectsNamesOnly<A>>;
+// type AR = RemoveObjectsFrom2<A>;
+
+// const ar = {} as AR;
+
+// console.log('ar: ', ar.);
 
 export type ObjectToPrimitive<T> = T extends String
     ? string
@@ -604,7 +621,9 @@ type TransformPropsToFunctionsLevel1<Level1Type> = {
 };
 
 type TransformPropsToFunctionsOnlyLevel1<Level1Type> = {
-    [Level1Property in keyof Level1Type]: Level1Type[Level1Property] extends object
+    [Level1Property in keyof RemoveObjectsFrom<
+        Level1Type
+    >]: Level1Type[Level1Property] extends object
         ? never
         : (() => Pick<Level1Type, Level1Property>)
 };
