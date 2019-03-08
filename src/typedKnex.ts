@@ -66,6 +66,7 @@ export interface ITypedQueryBuilder<Model, Row> {
     whereNot: IWhere<Model, Row>;
     // selectColumn: ISelectWithFunctionColumn<Model, Row extends Model ? {} : Row>;
     select: ISelectWithFunctionColumns2<Model, Row extends Model ? {} : Row>;
+    select3: ISelectWithFunctionColumns3<Model, Row extends Model ? {} : Row>;
 
     // select2: ISelectWithFunctionColumns2<Model, Row extends Model ? {} : Row>;
 
@@ -1101,6 +1102,25 @@ interface ISelectWithFunctionColumns2<Model, Row> {
     // <NewRow>(selectColumnFunction: [((c: IColumnFunctionReturnNewRow<Model>) => () => NewRow)]): ITypedQueryBuilder<Model, Row & NewRow>;
 }
 
+type TransformPropsToFunctionsLevel1NextLevel<Level1Type> = {
+    [Level1Property in keyof Level1Type]: Level1Type[Level1Property] extends object
+        ? PickAndTransformLevel2<
+              Level1Type,
+              Level1Property,
+              Level1Type[Level1Property],
+              keyof Level1Type[Level1Property]
+          >
+        : (() => Pick<Level1Type, Level1Property>)
+};
+
+interface ISelectWithFunctionColumns3<Model, Row> {
+    <R1, R2>(
+        selectColumnFunction: (
+            c: TransformPropsToFunctionsLevel1NextLevel<Model>
+        ) => [() => R1, (() => R2)?]
+    ): ITypedQueryBuilder<Model, Row & R1 & R2>;
+}
+
 // interface IColumnFunctionReturnNewRow2<Model> {
 //     <
 //         K1 extends keyof Model,
@@ -1413,16 +1433,17 @@ interface IUnion<Model, Row> {
 function getProxyAndMemories<ModelType, Row>(
     typedQueryBuilder?: TypedQueryBuilder<ModelType, Row>
 ) {
-    const memories = [] as string[];
+    let memories = [] as string[];
 
     function allGet(_target: any, name: any): any {
         if (name === 'memories') {
             return memories;
         }
+
         if (name === 'getColumnName') {
             return typedQueryBuilder!.getColumnName(...memories);
         }
-        // console.log('typeof name: ', typeof name);
+
         if (typeof name === 'string') {
             memories.push(name);
         }
@@ -1442,6 +1463,59 @@ function getProxyAndMemories<ModelType, Row>(
     );
 
     return { root, memories };
+}
+
+function getProxyAndMemoriesForArray<ModelType, Row>(
+    typedQueryBuilder?: TypedQueryBuilder<ModelType, Row>
+) {
+    const result = [] as string[][];
+
+    // result.push([]);
+    let counter = -1;
+
+    // let memories = [] as string[];
+
+    function allGet(_target: any, name: any): any {
+        console.log('_target: ', _target);
+        if (_target.level === 0) {
+            console.log('dus hier een actie op ', name);
+            // memories = memories.splice(0, memories.length);
+            counter++;
+            result.push([]);
+        }
+        if (name === 'memories') {
+            return result[counter];
+        }
+        if (name === 'result') {
+            return result;
+        }
+        if (name === 'level') {
+            return _target.level;
+        }
+        if (name === 'getColumnName') {
+            return typedQueryBuilder!.getColumnName(...result[counter]);
+        }
+        console.log(' name: ', name);
+        console.log('typeof name: ', typeof name);
+        if (typeof name === 'string') {
+            result[counter].push(name);
+        }
+        return new Proxy(
+            {},
+            {
+                get: allGet
+            }
+        );
+    }
+
+    const root = new Proxy(
+        { level: 0 },
+        {
+            get: allGet
+        }
+    );
+
+    return { root, result };
 }
 
 export class TypedQueryBuilder<ModelType, Row = {}>
@@ -1660,6 +1734,43 @@ export class TypedQueryBuilder<ModelType, Row = {}>
         return this as any;
     }
 
+    public getArgumentsFromColumnFunction3(f: any) {
+        console.log('f: ', f);
+        const { root, result } = getProxyAndMemoriesForArray();
+
+        f(root);
+
+        return result;
+    }
+
+    public select3() {
+        const f = arguments[0];
+
+        // for (const f of functions) {
+        // const columnArguments = this.getArgumentsFromColumnFunction(f);
+        // console.log('columnArguments: ', columnArguments);
+
+        const columnArgumentsList = this.getArgumentsFromColumnFunction3(f);
+        console.log('columnArgumentsList: ', columnArgumentsList);
+
+        for (const columnArguments of columnArgumentsList) {
+            this.queryBuilder.select(
+                this.getColumnName(...columnArguments) +
+                    ' as ' +
+                    this.getColumnSelectAlias(...columnArguments)
+            );
+        }
+
+        // this.queryBuilder.select(
+        //     this.getColumnName(...columnArguments) +
+        //         ' as ' +
+        //         this.getColumnSelectAlias(...columnArguments)
+        // );
+        // // }
+
+        return this as any;
+    }
+
     public orderBy() {
         // if (arguments.length === 1) {
         this.queryBuilder.orderBy(
@@ -1861,6 +1972,7 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     }
 
     public getArgumentsFromColumnFunction(f: any) {
+        console.log('f: ', f);
         const { root, memories } = getProxyAndMemories();
 
         f(root);

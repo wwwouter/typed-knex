@@ -997,17 +997,33 @@ describe('TypedKnexQueryBuilder', () => {
 
         done();
     });
-    // it('should stay commented out', async done => {
-    //     const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
 
-    //     const item = await typedKnex
-    //         .query(User)
-    //         .findByPrimaryKey('id', [c => c.categoryId]);
+    it('should return camelCase correctly', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(UserSetting)
+            .select3(c => [c.initialValue, c.user.category.name]);
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select "userSettings"."initialValue" as "initialValue" from "userSettings"'
+        );
 
-    //     if (item !== undefined) {
-    //         console.log(item);
-    //     }
+        done();
+    });
 
-    //     done();
-    // });
+    it('should stay commented out', async done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+
+        const item = await typedKnex
+            .query(UserSetting)
+            .select3(c => [c.initialValue, c.user.category.name])
+            .firstItem();
+
+        if (item !== undefined) {
+            console.log(item.user.category.name);
+        }
+
+        done();
+    });
 });
