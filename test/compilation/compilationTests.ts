@@ -31,7 +31,7 @@ describe('compile time typed-knex', function() {
                 const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
                 const result = await typedKnex
                     .query(User)
-                    .select([c=>c.id])
+                    .select(c=>[c.id])
                     .firstItem();
 
                 console.log(result.id);
@@ -60,7 +60,7 @@ describe('compile time typed-knex', function() {
                 const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
                 const result = await typedKnex
                     .query(User)
-                    .select([c=>c.id])
+                    .select(c=>[c.id])
                     .firstItem();
 
                 console.log(result.name);
@@ -89,7 +89,7 @@ describe('compile time typed-knex', function() {
                 const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
                 const result = await typedKnex
                     .query(User)
-                    .select([c=>c.id])
+                    .select(c=>[c.id])
                     .firstItem();
 
                 console.log(result.id);
@@ -118,7 +118,7 @@ describe('compile time typed-knex', function() {
                 const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
                 const result = await typedKnex
                     .query(User)
-                    .select([c=>c.id])
+                    .select(c=>[c.id])
                     .firstItem();
 
                 console.log(result.name);
@@ -392,7 +392,7 @@ describe('compile time typed-knex', function() {
                 const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
                 const result = await typedKnex
                     .query(User)
-                    .select([c=>c.id])
+                    .select(c=>[c.id])
                     .clearSelect()
                     .firstItem();
 

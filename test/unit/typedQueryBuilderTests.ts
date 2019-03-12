@@ -16,7 +16,7 @@ describe('TypedKnexQueryBuilder', () => {
 
     it('should return select "id" from "users"', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).select([c => c.id]);
+        const query = typedKnex.query(User).select(c => [c.id]);
         const queryString = query.toQuery();
         assert.equal(queryString, 'select "users"."id" as "id" from "users"');
 
@@ -27,7 +27,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .select([c => c.initialValue]);
+            .select(c => [c.initialValue]);
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -79,7 +79,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .select([c => c.user.name])
+            .select(c => [c.user.name])
             .innerJoinColumn(c => c.user);
         const queryString = query.toQuery();
         assert.equal(
@@ -138,7 +138,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .select([c => c.user.category.name])
+            .select(c => c.user.category.name)
             .innerJoinColumn(c => c.user.category);
         const queryString = query.toQuery();
         assert.equal(
@@ -153,7 +153,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .select([c => c.user.category.region.code])
+            .select(c => [c.user.category.region.code])
             .innerJoinColumn(c => c.user.category.region);
         const queryString = query.toQuery();
         assert.equal(
@@ -196,7 +196,7 @@ describe('TypedKnexQueryBuilder', () => {
 
     it('should select 2 columns at once', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).select([c => c.id, c => c.name]);
+        const query = typedKnex.query(User).select(c => [c.id, c.name]);
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -210,7 +210,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .select([c => c.user.id, c => c.user.name]);
+            .select(c => [c.user.id, c.user.name]);
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -239,7 +239,7 @@ describe('TypedKnexQueryBuilder', () => {
             .query(UserSetting)
             // .selectColumnWithArrays('category', 'name');
             // .select(['category2', 'regionId')];
-            .select([c => c.user.category.regionId]);
+            .select(c => [c.user.category.regionId]);
         // .select(['user2s', 'category')];
         // .select(['name')];
         const queryString = query.toQuery();
@@ -466,7 +466,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .select([c => c.someValue])
+            .select(c => c.someValue)
             .selectRaw('total', Number, 'SUM("numericValue")')
             .groupBy(c => c.someValue);
 
@@ -633,9 +633,9 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .select([c => c.id])
+            .select(c => [c.id])
             .union(User, subQuery => {
-                subQuery.select([c => c.id]).where(c => c.numericValue, 12);
+                subQuery.select(c => [c.id]).where(c => c.numericValue, 12);
             });
 
         const queryString = query.toQuery();
@@ -651,9 +651,9 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .select([c => c.id])
+            .select(c => [c.id])
             .unionAll(User, subQuery => {
-                subQuery.select([c => c.id]).where(c => c.numericValue, 12);
+                subQuery.select(c => [c.id]).where(c => c.numericValue, 12);
             });
 
         const queryString = query.toQuery();
@@ -785,7 +785,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .select([c => c.id])
+            .select(c => [c.id])
             .clearSelect();
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users"');
@@ -822,7 +822,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .select([c => c.id])
+            .select(c => [c.id])
             .distinct();
         const queryString = query.toQuery();
         assert.equal(
@@ -836,11 +836,11 @@ describe('TypedKnexQueryBuilder', () => {
     it('should clone and adjust only the clone', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
 
-        const query = typedKnex.query(User).select([c => c.id]);
+        const query = typedKnex.query(User).select(c => [c.id]);
 
         const clonedQuery = query.clone();
 
-        clonedQuery.select([c => c.name]);
+        clonedQuery.select(c => [c.name]);
 
         assert.equal(
             query.toQuery(),
@@ -1000,9 +1000,7 @@ describe('TypedKnexQueryBuilder', () => {
 
     it('should return camelCase correctly', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex
-            .query(UserSetting)
-            .select3(c => [c.initialValue, c.user.category.name]);
+        const query = typedKnex.query(UserSetting).select(c => c.initialValue);
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -1012,18 +1010,36 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should stay commented out', async done => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    // it('should stay commented out', async done => {
+    //     const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
 
-        const item = await typedKnex
-            .query(UserSetting)
-            .select3(c => [c.initialValue, c.user.category.name])
-            .firstItem();
+    //     const item = await typedKnex
+    //         .query(UserSetting)
+    //         .select(c => [c.user.category.name])
+    //         .select(c => [
+    //             c.key,
+    //             c.id,
+    //             c.id,
+    //             c.id,
+    //             c.id,
+    //             c.id,
+    //             c.id,
+    //             c.id,
+    //             c.id,
+    //             c.id,
+    //             c.id,
+    //             c.id,
+    //             c.id,
+    //             c.id,
+    //             c.id
+    //         ])
+    //         .firstItem();
 
-        if (item !== undefined) {
-            console.log(item.user.category.name);
-        }
+    //     if (item !== undefined) {
+    //         console.log(item.user.category.name);
+    //         console.log(item.id);
+    //     }
 
-        done();
-    });
+    //     done();
+    // });
 });

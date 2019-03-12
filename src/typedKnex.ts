@@ -65,8 +65,8 @@ export interface ITypedQueryBuilder<Model, Row> {
     orWhere: IWhere<Model, Row>;
     whereNot: IWhere<Model, Row>;
     // selectColumn: ISelectWithFunctionColumn<Model, Row extends Model ? {} : Row>;
-    select: ISelectWithFunctionColumns2<Model, Row extends Model ? {} : Row>;
-    select3: ISelectWithFunctionColumns3<Model, Row extends Model ? {} : Row>;
+    // select: ISelectWithFunctionColumns2<Model, Row extends Model ? {} : Row>;
+    select: ISelectWithFunctionColumns3<Model, Row extends Model ? {} : Row>;
 
     // select2: ISelectWithFunctionColumns2<Model, Row extends Model ? {} : Row>;
 
@@ -1000,7 +1000,120 @@ interface IDbFunctionWithAlias<Model, Row> {
 //     // <NewRow>(selectColumnFunction: [((c: IColumnFunctionReturnNewRow<Model>) => NewRow)]): ITypedQueryBuilder<Model, Row & NewRow>;
 // }
 
-interface ISelectWithFunctionColumns2<Model, Row> {
+// interface ISelectWithFunctionColumns2<Model, Row> {
+//     <
+//         R1,
+//         R2,
+//         R3,
+//         R4,
+//         R5,
+//         R6,
+//         R7,
+//         R8,
+//         R9,
+//         R10,
+//         R11,
+//         R12,
+//         R13,
+//         R14,
+//         R15,
+//         R16,
+//         R17,
+//         R18,
+//         R19,
+//         R20,
+//         R21,
+//         R22,
+//         R23,
+//         R24,
+//         R25,
+//         R26,
+//         R27,
+//         R28,
+//         R29
+//     >(
+//         selectColumnFunction: [
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R1),
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R2)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R3)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R4)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R5)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R6)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R7)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R8)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R9)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R10)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R11)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R12)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R13)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R14)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R15)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R16)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R17)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R18)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R19)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R20)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R21)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R22)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R23)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R24)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R25)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R26)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R27)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R28)?,
+//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R29)?
+//         ]
+//     ): ITypedQueryBuilder<
+//         Model,
+//         Row &
+//             R1 &
+//             R2 &
+//             R3 &
+//             R4 &
+//             R5 &
+//             R6 &
+//             R7 &
+//             R8 &
+//             R8 &
+//             R9 &
+//             R10 &
+//             R11 &
+//             R12 &
+//             R13 &
+//             R14 &
+//             R15 &
+//             R16 &
+//             R17 &
+//             R18 &
+//             R18 &
+//             R19 &
+//             R20 &
+//             R21 &
+//             R22 &
+//             R23 &
+//             R24 &
+//             R25 &
+//             R26 &
+//             R27 &
+//             R28 &
+//             R28 &
+//             R29
+//     >;
+//     // <NewRow>(selectColumnFunction: [((c: IColumnFunctionReturnNewRow<Model>) => () => NewRow)]): ITypedQueryBuilder<Model, Row & NewRow>;
+// }
+
+type TransformPropsToFunctionsLevel1NextLevel<Level1Type> = {
+    [Level1Property in keyof Level1Type]: Level1Type[Level1Property] extends object
+        ? PickAndTransformLevel2<
+              Level1Type,
+              Level1Property,
+              Level1Type[Level1Property],
+              keyof Level1Type[Level1Property]
+          >
+        : (() => Pick<Level1Type, Level1Property>)
+};
+
+interface ISelectWithFunctionColumns3<Model, Row> {
     <
         R1,
         R2,
@@ -1032,36 +1145,36 @@ interface ISelectWithFunctionColumns2<Model, Row> {
         R28,
         R29
     >(
-        selectColumnFunction: [
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R1),
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R2)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R3)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R4)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R5)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R6)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R7)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R8)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R9)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R10)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R11)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R12)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R13)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R14)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R15)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R16)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R17)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R18)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R19)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R20)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R21)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R22)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R23)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R24)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R25)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R26)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R27)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R28)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R29)?
+        selectColumnFunction: (
+            c: TransformPropsToFunctionsLevel1NextLevel<Model>
+        ) => [
+            () => R1,
+            (() => R2)?,
+            (() => R3)?,
+            (() => R4)?,
+            (() => R5)?,
+            (() => R6)?,
+            (() => R7)?,
+            (() => R8)?,
+            (() => R9)?,
+            (() => R10)?,
+            (() => R12)?,
+            (() => R13)?,
+            (() => R14)?,
+            (() => R15)?,
+            (() => R16)?,
+            (() => R17)?,
+            (() => R18)?,
+            (() => R19)?,
+            (() => R20)?,
+            (() => R22)?,
+            (() => R23)?,
+            (() => R24)?,
+            (() => R25)?,
+            (() => R26)?,
+            (() => R27)?,
+            (() => R28)?,
+            (() => R29)?
         ]
     ): ITypedQueryBuilder<
         Model,
@@ -1099,26 +1212,11 @@ interface ISelectWithFunctionColumns2<Model, Row> {
             R28 &
             R29
     >;
-    // <NewRow>(selectColumnFunction: [((c: IColumnFunctionReturnNewRow<Model>) => () => NewRow)]): ITypedQueryBuilder<Model, Row & NewRow>;
-}
-
-type TransformPropsToFunctionsLevel1NextLevel<Level1Type> = {
-    [Level1Property in keyof Level1Type]: Level1Type[Level1Property] extends object
-        ? PickAndTransformLevel2<
-              Level1Type,
-              Level1Property,
-              Level1Type[Level1Property],
-              keyof Level1Type[Level1Property]
-          >
-        : (() => Pick<Level1Type, Level1Property>)
-};
-
-interface ISelectWithFunctionColumns3<Model, Row> {
-    <R1, R2>(
+    <R1>(
         selectColumnFunction: (
             c: TransformPropsToFunctionsLevel1NextLevel<Model>
-        ) => [() => R1, (() => R2)?]
-    ): ITypedQueryBuilder<Model, Row & R1 & R2>;
+        ) => () => R1
+    ): ITypedQueryBuilder<Model, Row & R1>;
 }
 
 // interface IColumnFunctionReturnNewRow2<Model> {
@@ -1476,10 +1574,7 @@ function getProxyAndMemoriesForArray<ModelType, Row>(
     // let memories = [] as string[];
 
     function allGet(_target: any, name: any): any {
-        console.log('_target: ', _target);
         if (_target.level === 0) {
-            console.log('dus hier een actie op ', name);
-            // memories = memories.splice(0, memories.length);
             counter++;
             result.push([]);
         }
@@ -1495,8 +1590,6 @@ function getProxyAndMemoriesForArray<ModelType, Row>(
         if (name === 'getColumnName') {
             return typedQueryBuilder!.getColumnName(...result[counter]);
         }
-        console.log(' name: ', name);
-        console.log('typeof name: ', typeof name);
         if (typeof name === 'string') {
             result[counter].push(name);
         }
@@ -1718,24 +1811,23 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     //     return this as any;
     // }
 
-    public select() {
-        const functions = arguments[0];
+    // public select() {
+    //     const functions = arguments[0];
 
-        for (const f of functions) {
-            const columnArguments = this.getArgumentsFromColumnFunction(f);
+    //     for (const f of functions) {
+    //         const columnArguments = this.getArgumentsFromColumnFunction(f);
 
-            this.queryBuilder.select(
-                this.getColumnName(...columnArguments) +
-                    ' as ' +
-                    this.getColumnSelectAlias(...columnArguments)
-            );
-        }
+    //         this.queryBuilder.select(
+    //             this.getColumnName(...columnArguments) +
+    //                 ' as ' +
+    //                 this.getColumnSelectAlias(...columnArguments)
+    //         );
+    //     }
 
-        return this as any;
-    }
+    //     return this as any;
+    // }
 
     public getArgumentsFromColumnFunction3(f: any) {
-        console.log('f: ', f);
         const { root, result } = getProxyAndMemoriesForArray();
 
         f(root);
@@ -1743,15 +1835,10 @@ export class TypedQueryBuilder<ModelType, Row = {}>
         return result;
     }
 
-    public select3() {
+    public select() {
         const f = arguments[0];
 
-        // for (const f of functions) {
-        // const columnArguments = this.getArgumentsFromColumnFunction(f);
-        // console.log('columnArguments: ', columnArguments);
-
         const columnArgumentsList = this.getArgumentsFromColumnFunction3(f);
-        console.log('columnArgumentsList: ', columnArgumentsList);
 
         for (const columnArguments of columnArgumentsList) {
             this.queryBuilder.select(
@@ -1760,14 +1847,6 @@ export class TypedQueryBuilder<ModelType, Row = {}>
                     this.getColumnSelectAlias(...columnArguments)
             );
         }
-
-        // this.queryBuilder.select(
-        //     this.getColumnName(...columnArguments) +
-        //         ' as ' +
-        //         this.getColumnSelectAlias(...columnArguments)
-        // );
-        // // }
-
         return this as any;
     }
 
@@ -1913,16 +1992,12 @@ export class TypedQueryBuilder<ModelType, Row = {}>
             ...this.getArgumentsFromColumnFunction(arguments[0])
         );
 
-        // const column1Parts = arguments[0];
         const operator = arguments[1];
 
         let column2Name;
-        // console.log('arguments[2]: ', arguments[2]);
-        // console.log('arguments[2].mem: ', arguments[2].memories);
-        // console.log('arguments[3]: ', arguments[3]);
         if (typeof arguments[2] === 'string') {
             column2Name = arguments[2];
-        } else if (arguments[2].memories != undefined) {
+        } else if (arguments[2].memories !== undefined) {
             // column2Name = arguments[2];
             column2Name = arguments[2].getColumnName; // parent this nodig ...
         } else {
@@ -1972,7 +2047,6 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     }
 
     public getArgumentsFromColumnFunction(f: any) {
-        console.log('f: ', f);
         const { root, memories } = getProxyAndMemories();
 
         f(root);
