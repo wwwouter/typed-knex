@@ -455,7 +455,7 @@ describe('compile time typed-knex', function() {
 
                 const item = await typedKnex
                 .query(User)
-                .findByPrimaryKey("id", [c => c.name]);
+                .findByPrimaryKey("id", c => [c.name]);
 
                 if (item !== undefined) {
                     console.log(item.name);
@@ -486,7 +486,7 @@ describe('compile time typed-knex', function() {
 
                 const item = await typedKnex
                 .query(User)
-                .findByPrimaryKey("id", [c => c.category]);
+                .findByPrimaryKey("id", c => [c.category]);
 
                 if (item !== undefined) {
                     console.log(item.category);

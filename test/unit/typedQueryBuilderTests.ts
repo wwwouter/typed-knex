@@ -1015,29 +1015,13 @@ describe('TypedKnexQueryBuilder', () => {
 
     //     const item = await typedKnex
     //         .query(UserSetting)
-    //         .select(c => [c.user.category.name])
-    //         .select(c => [
-    //             c.key,
-    //             c.id,
-    //             c.id,
-    //             c.id,
-    //             c.id,
-    //             c.id,
-    //             c.id,
-    //             c.id,
-    //             c.id,
-    //             c.id,
-    //             c.id,
-    //             c.id,
-    //             c.id,
-    //             c.id,
-    //             c.id
-    //         ])
-    //         .firstItem();
+    //         .findByPrimaryKey('', i => [i.id, i.value]);
 
     //     if (item !== undefined) {
     //         console.log(item.user.category.name);
     //         console.log(item.id);
+    //         console.log(item.value);
+    //         console.log(item.nver);
     //     }
 
     //     done();
