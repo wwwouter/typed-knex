@@ -424,7 +424,7 @@ describe('compile time typed-knex', function() {
 
                 const item = await typedKnex
                 .query(User)
-                .findByColumn(c => c.numericValue, 1, [c => c.name]);
+                .findByColumn(c => c.numericValue, 1, c => [c.name]);
 
                 if (item !== undefined) {
                     console.log(item.name);

@@ -1015,7 +1015,7 @@ describe('TypedKnexQueryBuilder', () => {
 
     //     const item = await typedKnex
     //         .query(UserSetting)
-    //         .findByPrimaryKey('', i => [i.id, i.value]);
+    //         .findByColumn(i => i.id, '', i => [i.id, i.value]);
 
     //     if (item !== undefined) {
     //         console.log(item.user.category.name);

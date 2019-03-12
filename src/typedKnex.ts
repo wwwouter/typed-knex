@@ -1276,32 +1276,52 @@ interface IFindByColumn<Model, Row> {
         R16,
         R17,
         R18,
-        R19
+        R19,
+        R20,
+        R21,
+        R22,
+        R23,
+        R24,
+        R25,
+        R26,
+        R27,
+        R28,
+        R29
     >(
         whereColumnFunction: (
             c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
         ) => () => PropertyType,
         value: PropertyType,
-        selectColumnFunctions: [
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R1),
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R2)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R3)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R4)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R5)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R6)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R7)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R8)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R9)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R10)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R11)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R12)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R13)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R14)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R15)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R16)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R17)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R18)?,
-            ((c: TransformPropsToFunctionsLevel1<Model>) => () => R19)?
+        selectColumnFunction: (
+            c: TransformPropsToFunctionsOnlyLevel1<Model>
+        ) => [
+            () => R1,
+            (() => R2)?,
+            (() => R3)?,
+            (() => R4)?,
+            (() => R5)?,
+            (() => R6)?,
+            (() => R7)?,
+            (() => R8)?,
+            (() => R9)?,
+            (() => R10)?,
+            (() => R12)?,
+            (() => R13)?,
+            (() => R14)?,
+            (() => R15)?,
+            (() => R16)?,
+            (() => R17)?,
+            (() => R18)?,
+            (() => R19)?,
+            (() => R20)?,
+            (() => R22)?,
+            (() => R23)?,
+            (() => R24)?,
+            (() => R25)?,
+            (() => R26)?,
+            (() => R27)?,
+            (() => R28)?,
+            (() => R29)?
         ]
     ): Promise<
         | Row &
@@ -1325,7 +1345,18 @@ interface IFindByColumn<Model, Row> {
               R17 &
               R18 &
               R18 &
-              R19
+              R19 &
+              R20 &
+              R21 &
+              R22 &
+              R23 &
+              R24 &
+              R25 &
+              R26 &
+              R27 &
+              R28 &
+              R28 &
+              R29
         | void
     >;
 }
