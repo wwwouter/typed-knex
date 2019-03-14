@@ -89,7 +89,7 @@ export interface ITypedQueryBuilder<Model, Row> {
 
     selectRaw: ISelectRaw<Model, Row extends Model ? {} : Row>;
 
-    findByColumn: IFindByColumn<Model, Row extends Model ? {} : Row>;
+    // findByColumn: IFindByColumn<Model, Row extends Model ? {} : Row>;
     findByPrimaryKey: IFindByPrimaryKey<Model, Row extends Model ? {} : Row>;
 
     whereIn: IWhereIn<Model, Row>;
@@ -1305,111 +1305,111 @@ interface ISelectWithFunctionColumns3<Model, Row> {
 //     <K extends keyof Model>(key1: K): Pick<Model, K>;
 // }
 
-interface IFindByColumn<Model, Row> {
-    <
-        PropertyType,
-        R1,
-        R2,
-        R3,
-        R4,
-        R5,
-        R6,
-        R7,
-        R8,
-        R9,
-        R10,
-        R11,
-        R12,
-        R13,
-        R14,
-        R15,
-        R16,
-        R17,
-        R18,
-        R19,
-        R20,
-        R21,
-        R22,
-        R23,
-        R24,
-        R25,
-        R26,
-        R27,
-        R28,
-        R29
-    >(
-        whereColumnFunction: (
-            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
-        ) => () => PropertyType,
-        value: PropertyType,
-        selectColumnFunction: (
-            c: TransformPropsToFunctionsOnlyLevel1<Model>
-        ) => [
-            () => R1,
-            (() => R2)?,
-            (() => R3)?,
-            (() => R4)?,
-            (() => R5)?,
-            (() => R6)?,
-            (() => R7)?,
-            (() => R8)?,
-            (() => R9)?,
-            (() => R10)?,
-            (() => R12)?,
-            (() => R13)?,
-            (() => R14)?,
-            (() => R15)?,
-            (() => R16)?,
-            (() => R17)?,
-            (() => R18)?,
-            (() => R19)?,
-            (() => R20)?,
-            (() => R22)?,
-            (() => R23)?,
-            (() => R24)?,
-            (() => R25)?,
-            (() => R26)?,
-            (() => R27)?,
-            (() => R28)?,
-            (() => R29)?
-        ]
-    ): Promise<
-        | Row &
-              R1 &
-              R2 &
-              R3 &
-              R4 &
-              R5 &
-              R6 &
-              R7 &
-              R8 &
-              R8 &
-              R9 &
-              R10 &
-              R11 &
-              R12 &
-              R13 &
-              R14 &
-              R15 &
-              R16 &
-              R17 &
-              R18 &
-              R18 &
-              R19 &
-              R20 &
-              R21 &
-              R22 &
-              R23 &
-              R24 &
-              R25 &
-              R26 &
-              R27 &
-              R28 &
-              R28 &
-              R29
-        | void
-    >;
-}
+// interface IFindByColumn<Model, Row> {
+//     <
+//         PropertyType,
+//         R1,
+//         R2,
+//         R3,
+//         R4,
+//         R5,
+//         R6,
+//         R7,
+//         R8,
+//         R9,
+//         R10,
+//         R11,
+//         R12,
+//         R13,
+//         R14,
+//         R15,
+//         R16,
+//         R17,
+//         R18,
+//         R19,
+//         R20,
+//         R21,
+//         R22,
+//         R23,
+//         R24,
+//         R25,
+//         R26,
+//         R27,
+//         R28,
+//         R29
+//     >(
+//         whereColumnFunction: (
+//             c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
+//         ) => () => PropertyType,
+//         value: PropertyType,
+//         selectColumnFunction: (
+//             c: TransformPropsToFunctionsOnlyLevel1<Model>
+//         ) => [
+//             () => R1,
+//             (() => R2)?,
+//             (() => R3)?,
+//             (() => R4)?,
+//             (() => R5)?,
+//             (() => R6)?,
+//             (() => R7)?,
+//             (() => R8)?,
+//             (() => R9)?,
+//             (() => R10)?,
+//             (() => R12)?,
+//             (() => R13)?,
+//             (() => R14)?,
+//             (() => R15)?,
+//             (() => R16)?,
+//             (() => R17)?,
+//             (() => R18)?,
+//             (() => R19)?,
+//             (() => R20)?,
+//             (() => R22)?,
+//             (() => R23)?,
+//             (() => R24)?,
+//             (() => R25)?,
+//             (() => R26)?,
+//             (() => R27)?,
+//             (() => R28)?,
+//             (() => R29)?
+//         ]
+//     ): Promise<
+//         | Row &
+//               R1 &
+//               R2 &
+//               R3 &
+//               R4 &
+//               R5 &
+//               R6 &
+//               R7 &
+//               R8 &
+//               R8 &
+//               R9 &
+//               R10 &
+//               R11 &
+//               R12 &
+//               R13 &
+//               R14 &
+//               R15 &
+//               R16 &
+//               R17 &
+//               R18 &
+//               R18 &
+//               R19 &
+//               R20 &
+//               R21 &
+//               R22 &
+//               R23 &
+//               R24 &
+//               R25 &
+//               R26 &
+//               R27 &
+//               R28 &
+//               R28 &
+//               R29
+//         | void
+//     >;
+// }
 
 interface IFindByPrimaryKey<Model, Row> {
     <
@@ -1807,7 +1807,10 @@ export class TypedQueryBuilder<ModelType, Row = {}>
     }
 
     public async updateItemsByPrimaryKey(
-        items: { primaryKeyValue: any; data: Partial<RemoveObjectsFrom2<ModelType>> }[]
+        items: {
+            primaryKeyValue: any;
+            data: Partial<RemoveObjectsFrom2<ModelType>>;
+        }[]
     ) {
         const primaryKeyColumnInfo = getPrimaryKeyColumn(this.tableClass);
 
@@ -2195,31 +2198,31 @@ export class TypedQueryBuilder<ModelType, Row = {}>
         return memories;
     }
 
-    public async findByColumn() {
-        const functions = arguments[2];
+    // public async findByColumn() {
+    //     const functions = arguments[2];
 
-        // for (const f of functions) {
-        //     (this.selectColumn as any)(f);
+    //     // for (const f of functions) {
+    //     //     (this.selectColumn as any)(f);
 
-        // }
+    //     // }
 
-        for (const f of functions) {
-            const columnArguments = this.getArgumentsFromColumnFunction(f);
+    //     for (const f of functions) {
+    //         const columnArguments = this.getArgumentsFromColumnFunction(f);
 
-            this.queryBuilder.select(
-                this.getColumnName(...columnArguments) +
-                    ' as ' +
-                    this.getColumnSelectAlias(...columnArguments)
-            );
-        }
+    //         this.queryBuilder.select(
+    //             this.getColumnName(...columnArguments) +
+    //                 ' as ' +
+    //                 this.getColumnSelectAlias(...columnArguments)
+    //         );
+    //     }
 
-        this.queryBuilder.where(
-            this.getColumnNameWithoutAliasFromFunction(arguments[0]),
-            arguments[1]
-        );
+    //     this.queryBuilder.where(
+    //         this.getColumnNameWithoutAliasFromFunction(arguments[0]),
+    //         arguments[1]
+    //     );
 
-        return await this.queryBuilder.first();
-    }
+    //     return await this.queryBuilder.first();
+    // }
 
     public async findByPrimaryKey() {
         const primaryKeyColumnInfo = getPrimaryKeyColumn(this.tableClass);

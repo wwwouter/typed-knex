@@ -409,36 +409,35 @@ describe('compile time typed-knex', function() {
         done();
     });
 
-    it('should return correct type from findByColumn', done => {
-        file = project.createSourceFile(
-            'test/test4.ts',
-            `
-            import * as knex from 'knex';
-            import { TypedKnex } from '../src/typedKnex';
-            import { User } from './testEntities';
+    // it('should return correct type from findByColumn', done => {
+    //     file = project.createSourceFile(
+    //         'test/test4.ts',
+    //         `
+    //         import * as knex from 'knex';
+    //         import { TypedKnex } from '../src/typedKnex';
+    //         import { User } from './testEntities';
 
+    //         (async () => {
 
-            (async () => {
+    //             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
 
-                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    //             const item = await typedKnex
+    //             .query(User)
+    //             .findByColumn(c => c.numericValue, 1, c => [c.name]);
 
-                const item = await typedKnex
-                .query(User)
-                .findByColumn(c => c.numericValue, 1, c => [c.name]);
+    //             if (item !== undefined) {
+    //                 console.log(item.name);
+    //             }
 
-                if (item !== undefined) {
-                    console.log(item.name);
-                }
+    //         })();
+    //     `
+    //     );
 
-            })();
-        `
-        );
+    //     assert.equal(project.getPreEmitDiagnostics().length, 0);
 
-        assert.equal(project.getPreEmitDiagnostics().length, 0);
-
-        file.delete();
-        done();
-    });
+    //     file.delete();
+    //     done();
+    // });
 
     it('should return correct type from findByPrimaryKey', done => {
         file = project.createSourceFile(
