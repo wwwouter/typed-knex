@@ -1067,16 +1067,20 @@ describe('TypedKnexQueryBuilder', () => {
 
     //     const item = await typedKnex
     //         .query(UserSetting)
-    //         .leftOuterJoinTableOnFunction('otherUser', User, join => {
-    //             join.onColumns(i => i.user2Id, '=', j => j.id);
-    //         })
-    //         .select(i => [i.otherUser.name, i.user2.numericValue])
-    //         .firstItem();
+    //         .insertItem({ id: '1', key:  });
 
-    //     if (item !== undefined) {
-    //         console.log(item.user2.numericValue);
-    //         console.log(item.otherUser.name);
-    //     }
+    //     // const item = await typedKnex
+    //     //     .query(UserSetting)
+    //     //     .leftOuterJoinTableOnFunction('otherUser', User, join => {
+    //     //         join.onColumns(i => i.user2Id, '=', j => j.id);
+    //     //     })
+    //     //     .select(i => [i.otherUser.name, i.user2.numericValue])
+    //     //     .firstItem();
+
+    //     // if (item !== undefined) {
+    //     //     console.log(item.user2.numericValue);
+    //     //     console.log(item.otherUser.name);
+    //     // }
 
     //     done();
     // });

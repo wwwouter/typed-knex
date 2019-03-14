@@ -35,7 +35,7 @@ export class TypedKnex {
 
 let beforeInsertTransform = undefined as
     | undefined
-    | ((item: any, typedQueryBuilder: TypedQueryBuilder<{}, {}>) => any);
+    | ((item: any, typedQueryBuilder: TypedQueryBuilder<any, any>) => any);
 
 export function registerBeforeInsertTransform<T>(
     f: (item: T, typedQueryBuilder: TypedQueryBuilder<{}, {}>) => T
@@ -45,7 +45,7 @@ export function registerBeforeInsertTransform<T>(
 
 let beforeUpdateTransform = undefined as
     | undefined
-    | ((item: any, typedQueryBuilder: TypedQueryBuilder<{}, {}>) => any);
+    | ((item: any, typedQueryBuilder: TypedQueryBuilder<any, any>) => any);
 
 export function registerBeforeUpdateTransform<T>(
     f: (item: T, typedQueryBuilder: TypedQueryBuilder<{}, {}>) => T
@@ -147,21 +147,27 @@ export interface ITypedQueryBuilder<Model, Row> {
     limit(value: number): ITypedQueryBuilder<Model, Row>;
     offset(value: number): ITypedQueryBuilder<Model, Row>;
 
-    firstItemOrNull(): Promise<Row | null>;
-    firstItem(): Promise<Row>;
-    list(): Promise<Row[]>;
     useKnexQueryBuilder(f: (query: Knex.QueryBuilder) => void): void;
     toQuery(): string;
 
-    insert(newObject: Partial<Model>): Promise<void>;
+    firstItemOrNull(): Promise<Row | null>;
+    firstItem(): Promise<Row>;
+    list(): Promise<Row[]>;
+    insertItem(newObject: Partial<RemoveObjectsFrom2<Model>>): Promise<void>;
+    insertItems(items: Partial<RemoveObjectsFrom2<Model>>[]): Promise<void>;
     countResult(): Promise<number>;
     delByPrimaryKey(primaryKeyValue: any): Promise<void>;
-    update(primaryKeyValue: any, item: Partial<Model>): Promise<void>;
-    updateItems(
-        items: { primaryKeyValue: any; data: Partial<Model> }[]
+    updateItem(item: Partial<RemoveObjectsFrom2<Model>>): Promise<void>;
+    updateItemByPrimaryKey(
+        primaryKeyValue: any,
+        item: Partial<RemoveObjectsFrom2<Model>>
     ): Promise<void>;
-
-    insertItems(items: Partial<Model>[]): Promise<void>;
+    updateItemsByPrimaryKey(
+        items: {
+            primaryKeyValue: any;
+            data: Partial<RemoveObjectsFrom2<Model>>;
+        }[]
+    ): Promise<void>;
 
     whereRaw(
         sql: string,
@@ -203,7 +209,9 @@ type ReturnNonObjectsNamesOnly<T> = {
 }[keyof T];
 
 // type RemoveObjectsFrom<T, K extends ReturnNonObjectsNamesOnly<T>> = { [P in K]: [T[P]] };?
-type RemoveObjectsFrom<T> = { [P in ReturnNonObjectsNamesOnly<T>]: [T[P]] };
+type RemoveObjectsFrom<T> = { [P in ReturnNonObjectsNamesOnly<T>]: T[P] };
+
+type RemoveObjectsFrom2<T> = { [P in ReturnNonObjectsNamesOnly<T>]: T[P] };
 
 // class A{
 //     public a: string;
@@ -211,12 +219,15 @@ type RemoveObjectsFrom<T> = { [P in ReturnNonObjectsNamesOnly<T>]: [T[P]] };
 //     public c: String;
 // }
 
-// // type AR = RemoveObjectsFrom<A, ReturnNonObjectsNamesOnly<A>>;
-// type AR = RemoveObjectsFrom2<A>;
+// // // type AR = RemoveObjectsFrom<A, ReturnNonObjectsNamesOnly<A>>;
+// type AR = RemoveObjectsFrom<A>;
 
 // const ar = {} as AR;
 
-// console.log('ar: ', ar.);
+// console.log('ar: ', ar.a);
+// console.log('ar: ', ar.b);
+// console.log('ar: ', ar.c);
+// console.log('ar: ', ar.d);
 
 export type ObjectToPrimitive<T> = T extends String
     ? string
@@ -1749,11 +1760,11 @@ export class TypedQueryBuilder<ModelType, Row = {}>
         await this.queryBuilder.del().where(primaryKeyColumnInfo.name, value);
     }
 
-    public async insert(newObject: Partial<ModelType>) {
+    public async insertItem(newObject: Partial<RemoveObjectsFrom2<ModelType>>) {
         await this.insertItems([newObject]);
     }
 
-    public async insertItems(items: Partial<ModelType>[]) {
+    public async insertItems(items: Partial<RemoveObjectsFrom2<ModelType>>[]) {
         items = [...items];
 
         for (let item of items) {
@@ -1772,7 +1783,18 @@ export class TypedQueryBuilder<ModelType, Row = {}>
         }
     }
 
-    public async update(primaryKeyValue: any, item: Partial<ModelType>) {
+    public async updateItem(item: Partial<RemoveObjectsFrom2<ModelType>>) {
+        if (beforeUpdateTransform) {
+            item = beforeUpdateTransform(item, this);
+        }
+
+        await this.queryBuilder.update(item);
+    }
+
+    public async updateItemByPrimaryKey(
+        primaryKeyValue: any,
+        item: Partial<RemoveObjectsFrom2<ModelType>>
+    ) {
         if (beforeUpdateTransform) {
             item = beforeUpdateTransform(item, this);
         }
@@ -1784,8 +1806,8 @@ export class TypedQueryBuilder<ModelType, Row = {}>
             .where(primaryKeyColumnInfo.name, primaryKeyValue);
     }
 
-    public async updateItems(
-        items: { primaryKeyValue: any; data: Partial<ModelType> }[]
+    public async updateItemsByPrimaryKey(
+        items: { primaryKeyValue: any; data: Partial<RemoveObjectsFrom2<ModelType>> }[]
     ) {
         const primaryKeyColumnInfo = getPrimaryKeyColumn(this.tableClass);
 
