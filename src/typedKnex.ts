@@ -238,36 +238,36 @@ export type AddPropertyWithType<
     NewKeyType
 > = Original & Pick<TypeWithIndexerOf<NewKeyType>, NewKey>;
 
-interface IKeysAsArguments<Model, Return> {
-    <
-        K1 extends keyof Model,
-        K2 extends keyof Model[K1],
-        K3 extends keyof Model[K1][K2]
-    >(
-        key1: K1,
-        key2: K2,
-        key3: K3,
-        ...keys: string[]
-    ): Return;
-    <
-        K1 extends keyof Model,
-        K2 extends keyof Model[K1],
-        K3 extends keyof Model[K1][K2]
-    >(
-        key1: K1,
-        key2: K2,
-        key3: K3
-    ): Return;
-    <K1 extends keyof Model, K2 extends keyof Model[K1]>(
-        key1: K1,
-        key2: K2
-    ): Return;
-    <K extends keyof Model>(key1: K): Return;
-}
+// interface IKeysAsArguments<Model, Return> {
+//     <
+//         K1 extends keyof Model,
+//         K2 extends keyof Model[K1],
+//         K3 extends keyof Model[K1][K2]
+//     >(
+//         key1: K1,
+//         key2: K2,
+//         key3: K3,
+//         ...keys: string[]
+//     ): Return;
+//     <
+//         K1 extends keyof Model,
+//         K2 extends keyof Model[K1],
+//         K3 extends keyof Model[K1][K2]
+//     >(
+//         key1: K1,
+//         key2: K2,
+//         key3: K3
+//     ): Return;
+//     <K1 extends keyof Model, K2 extends keyof Model[K1]>(
+//         key1: K1,
+//         key2: K2
+//     ): Return;
+//     <K extends keyof Model>(key1: K): Return;
+// }
 
 // tslint:disable-next-line:no-empty-interfaces
-interface IKeysAsParametersReturnQueryBuider<Model, Row>
-    extends IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> {}
+// interface IKeysAsParametersReturnQueryBuider<Model, Row>
+//     extends IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> {}
 
 interface IColumnParamaterNoRowTransformation<Model, Row> {
     <PropertyType1>(
@@ -320,20 +320,20 @@ interface IJoinTable<Model, Row> {
     >;
 }
 
-interface IJoinOnClause<Model> {
-    // <L1K1 extends keyof Model, L2K1 extends keyof Model, L2K2 extends keyof Model[L2K1]>(column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2]): IJoinOnClause<Model>;
-    // <L1K1 extends keyof Model, L2K1 extends keyof Model, L2K2 extends keyof Model[L2K1]>(column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2]): IJoinOnClause<Model>;
-    onColumns: <
-        L1K1 extends keyof Model,
-        L2K1 extends keyof Model,
-        L2K2 extends keyof Model[L2K1]
-    >(
-        column1: [L1K1] | [L2K1, L2K2],
-        operator: Operator,
-        column2: [L1K1] | [L2K1, L2K2]
-    ) => IJoinOnClause<Model>;
-    onNull: IKeysAsParametersReturnQueryBuider<Model, IJoinOnClause<Model>>;
-}
+// interface IJoinOnClause<Model> {
+//     // <L1K1 extends keyof Model, L2K1 extends keyof Model, L2K2 extends keyof Model[L2K1]>(column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2]): IJoinOnClause<Model>;
+//     // <L1K1 extends keyof Model, L2K1 extends keyof Model, L2K2 extends keyof Model[L2K1]>(column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2]): IJoinOnClause<Model>;
+//     onColumns: <
+//         L1K1 extends keyof Model,
+//         L2K1 extends keyof Model,
+//         L2K2 extends keyof Model[L2K1]
+//     >(
+//         column1: [L1K1] | [L2K1, L2K2],
+//         operator: Operator,
+//         column2: [L1K1] | [L2K1, L2K2]
+//     ) => IJoinOnClause<Model>;
+//     onNull: IKeysAsParametersReturnQueryBuider<Model, IJoinOnClause<Model>>;
+// }
 
 interface IJoinOnClause2<Model, JoinedModel> {
     // <L1K1 extends keyof Model, L2K1 extends keyof Model, L2K2 extends keyof Model[L2K1]>(column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2]): IJoinOnClause<Model>;
@@ -2026,7 +2026,9 @@ export class TypedQueryBuilder<ModelType, Row = {}>
         const tableToJoinName = getTableMetadata(tableToJoinClass).tableName;
         const tableToJoinAlias = newPropertyKey;
 
-        const onFunction = arguments[2] as (join: IJoinOnClause<any>) => void;
+        const onFunction = arguments[2] as (
+            join: IJoinOnClause2<any, any>
+        ) => void;
 
         let knexOnObject: any;
         this.queryBuilder.leftOuterJoin(
