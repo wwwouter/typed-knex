@@ -1010,18 +1010,72 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+    it('should left outer join with function with itself', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(UserSetting)
+            .leftOuterJoinTableOnFunction('evilTwin', UserSetting, join => {
+                join.onColumns(i => i.id, '=', j => j.id);
+            });
+
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select * from "userSettings" left outer join "userSettings" as "evilTwin" on "userSettings"."id" = "evilTwin"."id"'
+        );
+
+        done();
+    });
+
+    it('should left outer join with function with other table', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(UserSetting)
+            .leftOuterJoinTableOnFunction('otherUser', User, join => {
+                join.onColumns(i => i.user2Id, '=', j => j.id);
+            });
+
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select * from "userSettings" left outer join "users" as "otherUser" on "userSettings"."user2Id" = "otherUser"."id"'
+        );
+
+        done();
+    });
+
+    it('should left outer join with function with other table', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(UserSetting)
+            .leftOuterJoinTableOnFunction('otherUser', User, join => {
+                join.onColumns(i => i.user2Id, '=', j => j.id);
+                join.onNull(i => i.name);
+            });
+
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select * from "userSettings" left outer join "users" as "otherUser" on "userSettings"."user2Id" = "otherUser"."id" and "otherUser"."name" is null'
+        );
+
+        done();
+    });
+
     // it('should stay commented out', async done => {
     //     const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
 
     //     const item = await typedKnex
     //         .query(UserSetting)
-    //         .findByColumn(i => i.id, '', i => [i.id, i.value]);
+    //         .leftOuterJoinTableOnFunction('otherUser', User, join => {
+    //             join.onColumns(i => i.user2Id, '=', j => j.id);
+    //         })
+    //         .select(i => [i.otherUser.name, i.user2.numericValue])
+    //         .firstItem();
 
     //     if (item !== undefined) {
-    //         console.log(item.user.category.name);
-    //         console.log(item.id);
-    //         console.log(item.value);
-    //         console.log(item.nver);
+    //         console.log(item.user2.numericValue);
+    //         console.log(item.otherUser.name);
     //     }
 
     //     done();

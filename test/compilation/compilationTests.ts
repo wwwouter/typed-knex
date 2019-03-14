@@ -501,4 +501,110 @@ describe('compile time typed-knex', function() {
         file.delete();
         done();
     });
+
+    it('should return correct type from leftOuterJoinTableOnFunction', done => {
+        file = project.createSourceFile(
+            'test/test4.ts',
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User, UserSetting } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+
+                const item = await typedKnex
+                .query(UserSetting)
+                .leftOuterJoinTableOnFunction('otherUser', User, join => {
+                    join.onColumns(i => i.user2Id, '=', j => j.id);
+                })
+                .select(i => [i.otherUser.name, i.user2.numericValue])
+                .firstItem();
+
+                if (item !== undefined) {
+                    console.log(item.user2.numericValue);
+                    console.log(item.otherUser.name);
+                }
+
+            })();
+        `
+        );
+
+        assert.equal(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
+
+    it('should not return type from leftOuterJoinTableOnFunction with not selected from joined table', done => {
+        file = project.createSourceFile(
+            'test/test4.ts',
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User, UserSetting } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+
+                const item = await typedKnex
+                .query(UserSetting)
+                .leftOuterJoinTableOnFunction('otherUser', User, join => {
+                    join.onColumns(i => i.user2Id, '=', j => j.id);
+                })
+                .select(i => [i.otherUser.name, i.user2.numericValue])
+                .firstItem();
+
+                if (item !== undefined) {
+                    console.log(item.otherUser.id);
+                }
+
+            })();
+        `
+        );
+
+        assert.notEqual(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
+
+    it('should not return type from leftOuterJoinTableOnFunction with not selected from main table', done => {
+        file = project.createSourceFile(
+            'test/test4.ts',
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User, UserSetting } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+
+                const item = await typedKnex
+                .query(UserSetting)
+                .leftOuterJoinTableOnFunction('otherUser', User, join => {
+                    join.onColumns(i => i.user2Id, '=', j => j.id);
+                })
+                .select(i => [i.otherUser.name, i.user2.numericValue])
+                .firstItem();
+
+                if (item !== undefined) {
+                    console.log(item.id);
+                }
+
+            })();
+        `
+        );
+
+        assert.notEqual(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
 });

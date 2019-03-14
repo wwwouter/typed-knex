@@ -82,7 +82,10 @@ export interface ITypedQueryBuilder<Model, Row> {
     innerJoinTable: IJoinTable<Model, Row>;
     leftOuterJoinTable: IJoinTable<Model, Row>;
 
-    leftOuterJoinTableOnFunction: IJoinTableMultipleOnClauses<Model, Row>;
+    leftOuterJoinTableOnFunction: IJoinTableMultipleOnClauses<
+        Model,
+        Row extends Model ? {} : Row
+    >;
 
     selectRaw: ISelectRaw<Model, Row extends Model ? {} : Row>;
 
@@ -332,6 +335,41 @@ interface IJoinOnClause<Model> {
     onNull: IKeysAsParametersReturnQueryBuider<Model, IJoinOnClause<Model>>;
 }
 
+interface IJoinOnClause2<Model, JoinedModel> {
+    // <L1K1 extends keyof Model, L2K1 extends keyof Model, L2K2 extends keyof Model[L2K1]>(column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2]): IJoinOnClause<Model>;
+    // <L1K1 extends keyof Model, L2K1 extends keyof Model, L2K2 extends keyof Model[L2K1]>(column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2]): IJoinOnClause<Model>;
+    onColumns: <PropertyType1, PropertyType2>(
+        // L1K1 extends keyof Model,
+        // L2K1 extends keyof Model
+        // L2K2 extends keyof Model[L2K1]
+        selectColumn1Function: (
+            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
+        ) => () => PropertyType1,
+        operator: Operator,
+        selectColumn2Function: (
+            c: TransformPropsToFunctionsLevel1ReturnProperyType<JoinedModel>
+        ) => () => PropertyType2
+    ) => void;
+    onNull: <X>(
+        selectColumn1Function: (
+            c: TransformPropsToFunctionsLevel1ReturnProperyType<JoinedModel>
+        ) => () => X
+    ) => void;
+    // onNull: IKeysAsParametersReturnQueryBuider<Model, IJoinOnClause2<Model>>;
+}
+
+interface IWhereCompareTwoColumns<Model, Row> {
+    <PropertyType1, _PropertyType2, Model2>(
+        selectColumn1Function: (
+            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
+        ) => () => PropertyType1,
+        operator: Operator,
+        selectColumn2Function: (
+            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model2>
+        ) => any // () => PropertyType2
+    ): ITypedQueryBuilder<Model, Row>;
+}
+
 // interface
 
 // // tslint:disable-next-line:no-empty-interfaces
@@ -347,8 +385,9 @@ interface IJoinTableMultipleOnClauses<Model, Row> {
         newPropertyKey: NewPropertyKey,
         newPropertyClass: new () => NewPropertyType,
         on: (
-            join: IJoinOnClause<
-                AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>
+            join: IJoinOnClause2<
+                AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>,
+                NewPropertyType
             >
         ) => void
     ): ITypedQueryBuilder<
@@ -2003,21 +2042,37 @@ export class TypedQueryBuilder<ModelType, Row = {}>
                 operator: any,
                 column2PartsArray: any
             ) => {
+                const column1Arguments = this.getArgumentsFromColumnFunction(
+                    column1PartsArray
+                );
+                const column2Arguments = this.getArgumentsFromColumnFunction(
+                    column2PartsArray
+                );
+                const column2ArgumentsWithJoinedTable = [
+                    tableToJoinAlias,
+                    ...column2Arguments
+                ];
                 knexOnObject.on(
-                    this.getColumnName(...column1PartsArray),
+                    this.getColumnName(...column1Arguments),
                     operator,
-                    this.getColumnName(...column2PartsArray)
+                    column2ArgumentsWithJoinedTable.join('.')
                 );
                 return onObject;
             },
-            onNull: (...args: any[]) => {
-                knexOnObject.onNull(this.getColumnName(...args));
+            onNull: (f: any) => {
+                const column2Arguments = this.getArgumentsFromColumnFunction(f);
+                const column2ArgumentsWithJoinedTable = [
+                    tableToJoinAlias,
+                    ...column2Arguments
+                ];
+
+                knexOnObject.onNull(column2ArgumentsWithJoinedTable.join('.'));
                 return onObject;
             }
         };
         onFunction(onObject as any);
 
-        return this;
+        return this as any;
     }
 
     public leftOuterJoinTable() {
@@ -2616,6 +2671,43 @@ export class TypedQueryBuilder<ModelType, Row = {}>
             let columnAlias = currentColumnPart.propertyKey;
             let currentClass = currentColumnPart.columnClass;
             for (let i = 1; i < keys.length; i++) {
+                currentColumnPart = getColumnInformation(currentClass, keys[i]);
+
+                columnName =
+                    columnAlias +
+                    '.' +
+                    (keys.length - 1 === i
+                        ? currentColumnPart.name
+                        : currentColumnPart.propertyKey);
+                columnAlias +=
+                    '_' +
+                    (keys.length - 1 === i
+                        ? currentColumnPart.name
+                        : currentColumnPart.propertyKey);
+                currentClass = currentColumnPart.columnClass;
+            }
+            return columnName;
+        }
+    }
+
+    public getColumnNameWithDifferentRoot(
+        _rootKey: string,
+        ...keys: string[]
+    ): string {
+        const firstPartName = this.getColumnNameWithoutAlias(keys[0]);
+
+        if (keys.length === 1) {
+            return firstPartName;
+        } else {
+            let currentColumnPart = getColumnInformation(
+                this.tableClass,
+                keys[0]
+            );
+
+            let columnName = '';
+            let columnAlias = currentColumnPart.propertyKey;
+            let currentClass = currentColumnPart.columnClass;
+            for (let i = 0; i < keys.length; i++) {
                 currentColumnPart = getColumnInformation(currentClass, keys[i]);
 
                 columnName =
