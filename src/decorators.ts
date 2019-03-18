@@ -6,6 +6,8 @@ interface IColumnData {
     name: string;
     primary: boolean;
     propertyKey: string;
+    isForeignKey: boolean;
+    designType: any;
 }
 const tableColumns = new Map<Function, IColumnData[]>();
 
@@ -84,6 +86,14 @@ function getRegisterColumn(options?: IColumnOptions) {
     function registerColumn(target: any, propertyKey: string): void {
         Reflect.metadata(columnMetadataKey, { isColumn: true })(target);
 
+        const designType = Reflect.getMetadata(
+            'design:type',
+            target,
+            propertyKey
+        );
+        const isForeignKey =
+            ['String', 'Number', 'Boolean'].includes(designType.name) === false;
+
         const columns = tableColumns.get(target.constructor) || [];
 
         let name = propertyKey;
@@ -97,7 +107,7 @@ function getRegisterColumn(options?: IColumnOptions) {
             primary = options.primary === true;
         }
 
-        columns.push({ name, primary, propertyKey });
+        columns.push({ name, primary, propertyKey, isForeignKey, designType });
         tableColumns.set(target.constructor, columns);
     }
 
@@ -133,7 +143,9 @@ export function getColumnInformation(
         ),
         name: property.name,
         primary: property.primary,
-        propertyKey: property.propertyKey
+        propertyKey: property.propertyKey,
+        designType: property.designType,
+        isForeignKey: property.isForeignKey
     };
 }
 
