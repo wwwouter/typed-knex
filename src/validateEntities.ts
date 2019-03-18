@@ -9,9 +9,9 @@ export async function validateEntities(knex: Knex) {
 
         if (doesTableExists === false) {
             throw new Error(
-                `Table ${entity.tableName} of class ${
+                `Table "${entity.tableName}" of class "${
                     entity.entityClass.name
-                } does not exist in database.`
+                }" does not exist in database.`
             );
         }
 
@@ -29,11 +29,11 @@ export async function validateEntities(knex: Knex) {
 
             if (doesColumnExists === false) {
                 throw new Error(
-                    `Column ${column.name} of table ${
+                    `Column "${column.name}" of table "${
                         entity.tableName
-                    } of class ${
+                    }" of class "${
                         entity.entityClass.name
-                    } does not exist in database.`
+                    }" does not exist in database.`
                 );
             }
         }
