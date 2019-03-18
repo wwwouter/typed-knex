@@ -21,7 +21,6 @@ const entities = [] as {
 //         return Reflect.metadata(tableyMetadataKey, { tableName: tableName });
 //     })(arguments);
 
-
 // }
 
 export function getEntities() {
@@ -29,19 +28,16 @@ export function getEntities() {
 }
 
 export function Entity(tableName: string) {
-
-    return ((target: Function) => {
+    return (target: Function) => {
         Reflect.metadata(tableyMetadataKey, { tableName: tableName })(target);
 
         entities.push({ tableName: tableName, entityClass: target });
-    });
+    };
 }
-
 
 export function getTableMetadata(tableClass: Function): { tableName: string } {
     return Reflect.getMetadata(tableyMetadataKey, tableClass);
 }
-
 
 // function registerEntity(target: any, propertyKey: string): void {
 
@@ -64,8 +60,6 @@ export function getTableMetadata(tableClass: Function): { tableName: string } {
 //     tableColumns.set(target.constructor, columns);
 // }
 
-
-
 const columnMetadataKey = Symbol('column');
 
 interface IColumnOptions {
@@ -80,13 +74,14 @@ interface IColumnOptions {
     primary?: boolean;
 }
 
-export function Column(options?: IColumnOptions): (target: object, propertyKey: string) => void {
+export function Column(
+    options?: IColumnOptions
+): (target: object, propertyKey: string) => void {
     return getRegisterColumn(options);
 }
 
 function getRegisterColumn(options?: IColumnOptions) {
     function registerColumn(target: any, propertyKey: string): void {
-
         Reflect.metadata(columnMetadataKey, { isColumn: true })(target);
 
         const columns = tableColumns.get(target.constructor) || [];
@@ -109,9 +104,10 @@ function getRegisterColumn(options?: IColumnOptions) {
     return registerColumn;
 }
 
-
-
-export function getColumnInformation(target: Function, propertyKey: string): { columnClass: new () => any } & IColumnData {
+export function getColumnInformation(
+    target: Function,
+    propertyKey: string
+): { columnClass: new () => any } & IColumnData {
     // console.log('target: ', target);
     // console.log('target: ', target.name);
     const properties = getColumnProperties(target);
@@ -123,30 +119,53 @@ export function getColumnInformation(target: Function, propertyKey: string): { c
     // const columnData = Reflect.getMetadata(columnMetadataKey, target, propertyKey);
     // console.log('columnData: ', columnData);
     if (!property) {
-        throw new Error(`Cannot get column data. Did you set @Column() attribute on ${target.name}.${propertyKey}?`);
+        throw new Error(
+            `Cannot get column data. Did you set @Column() attribute on ${
+                target.name
+            }.${propertyKey}?`
+        );
     }
-    return { columnClass: Reflect.getMetadata('design:type', target.prototype, propertyKey), name: property.name, primary: property.primary, propertyKey: property.propertyKey };
+    return {
+        columnClass: Reflect.getMetadata(
+            'design:type',
+            target.prototype,
+            propertyKey
+        ),
+        name: property.name,
+        primary: property.primary,
+        propertyKey: property.propertyKey
+    };
 }
 
 export function getColumnProperties(tableClass: Function): IColumnData[] {
     const columns = tableColumns.get(tableClass);
     if (!columns) {
-        throw new Error(`Cannot get column data from ${tableClass.constructor.name}, did you set @Column() attribute?`);
+        throw new Error(
+            `Cannot get column data from ${
+                tableClass.constructor.name
+            }, did you set @Column() attribute?`
+        );
     }
     return columns;
 }
-
 
 export function getPrimaryKeyColumn(tableClass: Function): IColumnData {
     // console.log('tableClass: ', tableClass);
     const columns = tableColumns.get(tableClass);
     if (!columns) {
-        throw new Error(`Cannot get column data from ${tableClass.constructor.name}, did you set @Column() attribute?`);
+        throw new Error(
+            `Cannot get column data from ${
+                tableClass.constructor.name
+            }, did you set @Column() attribute?`
+        );
     }
     const primaryKeyColumn = columns.find(i => i.primary);
     if (primaryKeyColumn === undefined) {
-        throw new Error(`Cannot get primary key column ${tableClass.constructor.name}, did you set @Column({primary:true}) attribute?`);
-
+        throw new Error(
+            `Cannot get primary key column ${
+                tableClass.constructor.name
+            }, did you set @Column({primary:true}) attribute?`
+        );
     }
     return primaryKeyColumn;
 }

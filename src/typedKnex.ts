@@ -35,20 +35,20 @@ export class TypedKnex {
 
 let beforeInsertTransform = undefined as
     | undefined
-    | ((item: any, typedQueryBuilder: TypedQueryBuilder<any, any>) => any);
+    | ((item: any, typedQueryBuilder: ITypedQueryBuilder<any, any>) => any);
 
 export function registerBeforeInsertTransform<T>(
-    f: (item: T, typedQueryBuilder: TypedQueryBuilder<{}, {}>) => T
+    f: (item: T, typedQueryBuilder: ITypedQueryBuilder<{}, {}>) => T
 ) {
     beforeInsertTransform = f;
 }
 
 let beforeUpdateTransform = undefined as
     | undefined
-    | ((item: any, typedQueryBuilder: TypedQueryBuilder<any, any>) => any);
+    | ((item: any, typedQueryBuilder: ITypedQueryBuilder<any, any>) => any);
 
 export function registerBeforeUpdateTransform<T>(
-    f: (item: T, typedQueryBuilder: TypedQueryBuilder<{}, {}>) => T
+    f: (item: T, typedQueryBuilder: ITypedQueryBuilder<{}, {}>) => T
 ) {
     beforeUpdateTransform = f;
 }
@@ -60,6 +60,8 @@ class NotImplementedError extends Error {
 }
 
 export interface ITypedQueryBuilder<Model, Row> {
+    columns: { name: string }[];
+
     where: IWhere<Model, Row>;
     andWhere: IWhere<Model, Row>;
     orWhere: IWhere<Model, Row>;
