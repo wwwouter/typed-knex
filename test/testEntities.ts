@@ -1,6 +1,5 @@
 import { Column, Entity } from '../src/decorators';
 
-
 @Entity('regions')
 export class Region {
     @Column({ primary: true })
@@ -23,7 +22,6 @@ export class UserCategory {
     public year!: number;
 }
 
-
 @Entity('users')
 export class User {
     @Column({ primary: true })
@@ -41,9 +39,7 @@ export class User {
     @Column()
     @Column({ name: 'category2Id' })
     public category2!: UserCategory;
-
 }
-
 
 @Entity('userSettings')
 export class UserSetting {
