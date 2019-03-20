@@ -158,6 +158,7 @@ export interface ITypedQueryBuilder<Model, Row> {
     insertItem(newObject: Partial<RemoveObjectsFrom2<Model>>): Promise<void>;
     insertItems(items: Partial<RemoveObjectsFrom2<Model>>[]): Promise<void>;
     countResult(): Promise<number>;
+    del(): Promise<void>;
     delByPrimaryKey(primaryKeyValue: any): Promise<void>;
     updateItem(item: Partial<RemoveObjectsFrom2<Model>>): Promise<void>;
     updateItemByPrimaryKey(
@@ -1754,6 +1755,10 @@ class TypedQueryBuilder<ModelType, Row = {}>
         }
 
         this.extraJoinedProperties = [];
+    }
+
+    public async del() {
+        await this.queryBuilder.del();
     }
 
     public async delByPrimaryKey(value: any) {
