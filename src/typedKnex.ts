@@ -1725,7 +1725,7 @@ function getProxyAndMemoriesForArray<ModelType, Row>(
     return { root, result };
 }
 
-export class TypedQueryBuilder<ModelType, Row = {}>
+class TypedQueryBuilder<ModelType, Row = {}>
     implements ITypedQueryBuilder<ModelType, Row> {
     public columns: { name: string }[];
 
