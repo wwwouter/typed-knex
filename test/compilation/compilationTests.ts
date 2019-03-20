@@ -32,7 +32,7 @@ describe('compile time typed-knex', function() {
                 const result = await typedKnex
                     .query(User)
                     .select(c=>[c.id])
-                    .firstItem();
+                    .getFirst();
 
                 console.log(result.id);
 
@@ -61,7 +61,7 @@ describe('compile time typed-knex', function() {
                 const result = await typedKnex
                     .query(User)
                     .select(c=>[c.id])
-                    .firstItem();
+                    .getFirst();
 
                 console.log(result.name);
 
@@ -90,7 +90,7 @@ describe('compile time typed-knex', function() {
                 const result = await typedKnex
                     .query(User)
                     .select(c=>[c.id])
-                    .firstItem();
+                    .getFirst();
 
                 console.log(result.id);
 
@@ -119,7 +119,7 @@ describe('compile time typed-knex', function() {
                 const result = await typedKnex
                     .query(User)
                     .select(c=>[c.id])
-                    .firstItem();
+                    .getFirst();
 
                 console.log(result.name);
 
@@ -335,7 +335,7 @@ describe('compile time typed-knex', function() {
                 const result = await typedKnex
                     .query(User)
                     .min(c => c.numericValue, 'minNumericValue')
-                    .firstItem();
+                    .getFirst();
 
                 console.log(result.minNumericValue);
 
@@ -364,7 +364,7 @@ describe('compile time typed-knex', function() {
                 const result = await typedKnex
                     .query(User)
                     .min(c => c('numericValue'), 'minNumericValue')
-                    .firstItem();
+                    .getFirst();
 
                 console.log(result.id);
 
@@ -394,7 +394,7 @@ describe('compile time typed-knex', function() {
                     .query(User)
                     .select(c=>[c.id])
                     .clearSelect()
-                    .firstItem();
+                    .getFirst();
 
                     console.log(result.id);
                     console.log(result.name);
@@ -520,7 +520,7 @@ describe('compile time typed-knex', function() {
                     join.onColumns(i => i.user2Id, '=', j => j.id);
                 })
                 .select(i => [i.otherUser.name, i.user2.numericValue])
-                .firstItem();
+                .getFirst();
 
                 if (item !== undefined) {
                     console.log(item.user2.numericValue);
@@ -556,7 +556,7 @@ describe('compile time typed-knex', function() {
                     join.onColumns(i => i.user2Id, '=', j => j.id);
                 })
                 .select(i => [i.otherUser.name, i.user2.numericValue])
-                .firstItem();
+                .getFirst();
 
                 if (item !== undefined) {
                     console.log(item.otherUser.id);
@@ -591,7 +591,7 @@ describe('compile time typed-knex', function() {
                     join.onColumns(i => i.user2Id, '=', j => j.id);
                 })
                 .select(i => [i.otherUser.name, i.user2.numericValue])
-                .firstItem();
+                .getFirst();
 
                 if (item !== undefined) {
                     console.log(item.id);

@@ -152,12 +152,14 @@ export interface ITypedQueryBuilder<Model, Row> {
     useKnexQueryBuilder(f: (query: Knex.QueryBuilder) => void): void;
     toQuery(): string;
 
-    firstItemOrNull(): Promise<Row | null>;
-    firstItem(): Promise<Row>;
-    list(): Promise<Row[]>;
+    getFirstOrNull(): Promise<Row | null>;
+    getFirst(): Promise<Row>;
+    getSingleOrNull(): Promise<Row | null>;
+    getSingle(): Promise<Row>;
+    getMany(): Promise<Row[]>;
+    getCount(): Promise<number>;
     insertItem(newObject: Partial<RemoveObjectsFrom2<Model>>): Promise<void>;
     insertItems(items: Partial<RemoveObjectsFrom2<Model>>[]): Promise<void>;
-    countResult(): Promise<number>;
     del(): Promise<void>;
     delByPrimaryKey(primaryKeyValue: any): Promise<void>;
     updateItem(item: Partial<RemoveObjectsFrom2<Model>>): Promise<void>;
@@ -1864,7 +1866,7 @@ class TypedQueryBuilder<ModelType, Row = {}>
             .first();
     }
 
-    public async countResult() {
+    public async getCount() {
         const query = this.queryBuilder.count();
         const result = await query;
         if (result.length === 0) {
@@ -1873,7 +1875,7 @@ class TypedQueryBuilder<ModelType, Row = {}>
         return result[0].count;
     }
 
-    public async firstItemOrNull() {
+    public async getFirstOrNull() {
         const items = await this.queryBuilder;
         if (!items || items.length === 0) {
             return null;
@@ -1881,10 +1883,30 @@ class TypedQueryBuilder<ModelType, Row = {}>
         return unflatten(items[0]);
     }
 
-    public async firstItem() {
+    public async getFirst() {
         const items = await this.queryBuilder;
         if (!items || items.length === 0) {
             throw new Error('Item not found.');
+        }
+        return unflatten(items[0]);
+    }
+
+    public async getSingleOrNull() {
+        const items = await this.queryBuilder;
+        if (!items || items.length === 0) {
+            return null;
+        } else if (items.length > 1) {
+            throw new Error(`More than one item found: ${items.length}.`);
+        }
+        return unflatten(items[0]);
+    }
+
+    public async getSingle() {
+        const items = await this.queryBuilder;
+        if (!items || items.length === 0) {
+            throw new Error('Item not found.');
+        } else if (items.length > 1) {
+            throw new Error(`More than one item found: ${items.length}.`);
         }
         return unflatten(items[0]);
     }
@@ -1996,7 +2018,7 @@ class TypedQueryBuilder<ModelType, Row = {}>
         return this as any;
     }
 
-    public async list() {
+    public async getMany() {
         const items = await this.queryBuilder;
         return unflatten(items) as Row[];
     }
