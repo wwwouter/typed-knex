@@ -1,6 +1,10 @@
 # typed-knex
 
+![npm](https://img.shields.io/npm/v/@wwwouter/typed-knex.svg)
+
 [Knex.js](https://knexjs.org/), but now everything is typed!
+
+    npm install @wwwouter/typed-knex
 
 # Documentation
 
@@ -80,6 +84,82 @@ const typedKnex = new TypedKnex(knex);
 ```
 
 ## Querybuilder
+
+-   [query](#query)
+-   [select](#select)
+-   [where](#where)
+-   [andWhere](#andWhere)
+-   [orWhere](#orWhere)
+-   [whereNot](#whereNot)
+-   [whereColumn](#whereColumn)
+-   [whereNull](#whereNull)
+-   [whereNotNull](#whereNotNull)
+-   [orderBy](#orderBy)
+-   [innerJoinColumn](#innerJoinColumn)
+-   [leftOuterJoinColumn](#leftOuterJoinColumn)
+-   [leftOuterJoinTableOnFunction](#leftOuterJoinTableOnFunction)
+-   [selectRaw](#selectRaw)
+-   [findByPrimaryKey](#findByPrimaryKey)
+-   [whereIn](#whereIn)
+-   [whereNotIn](#whereNotIn)
+-   [orWhereIn](#orWhereIn)
+-   [orWhereNotIn](#orWhereNotIn)
+-   [whereBetween](#whereBetween)
+-   [whereNotBetween](#whereNotBetween)
+-   [orWhereBetween](#orWhereBetween)
+-   [orWhereNotBetween](#orWhereNotBetween)
+-   [whereExists](#whereExists)
+-   [orWhereExists](#orWhereExists)
+-   [whereNotExists](#whereNotExists)
+-   [orWhereNotExists](#orWhereNotExists)
+-   [whereParentheses](#whereParentheses)
+-   [groupBy](#groupBy)
+-   [having](#having)
+-   [havingNull](#havingNull)
+-   [havingNotNull](#havingNotNull)
+-   [havingIn](#havingIn)
+-   [havingNotIn](#havingNotIn)
+-   [havingExists](#havingExists)
+-   [havingNotExists](#havingNotExists)
+-   [havingBetween](#havingBetween)
+-   [havingNotBetween](#havingNotBetween)
+-   [union](#union)
+-   [unionAll](#unionAll)
+-   [min](#min)
+-   [count](#count)
+-   [countDistinct](#countDistinct)
+-   [max](#max)
+-   [sum](#sum)
+-   [sumDistinct](#sumDistinct)
+-   [avg](#avg)
+-   [avgDistinct](#avgDistinct)
+-   [clearSelect](#clearSelect)
+-   [clearWhere](#clearWhere)
+-   [clearOrder](#clearOrder)
+-   [limit](#limit)
+-   [offset](#offset)
+-   [useKnexQueryBuilder](#useKnexQueryBuilder)
+-   [toQuery](#toQuery)
+-   [getFirstOrNull](#getFirstOrNull)
+-   [getFirst](#getFirst)
+-   [getSingleOrNull](#getSingleOrNull)
+-   [getSingle](#getSingle)
+-   [getMany](#getMany)
+-   [getCount](#getCount)
+-   [insertItem](#insertItem)
+-   [insertItems](#insertItems)
+-   [del](#del)
+-   [delByPrimaryKey](#delByPrimaryKey)
+-   [updateItem](#updateItem)
+-   [updateItemByPrimaryKey](#updateItemByPrimaryKey)
+-   [updateItemsByPrimaryKey](#updateItemsByPrimaryKey)
+-   [whereRaw](#whereRaw)
+-   [havingRaw](#havingRaw)
+-   [transacting](#transacting)
+-   [truncate](#truncate)
+-   [distinct](#distinct)
+-   [clone](#clone)
+-   [groupByRaw](#groupByRaw)
 
 ### query
 
