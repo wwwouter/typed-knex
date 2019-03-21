@@ -188,18 +188,6 @@ typedKnex.query(User).innerJoinColumn(i => i.category);
 typedKnex.query(User).leftOuterJoinColumn(i => i.category);
 ```
 
-### innerJoinTable
-
-```ts
-// typedKnex.query(User);
-```
-
-### leftOuterJoinTable
-
-```ts
-// typedKnex.query(User);
-```
-
 ### leftOuterJoinTableOnFunction
 
 ```ts

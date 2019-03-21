@@ -81,8 +81,8 @@ export interface ITypedQueryBuilder<Model, Row> {
     whereNull: IColumnParamaterNoRowTransformation<Model, Row>;
     whereNotNull: IColumnParamaterNoRowTransformation<Model, Row>;
 
-    innerJoinTable: IJoinTable<Model, Row>;
-    leftOuterJoinTable: IJoinTable<Model, Row>;
+    // innerJoinTable: IJoinTable<Model, Row>;
+    // leftOuterJoinTable: IJoinTable<Model, Row>;
 
     leftOuterJoinTableOnFunction: IJoinTableMultipleOnClauses<
         Model,
@@ -305,36 +305,36 @@ interface IColumnParamaterNoRowTransformation<Model, Row> {
 
 export type TypeWithIndexerOf<T> = { [key: string]: T };
 
-interface IJoinTable<Model, Row> {
-    <
-        NewPropertyType,
-        NewPropertyKey extends keyof TypeWithIndexerOf<NewPropertyType>,
-        L1K1 extends keyof AddPropertyWithType<
-            Model,
-            NewPropertyKey,
-            NewPropertyType
-        >,
-        L2K1 extends keyof AddPropertyWithType<
-            Model,
-            NewPropertyKey,
-            NewPropertyType
-        >,
-        L2K2 extends keyof AddPropertyWithType<
-            Model,
-            NewPropertyKey,
-            NewPropertyType
-        >[L2K1]
-    >(
-        newPropertyKey: NewPropertyKey,
-        newPropertyClass: new () => NewPropertyType,
-        column1: [L1K1] | [L2K1, L2K2],
-        operator: Operator,
-        column2: [L1K1] | [L2K1, L2K2]
-    ): ITypedQueryBuilder<
-        AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>,
-        Row
-    >;
-}
+// interface IJoinTable<Model, Row> {
+//     <
+//         NewPropertyType,
+//         NewPropertyKey extends keyof TypeWithIndexerOf<NewPropertyType>,
+//         L1K1 extends keyof AddPropertyWithType<
+//             Model,
+//             NewPropertyKey,
+//             NewPropertyType
+//         >,
+//         L2K1 extends keyof AddPropertyWithType<
+//             Model,
+//             NewPropertyKey,
+//             NewPropertyType
+//         >,
+//         L2K2 extends keyof AddPropertyWithType<
+//             Model,
+//             NewPropertyKey,
+//             NewPropertyType
+//         >[L2K1]
+//     >(
+//         newPropertyKey: NewPropertyKey,
+//         newPropertyClass: new () => NewPropertyType,
+//         column1: [L1K1] | [L2K1, L2K2],
+//         operator: Operator,
+//         column2: [L1K1] | [L2K1, L2K2]
+//     ): ITypedQueryBuilder<
+//         AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>,
+//         Row
+//     >;
+// }
 
 // interface IJoinOnClause<Model> {
 //     // <L1K1 extends keyof Model, L2K1 extends keyof Model, L2K2 extends keyof Model[L2K1]>(column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2]): IJoinOnClause<Model>;
