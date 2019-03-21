@@ -2257,11 +2257,12 @@ class TypedQueryBuilder<ModelType, Row = {}>
         const primaryKeyColumnInfo = getPrimaryKeyColumn(this.tableClass);
 
         const primaryKeyValue = arguments[0];
-        const functions = arguments[1];
 
-        for (const f of functions) {
-            const columnArguments = this.getArgumentsFromColumnFunction(f);
+        const f = arguments[1];
 
+        const columnArgumentsList = this.getArgumentsFromColumnFunction3(f);
+
+        for (const columnArguments of columnArgumentsList) {
             this.queryBuilder.select(
                 this.getColumnName(...columnArguments) +
                     ' as ' +

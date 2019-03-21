@@ -1,22 +1,6 @@
 # typed-knex
 
-Knex, but now it's typed!
-
-<i>The tests are the documentation (for now..)</i>
-
-## Test
-
-    npm test
-
-## Update version
-
-    npm version major|minor|patch
-    npm publish --access public
-    git push
-
-for beta
-
-    npm publish --access public --tag beta
+[Knex.js](https://knexjs.org/), but now everything is typed!
 
 # Documentation
 
@@ -38,10 +22,13 @@ async function example() {
 
     const query = typedKnex
         .query(User)
-        .select(i => [i.id])
+        .select(i => i.id)
         .where(i => i.name, 'Hejlsberg');
 
-    const oneUser = await query.getSingleOrNull();
+    const oneUser = await query.getSingle();
+
+    console.log(oneUser.id); // Ok
+    console.log(oneUser.name); // Compilation error
 }
 ```
 
@@ -51,7 +38,7 @@ Use the `Entity` decorator to refence a table and use the `Column` decorator to 
 
 Use `@Column({ primary: true })` for primary key columns.
 
-Use `@Column({ name: 'name' })` to reference another table.
+Use `@Column({ name: '[column name]' })` on property with the type of another `Entity` to reference another table.
 
 ```ts
 import { Column, Entity } from '@wwwouter/typed-knex';
@@ -478,67 +465,124 @@ typedKnex
 ### clearWhere
 
 ```ts
-typedKnex.query(User);
+typedKnex
+    .query(User)
+    .where(i => i.id, 'name')
+    .clearWhere()
+    .where((i = i.name), 'name');
 ```
 
 ### clearOrder
 
 ```ts
-typedKnex.query(User);
+typedKnex
+    .query(User)
+    .orderBy(i => i.id)
+    .clearOrder()
+    .orderBy((i = i.name));
 ```
 
 ### limit
 
 ```ts
-typedKnex.query(User);
+typedKnex.query(User).limit(10);
 ```
 
 ### offset
 
 ```ts
-typedKnex.query(User);
+typedKnex.query(User).offset(10);
 ```
 
 ### useKnexQueryBuilder
 
+Use `useKnexQueryBuilder` to get to the underlying Knex.js querybuilder.
+
 ```ts
-typedKnex.query(User);
+const query = typedKnex.query(User);
+query.useKnexQueryBuilder(queryBuilder =>
+    queryBuilder.where('somethingelse', 'value')
+);
 ```
 
 ### toQuery
 
 ```ts
-typedKnex.query(User);
+const query = typedKnex.query(User);
+console.log(query.toQuery()); // select * from "users"
 ```
 
 ### getFirstOrNull
 
+| Result            | No item | One item | Many items |
+| ----------------- | ------- | -------- | ---------- |
+| `getFirst`        | `Error` | Item     | First item |
+| `getSingle`       | `Error` | Item     | `Error`    |
+| `getFirstOrNull`  | `null`  | Item     | First item |
+| `getSingleOrNull` | `null`  | Item     | `Error`    |
+
 ```ts
-typedKnex.query(User);
+const user = await typedKnex
+    .query(User)
+    .where(i => i.name, 'name')
+    .getFirstOrNull();
 ```
 
 ### getFirst
 
+| Result            | No item | One item | Many items |
+| ----------------- | ------- | -------- | ---------- |
+| `getFirst`        | `Error` | Item     | First item |
+| `getSingle`       | `Error` | Item     | `Error`    |
+| `getFirstOrNull`  | `null`  | Item     | First item |
+| `getSingleOrNull` | `null`  | Item     | `Error`    |
+
 ```ts
-typedKnex.query(User);
+const user = await typedKnex
+    .query(User)
+    .where(i => i.name, 'name')
+    .getFirst();
 ```
 
 ### getSingleOrNull
 
+| Result            | No item | One item | Many items |
+| ----------------- | ------- | -------- | ---------- |
+| `getFirst`        | `Error` | Item     | First item |
+| `getSingle`       | `Error` | Item     | `Error`    |
+| `getFirstOrNull`  | `null`  | Item     | First item |
+| `getSingleOrNull` | `null`  | Item     | `Error`    |
+
 ```ts
-typedKnex.query(User);
+const user = await typedKnex
+    .query(User)
+    .where(i => i.name, 'name')
+    .getSingleOrNull();
 ```
 
 ### getSingle
 
+| Result            | No item | One item | Many items |
+| ----------------- | ------- | -------- | ---------- |
+| `getFirst`        | `Error` | Item     | First item |
+| `getSingle`       | `Error` | Item     | `Error`    |
+| `getFirstOrNull`  | `null`  | Item     | First item |
+| `getSingleOrNull` | `null`  | Item     | `Error`    |
+
 ```ts
-typedKnex.query(User);
+const user = await typedKnex
+    .query(User)
+    .where(i => i.name, 'name')
+    .getSingle();
 ```
 
 ### getMany
 
 ```ts
-typedKnex.query(User);
+const users = await typedKnex
+    .query(User)
+    .whereNotNull(i => i.name)
+    .getMany();
 ```
 
 ### getCount
@@ -604,7 +648,22 @@ typedKnex.query(User);
 ### transacting
 
 ```ts
-typedKnex.query(User);
+const typedKnex = new TypedKnex(database);
+const transaction = await typedKnex.beginTransaction();
+try {
+    await typedKnex
+        .query(User)
+        .transacting(transaction)
+        .insertItem(user1);
+    await typedKnex
+        .query(User)
+        .transacting(transaction)
+        .insertItem(user2);
+    await transaction.commit();
+} catch (error) {
+    await transaction.rollback();
+    // handle error
+}
 ```
 
 ### truncate
@@ -631,10 +690,25 @@ typedKnex.query(User);
 typedKnex.query(User);
 ```
 
-###
+## Transactions
 
 ```ts
-typedKnex.query(User);
+const typedKnex = new TypedKnex(database);
+const transaction = await typedKnex.beginTransaction();
+try {
+    await typedKnex
+        .query(User)
+        .transacting(transaction)
+        .insertItem(user1);
+    await typedKnex
+        .query(User)
+        .transacting(transaction)
+        .insertItem(user2);
+    await transaction.commit();
+} catch (error) {
+    await transaction.rollback();
+    // handle error
+}
 ```
 
 ## Validate Entities
@@ -652,3 +726,17 @@ const knex = Knex({
 
 await validateEntities(knex);
 ```
+
+## Test
+
+    npm test
+
+## Update version
+
+    npm version major|minor|patch
+    npm publish --access public
+    git push
+
+for beta
+
+    npm publish --access public --tag beta

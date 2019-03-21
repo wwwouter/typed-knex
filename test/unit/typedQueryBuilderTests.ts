@@ -1062,6 +1062,39 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+    it('should return select * from "users"', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex.query(User).limit(10);
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" limit 10');
+
+        done();
+    });
+
+    it('should return select * from "users"', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex.query(User).offset(10);
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" offset 10');
+
+        done();
+    });
+
+    it('should return select * from "users"', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex.query(User);
+        query.useKnexQueryBuilder(queryBuilder =>
+            queryBuilder.where('somethingelse', 'value')
+        );
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select * from "users" where "somethingelse" = \'value\''
+        );
+
+        done();
+    });
+
     // it('should stay commented out', async done => {
     //     const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
 
