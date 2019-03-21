@@ -91,8 +91,10 @@ function getRegisterColumn(options?: IColumnOptions) {
             target,
             propertyKey
         );
-        const isForeignKey =
-            ['String', 'Number', 'Boolean'].includes(designType.name) === false;
+        const isForeignKey = designType
+            ? ['String', 'Number', 'Boolean'].includes(designType.name) ===
+              false
+            : false;
 
         const columns = tableColumns.get(target.constructor) || [];
 
