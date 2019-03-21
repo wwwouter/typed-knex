@@ -1,6 +1,8 @@
 # typed-knex
 
-![npm](https://img.shields.io/npm/v/@wwwouter/typed-knex.svg)
+[![npm version](https://img.shields.io/npm/v/@wwwouter/typed-knex.svg)](https://www.npmjs.com/package/@wwwouter/typed-knex)
+[![Build Status](https://travis-ci.org/wwwouter/typed-knex.svg?branch=master)](https://travis-ci.org/wwwouter/typed-knex)
+[![Dependencies Status](https://david-dm.org/wwwouter/typed-knex.svg)](https://david-dm.org/wwwouter/typed-knex)
 
 [Knex.js](https://knexjs.org/), but now everything is typed!
 
