@@ -4,11 +4,22 @@
 [![Build Status](https://travis-ci.org/wwwouter/typed-knex.svg?branch=master)](https://travis-ci.org/wwwouter/typed-knex)
 [![Dependencies Status](https://david-dm.org/wwwouter/typed-knex.svg)](https://david-dm.org/wwwouter/typed-knex)
 
-[Knex.js](https://knexjs.org/), but now everything is typed!
+Standing on the shoulders of [Knex.js](https://knexjs.org/), but now everything is typed!
+
+> Goals:
+>
+> -   Be useful for 80% of the usecases, for the other 20% easily switch to lower-level Knex.js.
+> -   Be as concise a possible.
+> -   Mirror Knex.js as much a possible, with these exceptions:
+>     -   Don't use `this`.
+>     -   Be selective on what returns a `Promise` and what not.
+> -   Get the most the benefits of Typescript: typechecking of parameters, typed restults, rename refactoring.
+
+Install:
 
     npm install @wwwouter/typed-knex
 
-Tested with Knex.js v0.16.3
+_Tested with Knex.js v0.16.3_
 
 # Documentation
 
@@ -89,7 +100,33 @@ const typedKnex = new TypedKnex(knex);
 
 ## Querybuilder
 
+### General
+
 -   [query](#query)
+-   [transacting](#transacting)
+-   [toQuery](#toQuery)
+-   [useKnexQueryBuilder](#useKnexQueryBuilder)
+
+### Get results (Promises)
+
+-   [findByPrimaryKey](#findByPrimaryKey)
+-   [getFirstOrNull](#getFirstOrNull)
+-   [getFirst](#getFirst)
+-   [getSingleOrNull](#getSingleOrNull)
+-   [getSingle](#getSingle)
+-   [getMany](#getMany)
+-   [getCount](#getCount)
+-   [insertItem](#insertItem)
+-   [insertItems](#insertItems)
+-   [del](#del)
+-   [delByPrimaryKey](#delByPrimaryKey)
+-   [updateItem](#updateItem)
+-   [updateItemByPrimaryKey](#updateItemByPrimaryKey)
+-   [updateItemsByPrimaryKey](#updateItemsByPrimaryKey)
+-   [execute](#execute)
+
+### Building query
+
 -   [select](#select)
 -   [where](#where)
 -   [andWhere](#andWhere)
@@ -103,7 +140,6 @@ const typedKnex = new TypedKnex(knex);
 -   [leftOuterJoinColumn](#leftOuterJoinColumn)
 -   [leftOuterJoinTableOnFunction](#leftOuterJoinTableOnFunction)
 -   [selectRaw](#selectRaw)
--   [findByPrimaryKey](#findByPrimaryKey)
 -   [whereIn](#whereIn)
 -   [whereNotIn](#whereNotIn)
 -   [orWhereIn](#orWhereIn)
@@ -142,25 +178,8 @@ const typedKnex = new TypedKnex(knex);
 -   [clearOrder](#clearOrder)
 -   [limit](#limit)
 -   [offset](#offset)
--   [useKnexQueryBuilder](#useKnexQueryBuilder)
--   [toQuery](#toQuery)
--   [getFirstOrNull](#getFirstOrNull)
--   [getFirst](#getFirst)
--   [getSingleOrNull](#getSingleOrNull)
--   [getSingle](#getSingle)
--   [getMany](#getMany)
--   [getCount](#getCount)
--   [insertItem](#insertItem)
--   [insertItems](#insertItems)
--   [del](#del)
--   [delByPrimaryKey](#delByPrimaryKey)
--   [updateItem](#updateItem)
--   [updateItemByPrimaryKey](#updateItemByPrimaryKey)
--   [updateItemsByPrimaryKey](#updateItemsByPrimaryKey)
--   [execute](#execute)
 -   [whereRaw](#whereRaw)
 -   [havingRaw](#havingRaw)
--   [transacting](#transacting)
 -   [truncate](#truncate)
 -   [distinct](#distinct)
 -   [clone](#clone)
