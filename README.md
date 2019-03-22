@@ -19,7 +19,20 @@ Install:
 
     npm install @wwwouter/typed-knex
 
-_Tested with Knex.js v0.16.3_
+Make sure experimentalDecorators and emitDecoratorMetadata are turned on in your tsconfig.json:
+
+```json
+{
+    "compilerOptions": {
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        ...
+    },
+    ...
+}
+```
+
+_Tested with Knex.js v0.16.3, TypeScript v3.3.4000 and Node.js v10.13.0_
 
 # Documentation
 
