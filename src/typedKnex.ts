@@ -66,11 +66,7 @@ export interface ITypedQueryBuilder<Model, Row> {
     andWhere: IWhere<Model, Row>;
     orWhere: IWhere<Model, Row>;
     whereNot: IWhere<Model, Row>;
-    // selectColumn: ISelectWithFunctionColumn<Model, Row extends Model ? {} : Row>;
-    // select: ISelectWithFunctionColumns2<Model, Row extends Model ? {} : Row>;
     select: ISelectWithFunctionColumns3<Model, Row extends Model ? {} : Row>;
-
-    // select2: ISelectWithFunctionColumns2<Model, Row extends Model ? {} : Row>;
 
     orderBy: IOrderBy<Model, Row>;
     innerJoinColumn: IKeyFunctionAsParametersReturnQueryBuider<Model, Row>;
@@ -81,9 +77,6 @@ export interface ITypedQueryBuilder<Model, Row> {
     whereNull: IColumnParamaterNoRowTransformation<Model, Row>;
     whereNotNull: IColumnParamaterNoRowTransformation<Model, Row>;
 
-    // innerJoinTable: IJoinTable<Model, Row>;
-    // leftOuterJoinTable: IJoinTable<Model, Row>;
-
     leftOuterJoinTableOnFunction: IJoinTableMultipleOnClauses<
         Model,
         Row extends Model ? {} : Row
@@ -91,7 +84,6 @@ export interface ITypedQueryBuilder<Model, Row> {
 
     selectRaw: ISelectRaw<Model, Row extends Model ? {} : Row>;
 
-    // findByColumn: IFindByColumn<Model, Row extends Model ? {} : Row>;
     findByPrimaryKey: IFindByPrimaryKey<Model, Row extends Model ? {} : Row>;
 
     whereIn: IWhereIn<Model, Row>;
@@ -190,49 +182,21 @@ export interface ITypedQueryBuilder<Model, Row> {
 
     clone(): ITypedQueryBuilder<Model, Row>;
 
-    // beginTransaction(): Promise<Knex.Transaction>;
     groupByRaw(
         sql: string,
         ...bindings: string[]
     ): ITypedQueryBuilder<Model, Row>;
-
-    // TBD
-    // returningColumn(): void;
-    // returningColumns(): void;
-    // increment(): void;
-    // decrement(): void;
 }
 
 type TransformAll<T, IT> = { [Key in keyof T]: IT };
-
-// type FilterObjectsOnly<T> = {
-//     [K in keyof T]: T[K] extends object ? K : never
-// }[keyof T];
 
 type ReturnNonObjectsNamesOnly<T> = {
     [K in keyof T]: T[K] extends object ? never : K
 }[keyof T];
 
-// type RemoveObjectsFrom<T, K extends ReturnNonObjectsNamesOnly<T>> = { [P in K]: [T[P]] };?
 type RemoveObjectsFrom<T> = { [P in ReturnNonObjectsNamesOnly<T>]: T[P] };
 
 type RemoveObjectsFrom2<T> = { [P in ReturnNonObjectsNamesOnly<T>]: T[P] };
-
-// class A{
-//     public a: string;
-//     public b: string;
-//     public c: String;
-// }
-
-// // // type AR = RemoveObjectsFrom<A, ReturnNonObjectsNamesOnly<A>>;
-// type AR = RemoveObjectsFrom<A>;
-
-// const ar = {} as AR;
-
-// console.log('ar: ', ar.a);
-// console.log('ar: ', ar.b);
-// console.log('ar: ', ar.c);
-// console.log('ar: ', ar.d);
 
 export type ObjectToPrimitive<T> = T extends String
     ? string
@@ -254,37 +218,6 @@ export type AddPropertyWithType<
     NewKeyType
 > = Original & Pick<TypeWithIndexerOf<NewKeyType>, NewKey>;
 
-// interface IKeysAsArguments<Model, Return> {
-//     <
-//         K1 extends keyof Model,
-//         K2 extends keyof Model[K1],
-//         K3 extends keyof Model[K1][K2]
-//     >(
-//         key1: K1,
-//         key2: K2,
-//         key3: K3,
-//         ...keys: string[]
-//     ): Return;
-//     <
-//         K1 extends keyof Model,
-//         K2 extends keyof Model[K1],
-//         K3 extends keyof Model[K1][K2]
-//     >(
-//         key1: K1,
-//         key2: K2,
-//         key3: K3
-//     ): Return;
-//     <K1 extends keyof Model, K2 extends keyof Model[K1]>(
-//         key1: K1,
-//         key2: K2
-//     ): Return;
-//     <K extends keyof Model>(key1: K): Return;
-// }
-
-// tslint:disable-next-line:no-empty-interfaces
-// interface IKeysAsParametersReturnQueryBuider<Model, Row>
-//     extends IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> {}
-
 interface IColumnParamaterNoRowTransformation<Model, Row> {
     <PropertyType1>(
         selectColumn1Function: (
@@ -293,71 +226,10 @@ interface IColumnParamaterNoRowTransformation<Model, Row> {
     ): ITypedQueryBuilder<Model, Row>;
 }
 
-// interface IJoinColumn<Model, Row> extends IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> {
-
-// }
-// interface IJoinColumn<Model, Row> {
-//     <K1 extends FilterObjectsOnly<Model>, K2 extends FilterObjectsOnly<Model[K1]>>(key1: K1, key2: K2, ...keys: string[]): ITypedQueryBuilder<Model, Row>;
-//     <K1 extends FilterObjectsOnly<Model>, K2 extends FilterObjectsOnly<Model[K1]>>(key1: K1, key2: K2): ITypedQueryBuilder<Model, Row>;
-//     <K extends FilterObjectsOnly<Model>>(key1: K): ITypedQueryBuilder<Model, Row>;
-
-// }
-
 export type TypeWithIndexerOf<T> = { [key: string]: T };
 
-// interface IJoinTable<Model, Row> {
-//     <
-//         NewPropertyType,
-//         NewPropertyKey extends keyof TypeWithIndexerOf<NewPropertyType>,
-//         L1K1 extends keyof AddPropertyWithType<
-//             Model,
-//             NewPropertyKey,
-//             NewPropertyType
-//         >,
-//         L2K1 extends keyof AddPropertyWithType<
-//             Model,
-//             NewPropertyKey,
-//             NewPropertyType
-//         >,
-//         L2K2 extends keyof AddPropertyWithType<
-//             Model,
-//             NewPropertyKey,
-//             NewPropertyType
-//         >[L2K1]
-//     >(
-//         newPropertyKey: NewPropertyKey,
-//         newPropertyClass: new () => NewPropertyType,
-//         column1: [L1K1] | [L2K1, L2K2],
-//         operator: Operator,
-//         column2: [L1K1] | [L2K1, L2K2]
-//     ): ITypedQueryBuilder<
-//         AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>,
-//         Row
-//     >;
-// }
-
-// interface IJoinOnClause<Model> {
-//     // <L1K1 extends keyof Model, L2K1 extends keyof Model, L2K2 extends keyof Model[L2K1]>(column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2]): IJoinOnClause<Model>;
-//     // <L1K1 extends keyof Model, L2K1 extends keyof Model, L2K2 extends keyof Model[L2K1]>(column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2]): IJoinOnClause<Model>;
-//     onColumns: <
-//         L1K1 extends keyof Model,
-//         L2K1 extends keyof Model,
-//         L2K2 extends keyof Model[L2K1]
-//     >(
-//         column1: [L1K1] | [L2K1, L2K2],
-//         operator: Operator,
-//         column2: [L1K1] | [L2K1, L2K2]
-//     ) => IJoinOnClause<Model>;
-//     onNull: IKeysAsParametersReturnQueryBuider<Model, IJoinOnClause<Model>>;
-// }
-
 interface IJoinOnClause2<Model, JoinedModel> {
-    // <L1K1 extends keyof Model, L2K1 extends keyof Model, L2K2 extends keyof Model[L2K1]>(column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2]): IJoinOnClause<Model>;
-    // <L1K1 extends keyof Model, L2K1 extends keyof Model, L2K2 extends keyof Model[L2K1]>(column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2]): IJoinOnClause<Model>;
     onColumns: <PropertyType1, PropertyType2>(
-        // L1K1 extends keyof Model,
-        // L2K1 extends keyof Model
-        // L2K2 extends keyof Model[L2K1]
         selectColumn1Function: (
             c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
         ) => () => PropertyType1,
@@ -371,7 +243,6 @@ interface IJoinOnClause2<Model, JoinedModel> {
             c: TransformPropsToFunctionsLevel1ReturnProperyType<JoinedModel>
         ) => () => X
     ) => void;
-    // onNull: IKeysAsParametersReturnQueryBuider<Model, IJoinOnClause2<Model>>;
 }
 
 interface IWhereCompareTwoColumns<Model, Row> {
@@ -382,18 +253,11 @@ interface IWhereCompareTwoColumns<Model, Row> {
         operator: Operator,
         selectColumn2Function: (
             c: TransformPropsToFunctionsLevel1ReturnProperyType<Model2>
-        ) => any // () => PropertyType2
+        ) => any
     ): ITypedQueryBuilder<Model, Row>;
 }
 
-// interface
-
-// // tslint:disable-next-line:no-empty-interfaces
-// interface IReferencedColumn {
-
-// }
 interface IJoinTableMultipleOnClauses<Model, Row> {
-    // <NewPropertyType, NewPropertyKey extends keyof TypeWithIndexerOf<NewPropertyType>, L1K1 extends keyof AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, L2K1 extends keyof AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, L2K2 extends keyof AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>[L2K1]>(newPropertyKey: NewPropertyKey, newPropertyClass: new () => NewPropertyType, column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2]): ITypedQueryBuilder<AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, Row>;
     <
         NewPropertyType,
         NewPropertyKey extends keyof TypeWithIndexerOf<NewPropertyType>
@@ -412,29 +276,6 @@ interface IJoinTableMultipleOnClauses<Model, Row> {
     >;
 }
 
-// interface IWhereCompareTwoColumns<Model, Row> {
-
-//     // (): { Left: () : { RIght: IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> } };
-
-//     // (): { left: IKeysAsArguments<Model, { right: IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> }> };
-
-//     <L1K1 extends keyof Model, L2K1 extends keyof Model, L2K2 extends keyof Model[L2K1]>(column1: [L1K1] | [L2K1, L2K2], operator: Operator, column2: [L1K1] | [L2K1, L2K2] | IReferencedColumn): ITypedQueryBuilder<Model, Row>;
-
-// }
-
-// NM extends AddPropertyWithType<Model, NewPropertyKey, NewPropertyType> werkt dat?
-
-// function pluck2<T, K extends keyof IndexType<T>, TO>(names: K, newClass: new () => T, oldClass: new () => TO): Pick<IndexType<T>, K> & TO {
-//     return {} as any;
-// }
-
-// interface IGroupBy<Model, Row> {
-//     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): ITypedQueryBuilder<Model, Row>;
-//     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): ITypedQueryBuilder<Model, Row>;
-//     <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): ITypedQueryBuilder<Model, Row>;
-//     <K extends keyof Model>(key1: K): ITypedQueryBuilder<Model, Row>;
-// }
-
 interface ISelectRaw<Model, Row> {
     <
         TReturn extends Boolean | String | Number,
@@ -448,128 +289,6 @@ interface ISelectRaw<Model, Row> {
         Pick<TypeWithIndexerOf<ObjectToPrimitive<TReturn>>, TName> & Row
     >;
 }
-
-// export type TransformAll<T, IT> = { [Key in keyof T]: IT };
-
-// export type FilterObjectsOnly<T> = {
-//     [K in keyof T]: T[K] extends object ? K : never
-// }[keyof T];
-// export type FilterNonObjects<T> = {
-//     [K in keyof T]: T[K] extends object ? never : K
-// }[keyof T];
-
-// export type ObjectToPrimitive<T> = T extends String
-//     ? string
-//     : T extends Number
-//     ? number
-//     : T extends Boolean
-//     ? boolean
-//     : never;
-
-// class RCO {
-//     id: string;
-//     name: string;
-//     no: boolean;
-//     user: {
-//         id: string;
-//         name: string;
-//         catetgory: string;
-//         getal: number;
-
-//         nogDieper: {
-//             nogId: string;
-//             nogNr: number;
-
-//             nog2Dieper: {
-//                 nog2Id: string;
-//                 nog2Nr: number;
-//             };
-//         };
-//     };
-// }
-
-// type TransformOs<T> = { [Key in keyof T]: { Key: boolean } };
-// //     [K in keyof T]: T[K] extends object ? never : K
-// // }[keyof T];
-
-// type MakeObject<T, T2> = T; // { [Key in keyof T]: T2 };
-
-// type Pick<T, K extends keyof T> = { [P in K]: T[P] };
-// type Pick2<T, K extends keyof T, TypeOfValue> = Pick<
-//     { [P in K]: TypeOfValue },
-//     K
-// >;
-
-// type Pick3<T, K extends keyof T> = Pick<{ [P in K]: () => T[P] }, K>;
-
-// type Readonly<T> = {
-//     [P in keyof T]: T[P] extends object
-//         ? Pick2<Readonly<T[P]>, keyof T[P], Pick3<T, P>>
-//         : () => Pick<T, P>
-// };
-
-// type TransformObjectsAndNonObject<T, TransformObject, TransformNonObject> = {
-//     [P in keyof T]: T[P] extends object ? TransformObject : TransformNonObject
-// };
-
-// type TypeWithOneGenericType<T> = T;
-
-// // type TransformObjectsAndNonObject2<T, K extends keyof T, TransformObject extends TypeWithOneGenericType<K>, TransformNonObject> = { [P in keyof T]: T[P] extends object ? TransformObject<string> : TransformNonObject };
-
-// // type Readonly<T> = {
-// //     [P in keyof T]: T[P] extends object
-// //         ? Pick2<Readonly<T[P]>, keyof T[P], () => Pick<T, P>>
-// //         : () => Pick<T, P>
-// // };
-
-// type PickAndTransform<T, K extends keyof T, NewType> = {
-//     [P in K]: () => PickAndTransform2<T, P, Pick<T, K>>
-// };
-
-// type PickAndTransform2<T, K extends keyof T, NewType> = { [P in K]: NewType };
-
-// type PickAndTransform3<T, K extends keyof T, NewType> = { [P in K]: NewType };
-
-// type Pick4<T, K extends keyof T> = Pick<{ [P in K]: () => T[P] }, K>;
-
-// type Pick5<T, K extends keyof T, T2> = { [P in K]: T2 };
-
-// type Pick6<P, T, K extends keyof T, T2> = { [P in K]: T2 };
-
-// //
-// // type Pick<T, K extends keyof T> = { [P in K]: T[P] };
-
-// type PickAndTransform4<
-//     M,
-//     ModelProperty extends keyof M,
-//     T,
-//     K extends keyof T
-// > = {
-//     [P in K]: () => PickAndTransform2<M, ModelProperty, Pick<T, P>> // { iets: P }> // Pick<T,K> // P = "category"
-// };
-
-// type TransformPropsToFunctions<T> = {
-//     [P in keyof T]: T[P] extends object // ? PickAndTransform3<T[P], keyof T[P], Pick5<T[P],keyof T[P], T>> // () => Pick<T, P> // Pick5<T[P], keyof T[P], Pick5<T[P],keyof T[P], T>> //T = RCO, P = "user", T[P] = {id .. getal}, keyof T[P] ["id", .. , "getal"]
-//         ? PickAndTransform4<T, P, T[P], keyof T[P]> // Pick5<T[P], keyof T[P], Pick5<T[P],keyof T[P], T>>
-//         : () => Pick<T, P>
-// };
-
-// type PickAndTransform5<
-//     M,
-//     ModelProperty extends keyof M,
-//     T,
-//     K extends keyof T
-// > = {
-//     [P in K]: T[P] extends object
-//         ? any
-//         : () => PickAndTransform2<M, ModelProperty, Pick<T, P>> // { iets: P }> // Pick<T,K> // P = "category"
-// };
-
-// type TransformPropsToFunctions2<T> = {
-//     [P in keyof T]: T[P] extends object // ? PickAndTransform3<T[P], keyof T[P], Pick5<T[P],keyof T[P], T>> // () => Pick<T, P> // Pick5<T[P], keyof T[P], Pick5<T[P],keyof T[P], T>> //T = RCO, P = "user", T[P] = {id .. getal}, keyof T[P] ["id", .. , "getal"]
-//         ? PickAndTransform5<T, P, T[P], keyof T[P]> // Pick5<T[P], keyof T[P], Pick5<T[P],keyof T[P], T>>
-//         : () => Pick<T, P>
-// };
 
 type PickAndChangeType<T, K extends keyof T, NewType> = { [P in K]: NewType };
 
@@ -803,61 +522,6 @@ type TransformPropsToFunctionsLevel1ReturnProperyName<Level1Type> = {
         : (() => Level1Property)
 };
 
-// type TransformPropsToFunctions<T> = {
-//     [P in keyof T]: T[P] extends object // ? PickAndTransform3<T[P], keyof T[P], Pick5<T[P],keyof T[P], T>> // () => Pick<T, P> // Pick5<T[P], keyof T[P], Pick5<T[P],keyof T[P], T>> //T = RCO, P = "user", T[P] = {id .. getal}, keyof T[P] ["id", .. , "getal"]
-//         ? PickAndTransform4<T, P, T[P], keyof T[P]> // Pick5<T[P], keyof T[P], Pick5<T[P],keyof T[P], T>>
-//         : () => Pick<T, P>
-// };
-
-// type RCO2 = TransformPropsToFunctionsLevel1<RCO>;
-
-// const t6 = {} as RCO2;
-
-// console.log(t6.user.catetgory!().user.catetgory);
-// console.log(t6.user.nogDieper.nogId!().user.nogDieper.nogId);
-// console.log(t6.user.nogDieper.nog2Dieper.nog2Id!());
-// console.log(
-//     t6.user.nogDieper.nog2Dieper.nog2Id!().user.nogDieper.nog2Dieper.nog2Id
-// );
-// console.log(t6.user.nogDieper.nog2Dieper.nog2Id);
-
-// //.t6.user.id;
-
-// // t6.id.Key
-// type Z = Pick<RCO, 'name'>;
-
-// const z1 = {} as Z;
-
-// z1.name;
-
-// class RC {
-//     id: () => { id: string };
-//     user: {
-//         id: () => { id: string };
-//         name: () => { user: { name: string } };
-//     };
-// }
-
-// const t = {} as RC;
-
-// function result<Model, T>(
-//     subQueryModel: new () => Model,
-//     f: (m: Model) => () => T
-// ): T {
-//     return {} as any;
-// }
-
-// const rT = result(RC, i => i.user.name);
-
-// rT.user.name;
-
-// interface ISelectColumn<Model, Row> {
-//     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, TransformAll<Pick<Model[K1][K2], K3>, any>>> & Row>;
-//     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, TransformAll<Pick<Model[K1], K2>, Pick<Model[K1][K2], K3>>> & Row>;
-//     <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Row>;
-//     <K extends keyof Model>(key1: K): ITypedQueryBuilder<Model, Pick<Model, K> & Row>;
-// }
-
 interface IColumnFunctionReturnNewRow<Model> {
     <
         K1 extends keyof Model,
@@ -905,64 +569,6 @@ export function a(i: [string, string?]) {
     return i;
 }
 
-// interface IColumnFunctionReturnPropertyType<Model> {
-//     <
-//         K1 extends keyof Model,
-//         K2 extends keyof Model[K1],
-//         K3 extends keyof Model[K1][K2]
-//     >(
-//         key1: K1,
-//         key2: K2,
-//         key3: K3,
-//         ...keys: string[]
-//     ): any;
-//     <
-//         K1 extends keyof Model,
-//         K2 extends keyof Model[K1],
-//         K3 extends keyof Model[K1][K2]
-//     >(
-//         key1: K1,
-//         key2: K2,
-//         key3: K3
-//     ): Model[K1][K2][K3];
-//     <K1 extends keyof Model, K2 extends keyof Model[K1]>(
-//         key1: K1,
-//         key2: K2
-//     ): Model[K1][K2];
-//     <K extends keyof Model>(key1: K): Model[K];
-// }
-
-// interface IColumnFunctionReturnColumnName<Model> {
-//     <
-//         K1 extends keyof Model,
-//         K2 extends keyof Model[K1],
-//         K3 extends keyof Model[K1][K2]
-//     >(
-//         key1: K1,
-//         key2: K2,
-//         key3: K3,
-//         ...keys: string[]
-//     ): string;
-//     <
-//         K1 extends keyof Model,
-//         K2 extends keyof Model[K1],
-//         K3 extends keyof Model[K1][K2]
-//     >(
-//         key1: K1,
-//         key2: K2,
-//         key3: K3
-//     ): string;
-//     <K1 extends keyof Model, K2 extends keyof Model[K1]>(
-//         key1: K1,
-//         key2: K2
-//     ): string;
-//     <K extends keyof Model>(key1: K): string;
-// }
-
-// interface ISelectWithFunctionColumn<Model, Row> {
-//     <NewRow>(selectColumnFunction: (c: IColumnFunctionReturnNewRow<Model>) => NewRow): ITypedQueryBuilder<Model, Row & NewRow>;
-// }
-
 interface IOrderBy<Model, Row> {
     <NewRow>(
         selectColumnFunction: (
@@ -983,179 +589,6 @@ interface IDbFunctionWithAlias<Model, Row> {
         Pick<TypeWithIndexerOf<ObjectToPrimitive<NewPropertyType>>, TName> & Row
     >;
 }
-
-// interface ISelectWithFunctionColumns<Model, Row> {
-//     <
-//         R1,
-//         R2,
-//         R3,
-//         R4,
-//         R5,
-//         R6,
-//         R7,
-//         R8,
-//         R9,
-//         R10,
-//         R11,
-//         R12,
-//         R13,
-//         R14,
-//         R15,
-//         R16,
-//         R17,
-//         R18,
-//         R19
-//     >(
-//         selectColumnFunction: [
-//             ((c: IColumnFunctionReturnNewRow<Model>) => R1),
-//             ((c: IColumnFunctionReturnNewRow<Model>) => R2)?,
-//             ((c: IColumnFunctionReturnNewRow<Model>) => R3)?,
-//             ((c: IColumnFunctionReturnNewRow<Model>) => R4)?,
-//             ((c: IColumnFunctionReturnNewRow<Model>) => R5)?,
-//             ((c: IColumnFunctionReturnNewRow<Model>) => R6)?,
-//             ((c: IColumnFunctionReturnNewRow<Model>) => R7)?,
-//             ((c: IColumnFunctionReturnNewRow<Model>) => R8)?,
-//             ((c: IColumnFunctionReturnNewRow<Model>) => R9)?,
-//             ((c: IColumnFunctionReturnNewRow<Model>) => R10)?,
-//             ((c: IColumnFunctionReturnNewRow<Model>) => R11)?,
-//             ((c: IColumnFunctionReturnNewRow<Model>) => R12)?,
-//             ((c: IColumnFunctionReturnNewRow<Model>) => R13)?,
-//             ((c: IColumnFunctionReturnNewRow<Model>) => R14)?,
-//             ((c: IColumnFunctionReturnNewRow<Model>) => R15)?,
-//             ((c: IColumnFunctionReturnNewRow<Model>) => R16)?,
-//             ((c: IColumnFunctionReturnNewRow<Model>) => R17)?,
-//             ((c: IColumnFunctionReturnNewRow<Model>) => R18)?,
-//             ((c: IColumnFunctionReturnNewRow<Model>) => R19)?
-//         ]
-//     ): ITypedQueryBuilder<
-//         Model,
-//         Row &
-//             R1 &
-//             R2 &
-//             R3 &
-//             R4 &
-//             R5 &
-//             R6 &
-//             R7 &
-//             R8 &
-//             R8 &
-//             R9 &
-//             R10 &
-//             R11 &
-//             R12 &
-//             R13 &
-//             R14 &
-//             R15 &
-//             R16 &
-//             R17 &
-//             R18 &
-//             R18 &
-//             R19
-//     >;
-//     // <NewRow>(selectColumnFunction: [((c: IColumnFunctionReturnNewRow<Model>) => NewRow)]): ITypedQueryBuilder<Model, Row & NewRow>;
-// }
-
-// interface ISelectWithFunctionColumns2<Model, Row> {
-//     <
-//         R1,
-//         R2,
-//         R3,
-//         R4,
-//         R5,
-//         R6,
-//         R7,
-//         R8,
-//         R9,
-//         R10,
-//         R11,
-//         R12,
-//         R13,
-//         R14,
-//         R15,
-//         R16,
-//         R17,
-//         R18,
-//         R19,
-//         R20,
-//         R21,
-//         R22,
-//         R23,
-//         R24,
-//         R25,
-//         R26,
-//         R27,
-//         R28,
-//         R29
-//     >(
-//         selectColumnFunction: [
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R1),
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R2)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R3)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R4)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R5)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R6)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R7)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R8)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R9)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R10)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R11)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R12)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R13)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R14)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R15)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R16)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R17)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R18)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R19)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R20)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R21)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R22)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R23)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R24)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R25)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R26)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R27)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R28)?,
-//             ((c: TransformPropsToFunctionsLevel1<Model>) => () => R29)?
-//         ]
-//     ): ITypedQueryBuilder<
-//         Model,
-//         Row &
-//             R1 &
-//             R2 &
-//             R3 &
-//             R4 &
-//             R5 &
-//             R6 &
-//             R7 &
-//             R8 &
-//             R8 &
-//             R9 &
-//             R10 &
-//             R11 &
-//             R12 &
-//             R13 &
-//             R14 &
-//             R15 &
-//             R16 &
-//             R17 &
-//             R18 &
-//             R18 &
-//             R19 &
-//             R20 &
-//             R21 &
-//             R22 &
-//             R23 &
-//             R24 &
-//             R25 &
-//             R26 &
-//             R27 &
-//             R28 &
-//             R28 &
-//             R29
-//     >;
-//     // <NewRow>(selectColumnFunction: [((c: IColumnFunctionReturnNewRow<Model>) => () => NewRow)]): ITypedQueryBuilder<Model, Row & NewRow>;
-// }
 
 type TransformPropsToFunctionsLevel1NextLevel<Level1Type> = {
     [Level1Property in keyof Level1Type]: Level1Type[Level1Property] extends object
@@ -1274,148 +707,6 @@ interface ISelectWithFunctionColumns3<Model, Row> {
     ): ITypedQueryBuilder<Model, Row & R1>;
 }
 
-// interface IColumnFunctionReturnNewRow2<Model> {
-//     <
-//         K1 extends keyof Model,
-//         K2 extends keyof Model[K1],
-//         K3 extends keyof Model[K1][K2]
-//     >(
-//         key1: K1,
-//         key2: K2,
-//         key3: K3,
-//         ...keys: string[]
-//     ): TransformAll<
-//         Pick<Model, K1>,
-//         TransformAll<
-//             Pick<Model[K1], K2>,
-//             TransformAll<Pick<Model[K1][K2], K3>, any>
-//         >
-//     >;
-//     <
-//         K1 extends keyof Model,
-//         K2 extends keyof Model[K1],
-//         K3 extends keyof Model[K1][K2]
-//     >(
-//         key1: K1,
-//         key2: K2,
-//         key3: K3
-//     ): TransformAll<
-//         Pick<Model, K1>,
-//         TransformAll<Pick<Model[K1], K2>, Pick<Model[K1][K2], K3>>
-//     >;
-//     <K1 extends keyof Model, K2 extends keyof Model[K1]>(
-//         key1: K1,
-//         key2: K2
-//     ): TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>>;
-//     <K extends keyof Model>(key1: K): Pick<Model, K>;
-// }
-
-// interface IFindByColumn<Model, Row> {
-//     <
-//         PropertyType,
-//         R1,
-//         R2,
-//         R3,
-//         R4,
-//         R5,
-//         R6,
-//         R7,
-//         R8,
-//         R9,
-//         R10,
-//         R11,
-//         R12,
-//         R13,
-//         R14,
-//         R15,
-//         R16,
-//         R17,
-//         R18,
-//         R19,
-//         R20,
-//         R21,
-//         R22,
-//         R23,
-//         R24,
-//         R25,
-//         R26,
-//         R27,
-//         R28,
-//         R29
-//     >(
-//         whereColumnFunction: (
-//             c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
-//         ) => () => PropertyType,
-//         value: PropertyType,
-//         selectColumnFunction: (
-//             c: TransformPropsToFunctionsOnlyLevel1<Model>
-//         ) => [
-//             () => R1,
-//             (() => R2)?,
-//             (() => R3)?,
-//             (() => R4)?,
-//             (() => R5)?,
-//             (() => R6)?,
-//             (() => R7)?,
-//             (() => R8)?,
-//             (() => R9)?,
-//             (() => R10)?,
-//             (() => R12)?,
-//             (() => R13)?,
-//             (() => R14)?,
-//             (() => R15)?,
-//             (() => R16)?,
-//             (() => R17)?,
-//             (() => R18)?,
-//             (() => R19)?,
-//             (() => R20)?,
-//             (() => R22)?,
-//             (() => R23)?,
-//             (() => R24)?,
-//             (() => R25)?,
-//             (() => R26)?,
-//             (() => R27)?,
-//             (() => R28)?,
-//             (() => R29)?
-//         ]
-//     ): Promise<
-//         | Row &
-//               R1 &
-//               R2 &
-//               R3 &
-//               R4 &
-//               R5 &
-//               R6 &
-//               R7 &
-//               R8 &
-//               R8 &
-//               R9 &
-//               R10 &
-//               R11 &
-//               R12 &
-//               R13 &
-//               R14 &
-//               R15 &
-//               R16 &
-//               R17 &
-//               R18 &
-//               R18 &
-//               R19 &
-//               R20 &
-//               R21 &
-//               R22 &
-//               R23 &
-//               R24 &
-//               R25 &
-//               R26 &
-//               R27 &
-//               R28 &
-//               R28 &
-//               R29
-//         | void
-//     >;
-// }
-
 interface IFindByPrimaryKey<Model, Row> {
     <
         R1,
@@ -1518,16 +809,6 @@ interface IFindByPrimaryKey<Model, Row> {
     >;
 }
 
-// interface ISelectColumns<Model, Row> {
-//     <Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, keys2: K2[]): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev>;
-//     <K extends FilterNonObjects<Model>>(keys: K[]): ITypedQueryBuilder<Model, Pick<Model, K> & Row>;
-// }
-
-// interface ISelectColumns<Model, Row> {
-//     <Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, keys2: K2[]): ITypedQueryBuilder<Model, TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev>;
-//     <K extends FilterNonObjects<Model>>(keys: K[]): ITypedQueryBuilder<Model, Pick<Model, K> & Row>;
-// }
-
 interface IKeyFunctionAsParametersReturnQueryBuider<Model, Row> {
     (
         selectColumnFunction: (
@@ -1535,31 +816,6 @@ interface IKeyFunctionAsParametersReturnQueryBuider<Model, Row> {
         ) => void
     ): ITypedQueryBuilder<Model, Row>;
 }
-
-// interface IKeysAsArguments<Model, Return> {
-
-//     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): Return;
-//     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): Return;
-//     <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): Return;
-//     <K extends keyof Model>(key1: K): Return;
-
-// }
-
-// // tslint:disable-next-line:no-empty-interfaces
-// interface IKeyFunctionAsParametersReturnQueryBuider<Model, Row> extends IKeysAsArguments<Model, ITypedQueryBuilder<Model, Row>> {
-// }
-
-// interface IReferenceColumn<Model> {
-//     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keys: string[]): IReferencedColumn;
-//     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3): IReferencedColumn;
-//     <K1 extends keyof Model, K2 extends keyof Model[K1]>(key1: K1, key2: K2): IReferencedColumn;
-//     <K extends keyof Model>(key1: K): IReferencedColumn;
-// }
-
-// interface IFindById<Model, Row> {
-//     <Prev extends Row, K1 extends FilterObjectsOnly<Model>, K2 extends FilterNonObjects<Model[K1]>>(id: string, key1: K1, keys2: K2[]): Promise<TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>> & Prev | void>;
-//     <K extends FilterNonObjects<Model>>(id: string, keys: K[]): Promise<Pick<Model, K> & Row | void>;
-// }
 
 interface IWhere<Model, Row> {
     <PropertyType>(
@@ -1596,11 +852,6 @@ interface IHaving<Model, Row> {
         operator: Operator,
         value: PropertyType
     ): ITypedQueryBuilder<Model, Row>;
-
-    // <K extends FilterNonObjects<Model>>(key1: K, operator: Operator, value: Model[K]): ITypedQueryBuilder<Model, Row>;
-    // <K1 extends keyof Model, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, key2: K2, operator: Operator, value: Model[K1][K2]): ITypedQueryBuilder<Model, Row>;
-    // <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends FilterNonObjects<Model[K1][K2]>>(key1: K1, key2: K2, key3: K3, operator: Operator, value: Model[K1][K2][K3]): ITypedQueryBuilder<Model, Row>;
-    // <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keysOperratorAndValue: any[]): ITypedQueryBuilder<Model, Row>;
 }
 
 interface IWhereCompareTwoColumns<Model, Row> {
@@ -1611,16 +862,9 @@ interface IWhereCompareTwoColumns<Model, Row> {
         operator: Operator,
         selectColumn2Function: (
             c: TransformPropsToFunctionsLevel1ReturnProperyType<Model2>
-        ) => any // () => PropertyType2
+        ) => any
     ): ITypedQueryBuilder<Model, Row>;
 }
-
-// interface IWhereBetween<Model, Row> {
-//     <K extends FilterNonObjects<Model>>(key1: K, range: [Model[K], Model[K]]): ITypedQueryBuilder<Model, Row>;
-//     <K1 extends keyof Model, K2 extends FilterNonObjects<Model[K1]>>(key1: K1, key2: K2, range: [Model[K1][K2], Model[K1][K2]]): ITypedQueryBuilder<Model, Row>;
-//     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends FilterNonObjects<Model[K1][K2]>>(key1: K1, key2: K2, key3: K3, range: [Model[K1][K2][K3], Model[K1][K2][K3]]): ITypedQueryBuilder<Model, Row>;
-//     <K1 extends keyof Model, K2 extends keyof Model[K1], K3 extends keyof Model[K1][K2]>(key1: K1, key2: K2, key3: K3, ...keysAndValues: any[]): ITypedQueryBuilder<Model, Row>;
-// }
 
 interface IWhereExists<Model, Row> {
     <SubQueryModel>(
@@ -1685,10 +929,7 @@ function getProxyAndMemoriesForArray<ModelType, Row>(
 ) {
     const result = [] as string[][];
 
-    // result.push([]);
     let counter = -1;
-
-    // let memories = [] as string[];
 
     function allGet(_target: any, name: any): any {
         if (_target.level === 0) {
@@ -1915,16 +1156,6 @@ class TypedQueryBuilder<ModelType, Row = {}>
         return unflatten(items[0]);
     }
 
-    // public selectColumn() {
-    //     if (arguments.length === 1) {
-    //         this.queryBuilder.select(this.getColumnName(arguments[0]) + ' as ' + arguments[0]);
-    //     } else {
-
-    //         this.queryBuilder.select(this.getColumnName(...arguments) + ' as ' + this.getColumnSelectAlias(...arguments));
-    //     }
-    //     return this as any;
-    // }
-
     public selectColumn() {
         let calledArguments = [] as string[];
 
@@ -1942,49 +1173,6 @@ class TypedQueryBuilder<ModelType, Row = {}>
 
         return this as any;
     }
-
-    // public select() {
-    //     const functions = arguments[0];
-
-    //     for (const f of functions) {
-    //         (this.selectColumn as any)(f);
-    //         // const args = this.getArgumentsFromColumnFunction(f);
-
-    //         // if (args.length === 1) {
-    //         //     this.queryBuilder.select(this.getColumnName(key));
-    //         // } else {
-
-    //         //     this.queryBuilder.select(this.getColumnName(arguments[0], key) + ' as ' + this.getColumnSelectAlias(arguments[0], key));
-    //         // }
-    //     }
-
-    //     // const argumentsKeys = arguments[arguments.length - 1];
-    //     // for (const key of argumentsKeys) {
-    //     //     if (arguments.length === 1) {
-    //     //         this.queryBuilder.select(this.getColumnName(key));
-    //     //     } else {
-
-    //     //         this.queryBuilder.select(this.getColumnName(arguments[0], key) + ' as ' + this.getColumnSelectAlias(arguments[0], key));
-    //     //     }
-    //     // }
-    //     return this as any;
-    // }
-
-    // public select() {
-    //     const functions = arguments[0];
-
-    //     for (const f of functions) {
-    //         const columnArguments = this.getArgumentsFromColumnFunction(f);
-
-    //         this.queryBuilder.select(
-    //             this.getColumnName(...columnArguments) +
-    //                 ' as ' +
-    //                 this.getColumnSelectAlias(...columnArguments)
-    //         );
-    //     }
-
-    //     return this as any;
-    // }
 
     public getArgumentsFromColumnFunction3(f: any) {
         const { root, result } = getProxyAndMemoriesForArray();
@@ -2010,15 +1198,11 @@ class TypedQueryBuilder<ModelType, Row = {}>
     }
 
     public orderBy() {
-        // if (arguments.length === 1) {
         this.queryBuilder.orderBy(
             this.getColumnNameWithoutAliasFromFunction(arguments[0]),
             arguments[1]
         );
-        // } else {
 
-        //     this.queryBuilder.orderBy(this.getColumnSelectAlias(...arguments));
-        // }
         return this as any;
     }
 
@@ -2175,23 +1359,12 @@ class TypedQueryBuilder<ModelType, Row = {}>
         if (typeof arguments[2] === 'string') {
             column2Name = arguments[2];
         } else if (arguments[2].memories !== undefined) {
-            // column2Name = arguments[2];
-            column2Name = arguments[2].getColumnName; // parent this nodig ...
+            column2Name = arguments[2].getColumnName; // parent this needed ...
         } else {
             column2Name = this.getColumnName(
                 ...this.getArgumentsFromColumnFunction(arguments[2])
             );
         }
-
-        // const column2Name = this.getColumnName(...this.getArgumentsFromColumnFunction(arguments[2]));
-        // const column2Parts = arguments[2];
-
-        // let column2Name;
-        // if (typeof (column2Parts) === 'string') {
-        //     column2Name = column2Parts;
-        // } else {
-        //     column2Name = this.getColumnName(...column2Parts);
-        // }
 
         this.queryBuilder.whereRaw(`?? ${operator} ??`, [
             column1Name,
@@ -2230,32 +1403,6 @@ class TypedQueryBuilder<ModelType, Row = {}>
 
         return memories;
     }
-
-    // public async findByColumn() {
-    //     const functions = arguments[2];
-
-    //     // for (const f of functions) {
-    //     //     (this.selectColumn as any)(f);
-
-    //     // }
-
-    //     for (const f of functions) {
-    //         const columnArguments = this.getArgumentsFromColumnFunction(f);
-
-    //         this.queryBuilder.select(
-    //             this.getColumnName(...columnArguments) +
-    //                 ' as ' +
-    //                 this.getColumnSelectAlias(...columnArguments)
-    //         );
-    //     }
-
-    //     this.queryBuilder.where(
-    //         this.getColumnNameWithoutAliasFromFunction(arguments[0]),
-    //         arguments[1]
-    //     );
-
-    //     return await this.queryBuilder.first();
-    // }
 
     public async findByPrimaryKey() {
         const primaryKeyColumnInfo = getPrimaryKeyColumn(this.tableClass);
@@ -2408,16 +1555,13 @@ class TypedQueryBuilder<ModelType, Row = {}>
 
             functionToCall(
                 new TypedQueryBuilder(typeOfSubQuery, that.knex, subQuery),
-                root, //  that.getColumnName.bind(that)
+                root,
                 memories
             );
         });
     }
 
     public whereParentheses() {
-        // const typeOfSubQuery = arguments[0];
-        // const functionToCall = arguments[1];
-
         this.callQueryCallbackFunction('where', this.tableClass, arguments[0]);
 
         return this;
@@ -2786,28 +1930,6 @@ class TypedQueryBuilder<ModelType, Row = {}>
             }
             return columnName;
         }
-
-        // let currentClass = this.tableClass;
-        // let result = this.tableName;
-        // for (let i = 0; i < keys.length; i++) {
-        //     const currentColumnPart = getColumnInformation(currentClass, keys[i]);
-        //     result += '.' + currentColumnPart.name;
-        //     currentClass = currentColumnPart.columnClass;
-        // }
-
-        // return result;
-
-        // if (keys.length === 1) {
-        //     return this.tableName + '.' + keys[0];
-        // } else {
-        //     let columnName = keys[0];
-        //     let columnAlias = keys[0];
-        //     for (let i = 1; i < keys.length; i++) {
-        //         columnName = columnAlias + '.' + keys[i];
-        //         columnAlias += '_' + keys[i];
-        //     }
-        //     return columnName;
-        // }
     }
 
     private functionWithAlias(
@@ -2855,13 +1977,9 @@ class TypedQueryBuilder<ModelType, Row = {}>
             secondColumnAlias =
                 beforeSecondColumnAlias + '_' + columnInfo.propertyKey;
             secondColumnClass = columnInfo.columnClass;
-
-            // firstColumnAlias = beforeSecondColumnAlias;
-            // firstColumnClass = beforeSecondColumnClass;
         }
 
         const tableToJoinName = getTableMetadata(secondColumnClass).tableName;
-        // const tableToJoinAlias = tableToJoinName.replace('.', '_');
         const tableToJoinAlias = secondColumnAlias;
         const tableToJoinJoinColumnName = `${tableToJoinAlias}.${
             getPrimaryKeyColumn(secondColumnClass).name
@@ -2881,37 +1999,6 @@ class TypedQueryBuilder<ModelType, Row = {}>
             );
         }
 
-        // let firstColumnAlias = this.tableName;
-        // let firstColumnClass = this.tableClass;
-        // let secondColumnAlias = columnToJoinArguments[0];
-        // let secondColumnName = columnToJoinArguments[0];
-        // let secondColumnClass = getColumnInformation(firstColumnClass, secondColumnAlias).columnClass;
-
-        // for (let i = 1; i < columnToJoinArguments.length; i++) {
-        //     const beforeSecondColumnAlias = secondColumnAlias;
-        //     const beforeSecondColumnClass = secondColumnClass;
-
-        //     secondColumnName = columnToJoinArguments[i];
-        //     secondColumnAlias = beforeSecondColumnAlias + '_' + columnToJoinArguments[i];
-        //     secondColumnClass = getColumnInformation(beforeSecondColumnClass, columnToJoinArguments[i]).columnClass;
-
-        //     firstColumnAlias = beforeSecondColumnAlias;
-        //     firstColumnClass = beforeSecondColumnClass;
-        // }
-        // // tableToJoinJoinColumnName = getPrimaryKeyColumn(getColumnProperties);
-
-        // const tableToJoinName = getTableMetadata(secondColumnClass).tableName;
-        // const tableToJoinAlias = secondColumnAlias;
-        // const tableToJoinJoinColumnName = `${tableToJoinAlias}.${getPrimaryKeyColumn(secondColumnClass)}`;
-        // const tableJoinedColumnName = `${firstColumnAlias}.${secondColumnName}Id`;
-
-        // if (joinType === 'innerJoin') {
-        //     this.queryBuilder.innerJoin(`${tableToJoinName} as ${tableToJoinAlias}`, tableToJoinJoinColumnName, tableJoinedColumnName);
-        // } else if (joinType === 'leftOuterJoin') {
-        //     this.queryBuilder.leftOuterJoin(`${tableToJoinName} as ${tableToJoinAlias}`, tableToJoinJoinColumnName, tableJoinedColumnName);
-
-        // }
-
         return this;
     }
 
@@ -2927,15 +2014,11 @@ class TypedQueryBuilder<ModelType, Row = {}>
             const columnInfo = getColumnInformation(this.tableClass, keys[0]);
             return this.tableName + '.' + columnInfo.name;
         } else {
-            // let currentClass = this.tableClass;
-            // let result = '';
-
             let currentColumnPart = getColumnInformation(
                 this.tableClass,
                 keys[0]
             );
 
-            // let columnName = '';
             let result = currentColumnPart.propertyKey;
             let currentClass = currentColumnPart.columnClass;
 
@@ -2951,31 +2034,7 @@ class TypedQueryBuilder<ModelType, Row = {}>
 
             return result;
         }
-
-        // if (keys.length === 1) {
-        //     return this.tableName + '.' + keys[0];
-        // } else {
-        //     let columnName = keys[0];
-        //     // let columnAlias = keys[0];
-        //     for (let i = 1; i < keys.length; i++) {
-        //         columnName = columnName + '.' + keys[i];
-        //         // columnAlias += '_' + keys[i];
-        //     }
-        //     return columnName;
-        // }
     }
-
-    // private getColumnAlias(...keys: string[]): string {
-    //     if (arguments.length === 1) {
-    //         return arguments[0];
-    //     } else {
-    //         let columnAlias = arguments[0];
-    //         for (let i = 1; i < arguments.length; i++) {
-    //             columnAlias += '_' + arguments[i];
-    //         }
-    //         return columnAlias;
-    //     }
-    // }
 
     private getColumnSelectAlias(...keys: string[]): string {
         if (keys.length === 1) {
