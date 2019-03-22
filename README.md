@@ -107,7 +107,7 @@ const typedKnex = new TypedKnex(knex);
 -   [toQuery](#toQuery)
 -   [useKnexQueryBuilder](#useKnexQueryBuilder)
 
-### Get results (Promises)
+### Getting the results (Promises)
 
 -   [findByPrimaryKey](#findByPrimaryKey)
 -   [getFirstOrNull](#getFirstOrNull)
@@ -125,7 +125,7 @@ const typedKnex = new TypedKnex(knex);
 -   [updateItemsByPrimaryKey](#updateItemsByPrimaryKey)
 -   [execute](#execute)
 
-### Building query
+### Building the query
 
 -   [select](#select)
 -   [where](#where)
