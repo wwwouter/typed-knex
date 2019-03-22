@@ -155,6 +155,7 @@ const typedKnex = new TypedKnex(knex);
 -   [updateItem](#updateItem)
 -   [updateItemByPrimaryKey](#updateItemByPrimaryKey)
 -   [updateItemsByPrimaryKey](#updateItemsByPrimaryKey)
+-   [execute](#execute)
 -   [whereRaw](#whereRaw)
 -   [havingRaw](#havingRaw)
 -   [transacting](#transacting)
@@ -710,6 +711,12 @@ typedKnex.query(User);
 ```
 
 ### updateItemsByPrimaryKey
+
+```ts
+typedKnex.query(User);
+```
+
+### execute
 
 ```ts
 typedKnex.query(User);

@@ -173,7 +173,7 @@ export interface ITypedQueryBuilder<Model, Row> {
             data: Partial<RemoveObjectsFrom2<Model>>;
         }[]
     ): Promise<void>;
-
+    execute(): Promise<void>;
     whereRaw(
         sql: string,
         ...bindings: string[]
@@ -1847,6 +1847,10 @@ class TypedQueryBuilder<ModelType, Row = {}>
             }
             await finalQuery;
         }
+    }
+
+    public async execute() {
+        await this.queryBuilder;
     }
 
     public limit(value: number) {
