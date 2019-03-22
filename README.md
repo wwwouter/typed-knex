@@ -8,6 +8,8 @@
 
     npm install @wwwouter/typed-knex
 
+Tested with Knex.js v0.16.3
+
 # Documentation
 
 ## Quick example
