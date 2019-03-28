@@ -36,7 +36,6 @@ export class User {
     public category!: UserCategory;
     @Column()
     public categoryId!: string;
-    @Column()
     @Column({ name: 'category2Id' })
     public category2!: UserCategory;
 }
