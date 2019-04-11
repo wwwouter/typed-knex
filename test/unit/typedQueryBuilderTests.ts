@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import * as knex from 'knex';
 import { getEntities } from '../../src';
-import { TypedKnex } from '../../src/typedKnex';
+import { setToNull, TypedKnex, unflatten } from '../../src/typedKnex';
 import { User, UserSetting } from '../testEntities';
 
 describe('TypedKnexQueryBuilder', () => {
@@ -1094,6 +1094,28 @@ describe('TypedKnexQueryBuilder', () => {
 
         done();
     });
+
+    it('should removeNullObjects', done => {
+        const result = {
+            id: 'id',
+            'element.id': null,
+            'element.category.id': null,
+            'unit.category.id': null,
+            'category.name': 'cat name'
+        };
+        const flattened = unflatten([result]);
+        assert.isNull(flattened[0].element.id);
+        assert.isNull(flattened[0].unit.category.id);
+        assert.equal(flattened[0].category.name, 'cat name');
+        const nulled = setToNull(flattened);
+        assert.isNull(nulled[0].element);
+        assert.equal(nulled[0].category.name, 'cat name');
+        assert.isNull(nulled[0].unit);
+
+        done();
+    });
+
+    //
 
     // it('should stay commented out', async done => {
     //     const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));

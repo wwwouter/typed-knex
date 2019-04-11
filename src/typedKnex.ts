@@ -15,6 +15,57 @@ export function unflatten(o: any): any {
     return flat.unflatten(o);
 }
 
+function areAllPropertiesNull(o: any) {
+    if (o === null || o === undefined) {
+        return false;
+    }
+    const keys = Object.keys(o);
+    if (keys.length === 0) {
+        return false;
+    }
+    let allNull = true;
+    for (const key of keys) {
+        if (o[key] !== null) {
+            allNull = false;
+            break;
+        }
+    }
+    return allNull;
+}
+
+export function setToNull(o: any): any {
+    if (o instanceof Array) {
+        return o.map(i => setToNull(i));
+    } else {
+        if (o !== null && o !== undefined) {
+            const keys = Object.keys(o);
+            for (const key of keys) {
+                if (typeof o[key] === 'object') {
+                    setToNull(o[key]);
+                    if (areAllPropertiesNull(o[key])) {
+                        o[key] = null;
+                    }
+                }
+            }
+        }
+    }
+    return o;
+}
+
+export function flattenByOption(o: any, flattenOption?: FlattenOption) {
+    if (flattenOption === FlattenOption.noFlatten) {
+        return o;
+    }
+    const unflattened = unflatten(o);
+    if (
+        flattenOption === undefined ||
+        flattenOption === FlattenOption.flatten
+    ) {
+        return unflattened;
+    }
+    return setToNull(unflattened);
+}
+
 export class TypedKnex {
     constructor(private knex: Knex) {}
 
@@ -57,6 +108,12 @@ class NotImplementedError extends Error {
     constructor() {
         super('Not implemented');
     }
+}
+
+export enum FlattenOption {
+    flatten = 'flatten',
+    noFlatten = 'noFlatten',
+    flattenAndSetToNull = 'flattenAndSetToNull'
 }
 
 export interface ITypedQueryBuilder<Model, Row> {
@@ -144,11 +201,11 @@ export interface ITypedQueryBuilder<Model, Row> {
     useKnexQueryBuilder(f: (query: Knex.QueryBuilder) => void): void;
     toQuery(): string;
 
-    getFirstOrNull(): Promise<Row | null>;
-    getFirst(): Promise<Row>;
-    getSingleOrNull(): Promise<Row | null>;
-    getSingle(): Promise<Row>;
-    getMany(): Promise<Row[]>;
+    getFirstOrNull(flattenOption?: FlattenOption): Promise<Row | null>;
+    getFirst(flattenOption?: FlattenOption): Promise<Row>;
+    getSingleOrNull(flattenOption?: FlattenOption): Promise<Row | null>;
+    getSingle(flattenOption?: FlattenOption): Promise<Row>;
+    getMany(flattenOption?: FlattenOption): Promise<Row[]>;
     getCount(): Promise<number>;
     insertItem(newObject: Partial<RemoveObjectsFrom2<Model>>): Promise<void>;
     insertItems(items: Partial<RemoveObjectsFrom2<Model>>[]): Promise<void>;
@@ -1125,7 +1182,8 @@ class TypedQueryBuilder<ModelType, Row = {}>
         if (!items || items.length === 0) {
             return null;
         }
-        return unflatten(items[0]);
+
+        return this.flattenByOption(items[0], arguments[0]);
     }
 
     public async getFirst() {
@@ -1133,7 +1191,8 @@ class TypedQueryBuilder<ModelType, Row = {}>
         if (!items || items.length === 0) {
             throw new Error('Item not found.');
         }
-        return unflatten(items[0]);
+
+        return this.flattenByOption(items[0], arguments[0]);
     }
 
     public async getSingleOrNull() {
@@ -1143,7 +1202,7 @@ class TypedQueryBuilder<ModelType, Row = {}>
         } else if (items.length > 1) {
             throw new Error(`More than one item found: ${items.length}.`);
         }
-        return unflatten(items[0]);
+        return this.flattenByOption(items[0], arguments[0]);
     }
 
     public async getSingle() {
@@ -1153,7 +1212,7 @@ class TypedQueryBuilder<ModelType, Row = {}>
         } else if (items.length > 1) {
             throw new Error(`More than one item found: ${items.length}.`);
         }
-        return unflatten(items[0]);
+        return this.flattenByOption(items[0], arguments[0]);
     }
 
     public selectColumn() {
@@ -1208,7 +1267,8 @@ class TypedQueryBuilder<ModelType, Row = {}>
 
     public async getMany() {
         const items = await this.queryBuilder;
-        return unflatten(items) as Row[];
+
+        return this.flattenByOption(items, arguments[0]) as Row[];
     }
 
     public selectRaw() {
@@ -2046,5 +2106,19 @@ class TypedQueryBuilder<ModelType, Row = {}>
             }
             return columnAlias;
         }
+    }
+
+    private flattenByOption(o: any, flattenOption?: FlattenOption) {
+        if (flattenOption === FlattenOption.noFlatten) {
+            return o;
+        }
+        const unflattened = unflatten(o);
+        if (
+            flattenOption === undefined ||
+            flattenOption === FlattenOption.flatten
+        ) {
+            return unflattened;
+        }
+        return setToNull(unflattened);
     }
 }

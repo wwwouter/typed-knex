@@ -8,12 +8,12 @@ Standing on the shoulders of [Knex.js](https://knexjs.org/), but now everything 
 
 > Goals:
 >
-> -   Be useful for 80% of the usecases, for the other 20% easily switch to lower-level Knex.js.
+> -   Be useful for 80% of the use cases, for the other 20% easily switch to lower-level Knex.js.
 > -   Be as concise a possible.
 > -   Mirror Knex.js as much a possible, with these exceptions:
 >     -   Don't use `this`.
 >     -   Be selective on what returns a `Promise` and what not.
-> -   Get the most the benefits of TypeScript: type-checking of parameters, typed results, rename refactorings.
+> -   Get the most of the benefits TypeScript provides: type-checking of parameters, typed results, rename refactorings.
 
 Install:
 
@@ -78,22 +78,21 @@ import { Column, Entity } from '@wwwouter/typed-knex';
 @Entity('userCategories')
 export class UserCategory {
     @Column({ primary: true })
-    public id!: string;
+    public id: string;
     @Column()
-    public name!: string;
+    public name: string;
     @Column()
-    public year!: number;
+    public year: number;
 }
 
 @Entity('users')
 export class User {
     @Column({ primary: true })
-    public id!: string;
+    public id: string;
     @Column()
-    public name!: string;
-    @Column()
+    public name: string;
     @Column({ name: 'categoryId' })
-    public category!: UserCategory;
+    public category: UserCategory;
 }
 ```
 
@@ -613,7 +612,7 @@ typedKnex.query(User).offset(10);
 
 ### useKnexQueryBuilder
 
-Use `useKnexQueryBuilder` to get to the underlying Knex.js querybuilder.
+Use `useKnexQueryBuilder` to get to the underlying Knex.js query builder.
 
 ```ts
 const query = typedKnex.query(User);
