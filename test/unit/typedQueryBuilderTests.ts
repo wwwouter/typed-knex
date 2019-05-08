@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import * as knex from 'knex';
 import { getEntities } from '../../src';
 import { setToNull, TypedKnex, unflatten } from '../../src/typedKnex';
-import { User, UserSetting } from '../testEntities';
+import { User, UserCategory, UserSetting } from '../testEntities';
 
 describe('TypedKnexQueryBuilder', () => {
     it('should return select * from "users"', done => {
@@ -1111,6 +1111,25 @@ describe('TypedKnexQueryBuilder', () => {
         assert.isNull(nulled[0].element);
         assert.equal(nulled[0].category.name, 'cat name');
         assert.isNull(nulled[0].unit);
+
+        done();
+    });
+
+    it('should return sub query in select', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(UserCategory)
+            .select(i => i.id)
+            .selectQuery('total', Number, User, (subQuery, parentColumn) => {
+                subQuery
+                    .count(i => i.id, 'total')
+                    .whereColumn(c => c.categoryId, '=', parentColumn.id);
+            });
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select "userCategories"."id" as "id", (select count("users"."id") as "total" from "users" where "users"."categoryId" = "userCategories"."id") as "total" from "userCategories"'
+        );
 
         done();
     });

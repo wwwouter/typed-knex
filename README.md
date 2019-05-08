@@ -152,6 +152,7 @@ const typedKnex = new TypedKnex(knex);
 -   [leftOuterJoinColumn](#leftOuterJoinColumn)
 -   [leftOuterJoinTableOnFunction](#leftOuterJoinTableOnFunction)
 -   [selectRaw](#selectRaw)
+-   [selectQuery](#selectQuery)
 -   [whereIn](#whereIn)
 -   [whereNotIn](#whereNotIn)
 -   [orWhereIn](#orWhereIn)
@@ -305,6 +306,23 @@ typedKnex.query(User).leftOuterJoinTableOnFunction('evilTwin', User, join => {
 typedKnex
     .query(User)
     .selectRaw('otherId', Number, 'select other.id from other');
+```
+
+### selectQuery
+
+```ts
+typedKnex
+    .query(UserCategory)
+    .select(i => i.id)
+    .selectQuery('total', Number, User, (subQuery, parentColumn) => {
+        subQuery
+            .count(i => i.id, 'total')
+            .whereColumn(c => c.categoryId, '=', parentColumn.id);
+    });
+```
+
+```sql
+select "userCategories"."id" as "id", (select count("users"."id") as "total" from "users" where "users"."categoryId" = "userCategories"."id") as "total" from "userCategories"
 ```
 
 ### findByPrimaryKey

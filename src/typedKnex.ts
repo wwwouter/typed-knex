@@ -125,6 +125,8 @@ export interface ITypedQueryBuilder<Model, Row> {
     whereNot: IWhere<Model, Row>;
     select: ISelectWithFunctionColumns3<Model, Row extends Model ? {} : Row>;
 
+    selectQuery: ISelectQuery<Model, Row>;
+
     orderBy: IOrderBy<Model, Row>;
     innerJoinColumn: IKeyFunctionAsParametersReturnQueryBuider<Model, Row>;
     leftOuterJoinColumn: IKeyFunctionAsParametersReturnQueryBuider<Model, Row>;
@@ -341,6 +343,25 @@ interface ISelectRaw<Model, Row> {
         name: TName,
         returnType: IConstructor<TReturn>,
         query: string
+    ): ITypedQueryBuilder<
+        Model,
+        Pick<TypeWithIndexerOf<ObjectToPrimitive<TReturn>>, TName> & Row
+    >;
+}
+
+interface ISelectQuery<Model, Row> {
+    <
+        TReturn extends Boolean | String | Number,
+        TName extends keyof TypeWithIndexerOf<TReturn>,
+        SubQueryModel
+    >(
+        name: TName,
+        returnType: IConstructor<TReturn>,
+        subQueryModel: new () => SubQueryModel,
+        code: (
+            subQuery: ITypedQueryBuilder<SubQueryModel, {}>,
+            parent: TransformPropsToFunctionsLevel1ReturnProperyName<Model>
+        ) => void
     ): ITypedQueryBuilder<
         Model,
         Pick<TypeWithIndexerOf<ObjectToPrimitive<TReturn>>, TName> & Row
@@ -1619,6 +1640,24 @@ class TypedQueryBuilder<ModelType, Row = {}>
                 memories
             );
         });
+    }
+
+    public selectQuery() {
+        const name = arguments[0];
+        const typeOfSubQuery = arguments[2];
+        const functionToCall = arguments[3];
+
+        const { root, memories } = getProxyAndMemories(this);
+
+        const subQueryBuilder = new TypedQueryBuilder(
+            typeOfSubQuery,
+            this.knex
+        );
+        functionToCall(subQueryBuilder, root, memories);
+
+        (this.selectRaw as any)(name, undefined, subQueryBuilder.toQuery());
+
+        return this as any;
     }
 
     public whereParentheses() {
