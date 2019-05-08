@@ -254,7 +254,7 @@ typedKnex.query(User).whereNot(i => i.name, 'name');
 
 ### whereColumn
 
-To use in sub queries
+To use in subqueries
 
 ```ts
 typedKnex.query(User).whereNotExists(UserSetting, (subQuery, parentColumn) => {
