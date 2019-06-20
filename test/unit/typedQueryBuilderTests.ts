@@ -1167,6 +1167,24 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+    it('should left outer join with function and selection of joined table', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(UserSetting)
+            .leftOuterJoinTableOnFunction('evilTwin', UserSetting, join => {
+                join.onColumns(i => i.id, '=', j => j.id);
+            })
+            .select(i => i.evilTwin.key);
+
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select "evilTwin"."key" as "evilTwin.key" from "userSettings" left outer join "userSettings" as "evilTwin" on "userSettings"."id" = "evilTwin"."id"'
+        );
+
+        done();
+    });
+
     //
 
     // it('should stay commented out', async done => {

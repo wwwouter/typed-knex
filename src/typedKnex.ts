@@ -1966,14 +1966,27 @@ class TypedQueryBuilder<ModelType, Row = {}>
         if (keys.length === 1) {
             return firstPartName;
         } else {
-            let currentColumnPart = getColumnInformation(
-                this.tableClass,
-                keys[0]
+            let columnName;
+            let columnAlias;
+            let currentClass;
+            let currentColumnPart;
+            const extraJoinedProperty = this.extraJoinedProperties.find(
+                i => i.name === keys[0]
             );
+            if (extraJoinedProperty) {
+                columnName = '';
+                columnAlias = extraJoinedProperty.name;
+                currentClass = extraJoinedProperty.propertyType;
+            } else {
+                currentColumnPart = getColumnInformation(
+                    this.tableClass,
+                    keys[0]
+                );
 
-            let columnName = '';
-            let columnAlias = currentColumnPart.propertyKey;
-            let currentClass = currentColumnPart.columnClass;
+                columnName = '';
+                columnAlias = currentColumnPart.propertyKey;
+                currentClass = currentColumnPart.columnClass;
+            }
             for (let i = 1; i < keys.length; i++) {
                 currentColumnPart = getColumnInformation(currentClass, keys[i]);
 
@@ -2110,8 +2123,18 @@ class TypedQueryBuilder<ModelType, Row = {}>
 
     private getColumnNameWithoutAlias(...keys: string[]): string {
         if (keys.length === 1) {
-            const columnInfo = getColumnInformation(this.tableClass, keys[0]);
-            return this.tableName + '.' + columnInfo.name;
+            const extraJoinedProperty = this.extraJoinedProperties.find(
+                i => i.name === keys[0]
+            );
+            if (extraJoinedProperty) {
+                return extraJoinedProperty.name;
+            } else {
+                const columnInfo = getColumnInformation(
+                    this.tableClass,
+                    keys[0]
+                );
+                return this.tableName + '.' + columnInfo.name;
+            }
         } else {
             let currentColumnPart = getColumnInformation(
                 this.tableClass,
