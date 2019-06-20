@@ -717,6 +717,20 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+    it('should create query with two max', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .max(c => c.numericValue, 'maxNumericValue')
+            .max(c => c.someValue, 'maxSomeValue');
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select max("users"."numericValue") as "maxNumericValue", max("users"."someValue") as "maxSomeValue" from "users"'
+        );
+        done();
+    });
+
     it('should create query with sum', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
@@ -1125,10 +1139,29 @@ describe('TypedKnexQueryBuilder', () => {
                     .count(i => i.id, 'total')
                     .whereColumn(c => c.categoryId, '=', parentColumn.id);
             });
+
         const queryString = query.toQuery();
         assert.equal(
             queryString,
             'select "userCategories"."id" as "id", (select count("users"."id") as "total" from "users" where "users"."categoryId" = "userCategories"."id") as "total" from "userCategories"'
+        );
+
+        done();
+    });
+
+    it('should left outer join with function with and in on', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(UserSetting)
+            .leftOuterJoinTableOnFunction('evilTwin', UserSetting, join => {
+                join.onColumns(i => i.id, '=', j => j.id);
+                join.onColumns(i => i.key, '=', j => j.key);
+            });
+
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select * from "userSettings" left outer join "userSettings" as "evilTwin" on "userSettings"."id" = "evilTwin"."id" and "userSettings"."key" = "evilTwin"."key"'
         );
 
         done();
