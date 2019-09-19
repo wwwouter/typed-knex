@@ -67,7 +67,7 @@ export function flattenByOption(o: any, flattenOption?: FlattenOption) {
 }
 
 export class TypedKnex {
-    constructor(private knex: Knex) {}
+    constructor(private knex: Knex) { }
 
     public query<T>(tableClass: new () => T): ITypedQueryBuilder<T, T> {
         return new TypedQueryBuilder<T, T>(tableClass, this.knex);
@@ -79,7 +79,7 @@ export class TypedKnex {
                 .transaction(tr => resolve(tr))
                 // If this error is not caught here, it will throw, resulting in an unhandledRejection
                 // tslint:disable-next-line:no-empty
-                .catch(_e => {});
+                .catch(_e => { });
         });
     }
 }
@@ -268,14 +268,14 @@ export type ObjectToPrimitive<T> = T extends String
 export type Operator = '=' | '!=' | '>' | '<' | string;
 
 interface IConstructor<T> {
-    new (...args: any[]): T;
+    new(...args: any[]): T;
 }
 
 export type AddPropertyWithType<
     Original,
     NewKey extends keyof TypeWithIndexerOf<NewKeyType>,
     NewKeyType
-> = Original & Pick<TypeWithIndexerOf<NewKeyType>, NewKey>;
+    > = Original & Pick<TypeWithIndexerOf<NewKeyType>, NewKey>;
 
 interface IColumnParamaterNoRowTransformation<Model, Row> {
     <PropertyType1>(
@@ -320,7 +320,7 @@ interface IJoinTableMultipleOnClauses<Model, Row> {
     <
         NewPropertyType,
         NewPropertyKey extends keyof TypeWithIndexerOf<NewPropertyType>
-    >(
+        >(
         newPropertyKey: NewPropertyKey,
         newPropertyClass: new () => NewPropertyType,
         on: (
@@ -339,7 +339,7 @@ interface ISelectRaw<Model, Row> {
     <
         TReturn extends Boolean | String | Number,
         TName extends keyof TypeWithIndexerOf<TReturn>
-    >(
+        >(
         name: TName,
         returnType: IConstructor<TReturn>,
         query: string
@@ -354,7 +354,7 @@ interface ISelectQuery<Model, Row> {
         TReturn extends Boolean | String | Number,
         TName extends keyof TypeWithIndexerOf<TReturn>,
         SubQueryModel
-    >(
+        >(
         name: TName,
         returnType: IConstructor<TReturn>,
         subQueryModel: new () => SubQueryModel,
@@ -379,23 +379,23 @@ type PickAndTransformLevel4<
     Level3Property extends keyof Level3Type,
     Level4Type,
     Level4Properties extends keyof Level4Type
-> = {
-    [Level4Property in Level4Properties]: Level4Type[Level4Property] extends object
+    > = {
+        [Level4Property in Level4Properties]: Level4Type[Level4Property] extends object
         ? any
         : (() => PickAndChangeType<
-              Level1Type,
-              Level1Property,
-              PickAndChangeType<
-                  Level2Type,
-                  Level2Property,
-                  PickAndChangeType<
-                      Level3Type,
-                      Level3Property,
-                      Pick<Level4Type, Level4Property>
-                  >
-              >
-          >)
-};
+            Level1Type,
+            Level1Property,
+            PickAndChangeType<
+                Level2Type,
+                Level2Property,
+                PickAndChangeType<
+                    Level3Type,
+                    Level3Property,
+                    Pick<Level4Type, Level4Property>
+                >
+            >
+        >)
+    };
 
 type PickAndTransformLevel3<
     Level1Type,
@@ -404,68 +404,68 @@ type PickAndTransformLevel3<
     Level2Property extends keyof Level2Type,
     Level3Type,
     Level3Properties extends keyof Level3Type
-> = {
-    [Level3Property in Level3Properties]: Level3Type[Level3Property] extends object
+    > = {
+        [Level3Property in Level3Properties]: Level3Type[Level3Property] extends object
         ? PickAndTransformLevel4<
-              Level1Type,
-              Level1Property,
-              Level2Type,
-              Level2Property,
-              Level3Type,
-              Level3Property,
-              Level3Type[Level3Property],
-              keyof Level3Type[Level3Property]
-          >
+            Level1Type,
+            Level1Property,
+            Level2Type,
+            Level2Property,
+            Level3Type,
+            Level3Property,
+            Level3Type[Level3Property],
+            keyof Level3Type[Level3Property]
+        >
         : (() => PickAndChangeType<
-              Level1Type,
-              Level1Property,
-              PickAndChangeType<
-                  Level2Type,
-                  Level2Property,
-                  Pick<Level3Type, Level3Property>
-              >
-          >)
-};
+            Level1Type,
+            Level1Property,
+            PickAndChangeType<
+                Level2Type,
+                Level2Property,
+                Pick<Level3Type, Level3Property>
+            >
+        >)
+    };
 
 type PickAndTransformLevel2<
     Level1Type,
     Level1Property extends keyof Level1Type,
     Level2Type,
     Level2Properties extends keyof Level2Type
-> = {
-    [Level2Property in Level2Properties]: Level2Type[Level2Property] extends object
+    > = {
+        [Level2Property in Level2Properties]: Level2Type[Level2Property] extends object
         ? PickAndTransformLevel3<
-              Level1Type,
-              Level1Property,
-              Level2Type,
-              Level2Property,
-              Level2Type[Level2Property],
-              keyof Level2Type[Level2Property]
-          >
+            Level1Type,
+            Level1Property,
+            Level2Type,
+            Level2Property,
+            Level2Type[Level2Property],
+            keyof Level2Type[Level2Property]
+        >
         : (() => PickAndChangeType<
-              Level1Type,
-              Level1Property,
-              Pick<Level2Type, Level2Property>
-          >)
-};
+            Level1Type,
+            Level1Property,
+            Pick<Level2Type, Level2Property>
+        >)
+    };
 
 type TransformPropsToFunctionsLevel1<Level1Type> = {
     [Level1Property in keyof Level1Type]: Level1Type[Level1Property] extends object
-        ? PickAndTransformLevel2<
-              Level1Type,
-              Level1Property,
-              Level1Type[Level1Property],
-              keyof Level1Type[Level1Property]
-          >
-        : (() => Pick<Level1Type, Level1Property>)
+    ? PickAndTransformLevel2<
+        Level1Type,
+        Level1Property,
+        Level1Type[Level1Property],
+        keyof Level1Type[Level1Property]
+    >
+    : (() => Pick<Level1Type, Level1Property>)
 };
 
 type TransformPropsToFunctionsOnlyLevel1<Level1Type> = {
     [Level1Property in keyof RemoveObjectsFrom<
         Level1Type
     >]: Level1Type[Level1Property] extends object
-        ? never
-        : (() => Pick<Level1Type, Level1Property>)
+    ? never
+    : (() => Pick<Level1Type, Level1Property>)
 };
 
 type PickAndTransformLevel4ReturnProperyType<
@@ -477,11 +477,11 @@ type PickAndTransformLevel4ReturnProperyType<
     _Level3Property extends keyof Level3Type,
     Level4Type,
     Level4Properties extends keyof Level4Type
-> = {
-    [Level4Property in Level4Properties]: Level4Type[Level4Property] extends object
+    > = {
+        [Level4Property in Level4Properties]: Level4Type[Level4Property] extends object
         ? any
         : (() => Level4Type[Level4Property])
-};
+    };
 
 type PickAndTransformLevel3ReturnProperyType<
     Level1Type,
@@ -490,48 +490,48 @@ type PickAndTransformLevel3ReturnProperyType<
     Level2Property extends keyof Level2Type,
     Level3Type,
     Level3Properties extends keyof Level3Type
-> = {
-    [Level3Property in Level3Properties]: Level3Type[Level3Property] extends object
+    > = {
+        [Level3Property in Level3Properties]: Level3Type[Level3Property] extends object
         ? PickAndTransformLevel4ReturnProperyType<
-              Level1Type,
-              Level1Property,
-              Level2Type,
-              Level2Property,
-              Level3Type,
-              Level3Property,
-              Level3Type[Level3Property],
-              keyof Level3Type[Level3Property]
-          >
+            Level1Type,
+            Level1Property,
+            Level2Type,
+            Level2Property,
+            Level3Type,
+            Level3Property,
+            Level3Type[Level3Property],
+            keyof Level3Type[Level3Property]
+        >
         : (() => Level3Type[Level3Property])
-};
+    };
 
 type PickAndTransformLevel2ReturnProperyType<
     Level1Type,
     Level1Property extends keyof Level1Type,
     Level2Type,
     Level2Properties extends keyof Level2Type
-> = {
-    [Level2Property in Level2Properties]: Level2Type[Level2Property] extends object
+    > = {
+        [Level2Property in Level2Properties]: Level2Type[Level2Property] extends object
         ? PickAndTransformLevel3ReturnProperyType<
-              Level1Type,
-              Level1Property,
-              Level2Type,
-              Level2Property,
-              Level2Type[Level2Property],
-              keyof Level2Type[Level2Property]
-          >
+            Level1Type,
+            Level1Property,
+            Level2Type,
+            Level2Property,
+            Level2Type[Level2Property],
+            keyof Level2Type[Level2Property]
+        >
         : (() => Level2Type[Level2Property])
-};
+    };
 
 type TransformPropsToFunctionsLevel1ReturnProperyType<Level1Type> = {
     [Level1Property in keyof Level1Type]: Level1Type[Level1Property] extends object
-        ? PickAndTransformLevel2ReturnProperyType<
-              Level1Type,
-              Level1Property,
-              Level1Type[Level1Property],
-              keyof Level1Type[Level1Property]
-          >
-        : (() => Level1Type[Level1Property])
+    ? PickAndTransformLevel2ReturnProperyType<
+        Level1Type,
+        Level1Property,
+        Level1Type[Level1Property],
+        keyof Level1Type[Level1Property]
+    >
+    : (() => Level1Type[Level1Property])
 };
 
 type PickAndTransformLevel4ReturnProperyName<
@@ -543,11 +543,11 @@ type PickAndTransformLevel4ReturnProperyName<
     _Level3Property extends keyof Level3Type,
     Level4Type,
     Level4Properties extends keyof Level4Type
-> = {
-    [Level4Property in Level4Properties]: Level4Type[Level4Property] extends object
+    > = {
+        [Level4Property in Level4Properties]: Level4Type[Level4Property] extends object
         ? any
         : (() => Level4Property)
-};
+    };
 
 type PickAndTransformLevel3ReturnProperyName<
     Level1Type,
@@ -556,48 +556,48 @@ type PickAndTransformLevel3ReturnProperyName<
     Level2Property extends keyof Level2Type,
     Level3Type,
     Level3Properties extends keyof Level3Type
-> = {
-    [Level3Property in Level3Properties]: Level3Type[Level3Property] extends object
+    > = {
+        [Level3Property in Level3Properties]: Level3Type[Level3Property] extends object
         ? PickAndTransformLevel4ReturnProperyName<
-              Level1Type,
-              Level1Property,
-              Level2Type,
-              Level2Property,
-              Level3Type,
-              Level3Property,
-              Level3Type[Level3Property],
-              keyof Level3Type[Level3Property]
-          >
+            Level1Type,
+            Level1Property,
+            Level2Type,
+            Level2Property,
+            Level3Type,
+            Level3Property,
+            Level3Type[Level3Property],
+            keyof Level3Type[Level3Property]
+        >
         : (() => Level3Property)
-};
+    };
 
 type PickAndTransformLevel2ReturnProperyName<
     Level1Type,
     Level1Property extends keyof Level1Type,
     Level2Type,
     Level2Properties extends keyof Level2Type
-> = {
-    [Level2Property in Level2Properties]: Level2Type[Level2Property] extends object
+    > = {
+        [Level2Property in Level2Properties]: Level2Type[Level2Property] extends object
         ? PickAndTransformLevel3ReturnProperyName<
-              Level1Type,
-              Level1Property,
-              Level2Type,
-              Level2Property,
-              Level2Type[Level2Property],
-              keyof Level2Type[Level2Property]
-          >
+            Level1Type,
+            Level1Property,
+            Level2Type,
+            Level2Property,
+            Level2Type[Level2Property],
+            keyof Level2Type[Level2Property]
+        >
         : (() => Level2Property)
-};
+    };
 
 type TransformPropsToFunctionsLevel1ReturnProperyName<Level1Type> = {
     [Level1Property in keyof Level1Type]: Level1Type[Level1Property] extends object
-        ? PickAndTransformLevel2ReturnProperyName<
-              Level1Type,
-              Level1Property,
-              Level1Type[Level1Property],
-              keyof Level1Type[Level1Property]
-          >
-        : (() => Level1Property)
+    ? PickAndTransformLevel2ReturnProperyName<
+        Level1Type,
+        Level1Property,
+        Level1Type[Level1Property],
+        keyof Level1Type[Level1Property]
+    >
+    : (() => Level1Property)
 };
 
 interface IColumnFunctionReturnNewRow<Model> {
@@ -605,7 +605,7 @@ interface IColumnFunctionReturnNewRow<Model> {
         K1 extends keyof Model,
         K2 extends keyof Model[K1],
         K3 extends keyof Model[K1][K2]
-    >(
+        >(
         key1: K1,
         key2: K2,
         key3: K3,
@@ -621,7 +621,7 @@ interface IColumnFunctionReturnNewRow<Model> {
         K1 extends keyof Model,
         K2 extends keyof Model[K1],
         K3 extends keyof Model[K1][K2]
-    >(
+        >(
         key1: K1,
         key2: K2,
         key3: K3
@@ -670,13 +670,13 @@ interface IDbFunctionWithAlias<Model, Row> {
 
 type TransformPropsToFunctionsLevel1NextLevel<Level1Type> = {
     [Level1Property in keyof Level1Type]: Level1Type[Level1Property] extends object
-        ? PickAndTransformLevel2<
-              Level1Type,
-              Level1Property,
-              Level1Type[Level1Property],
-              keyof Level1Type[Level1Property]
-          >
-        : (() => Pick<Level1Type, Level1Property>)
+    ? PickAndTransformLevel2<
+        Level1Type,
+        Level1Property,
+        Level1Type[Level1Property],
+        keyof Level1Type[Level1Property]
+    >
+    : (() => Pick<Level1Type, Level1Property>)
 };
 
 interface ISelectWithFunctionColumns3<Model, Row> {
@@ -710,73 +710,73 @@ interface ISelectWithFunctionColumns3<Model, Row> {
         R27,
         R28,
         R29
-    >(
+        >(
         selectColumnFunction: (
             c: TransformPropsToFunctionsLevel1NextLevel<Model>
         ) => [
-            () => R1,
-            (() => R2)?,
-            (() => R3)?,
-            (() => R4)?,
-            (() => R5)?,
-            (() => R6)?,
-            (() => R7)?,
-            (() => R8)?,
-            (() => R9)?,
-            (() => R10)?,
-            (() => R12)?,
-            (() => R13)?,
-            (() => R14)?,
-            (() => R15)?,
-            (() => R16)?,
-            (() => R17)?,
-            (() => R18)?,
-            (() => R19)?,
-            (() => R20)?,
-            (() => R22)?,
-            (() => R23)?,
-            (() => R24)?,
-            (() => R25)?,
-            (() => R26)?,
-            (() => R27)?,
-            (() => R28)?,
-            (() => R29)?
-        ]
+                () => R1,
+                (() => R2)?,
+                (() => R3)?,
+                (() => R4)?,
+                (() => R5)?,
+                (() => R6)?,
+                (() => R7)?,
+                (() => R8)?,
+                (() => R9)?,
+                (() => R10)?,
+                (() => R12)?,
+                (() => R13)?,
+                (() => R14)?,
+                (() => R15)?,
+                (() => R16)?,
+                (() => R17)?,
+                (() => R18)?,
+                (() => R19)?,
+                (() => R20)?,
+                (() => R22)?,
+                (() => R23)?,
+                (() => R24)?,
+                (() => R25)?,
+                (() => R26)?,
+                (() => R27)?,
+                (() => R28)?,
+                (() => R29)?
+            ]
     ): ITypedQueryBuilder<
         Model,
         Row &
-            R1 &
-            R2 &
-            R3 &
-            R4 &
-            R5 &
-            R6 &
-            R7 &
-            R8 &
-            R8 &
-            R9 &
-            R10 &
-            R11 &
-            R12 &
-            R13 &
-            R14 &
-            R15 &
-            R16 &
-            R17 &
-            R18 &
-            R18 &
-            R19 &
-            R20 &
-            R21 &
-            R22 &
-            R23 &
-            R24 &
-            R25 &
-            R26 &
-            R27 &
-            R28 &
-            R28 &
-            R29
+        R1 &
+        R2 &
+        R3 &
+        R4 &
+        R5 &
+        R6 &
+        R7 &
+        R8 &
+        R8 &
+        R9 &
+        R10 &
+        R11 &
+        R12 &
+        R13 &
+        R14 &
+        R15 &
+        R16 &
+        R17 &
+        R18 &
+        R18 &
+        R19 &
+        R20 &
+        R21 &
+        R22 &
+        R23 &
+        R24 &
+        R25 &
+        R26 &
+        R27 &
+        R28 &
+        R28 &
+        R29
     >;
     <R1>(
         selectColumnFunction: (
@@ -816,73 +816,73 @@ interface IFindByPrimaryKey<Model, Row> {
         R27,
         R28,
         R29
-    >(
+        >(
         primaryKeyValue: any,
         selectColumnFunction: (
             c: TransformPropsToFunctionsOnlyLevel1<Model>
         ) => [
-            () => R1,
-            (() => R2)?,
-            (() => R3)?,
-            (() => R4)?,
-            (() => R5)?,
-            (() => R6)?,
-            (() => R7)?,
-            (() => R8)?,
-            (() => R9)?,
-            (() => R10)?,
-            (() => R12)?,
-            (() => R13)?,
-            (() => R14)?,
-            (() => R15)?,
-            (() => R16)?,
-            (() => R17)?,
-            (() => R18)?,
-            (() => R19)?,
-            (() => R20)?,
-            (() => R22)?,
-            (() => R23)?,
-            (() => R24)?,
-            (() => R25)?,
-            (() => R26)?,
-            (() => R27)?,
-            (() => R28)?,
-            (() => R29)?
-        ]
+                () => R1,
+                (() => R2)?,
+                (() => R3)?,
+                (() => R4)?,
+                (() => R5)?,
+                (() => R6)?,
+                (() => R7)?,
+                (() => R8)?,
+                (() => R9)?,
+                (() => R10)?,
+                (() => R12)?,
+                (() => R13)?,
+                (() => R14)?,
+                (() => R15)?,
+                (() => R16)?,
+                (() => R17)?,
+                (() => R18)?,
+                (() => R19)?,
+                (() => R20)?,
+                (() => R22)?,
+                (() => R23)?,
+                (() => R24)?,
+                (() => R25)?,
+                (() => R26)?,
+                (() => R27)?,
+                (() => R28)?,
+                (() => R29)?
+            ]
     ): Promise<
         | Row &
-              R1 &
-              R2 &
-              R3 &
-              R4 &
-              R5 &
-              R6 &
-              R7 &
-              R8 &
-              R8 &
-              R9 &
-              R10 &
-              R11 &
-              R12 &
-              R13 &
-              R14 &
-              R15 &
-              R16 &
-              R17 &
-              R18 &
-              R18 &
-              R19 &
-              R20 &
-              R21 &
-              R22 &
-              R23 &
-              R24 &
-              R25 &
-              R26 &
-              R27 &
-              R28 &
-              R28 &
-              R29
+        R1 &
+        R2 &
+        R3 &
+        R4 &
+        R5 &
+        R6 &
+        R7 &
+        R8 &
+        R8 &
+        R9 &
+        R10 &
+        R11 &
+        R12 &
+        R13 &
+        R14 &
+        R15 &
+        R16 &
+        R17 &
+        R18 &
+        R18 &
+        R19 &
+        R20 &
+        R21 &
+        R22 &
+        R23 &
+        R24 &
+        R25 &
+        R26 &
+        R27 &
+        R28 &
+        R28 &
+        R29
         | void
     >;
 }
@@ -1247,8 +1247,8 @@ class TypedQueryBuilder<ModelType, Row = {}>
 
         this.queryBuilder.select(
             this.getColumnName(...calledArguments) +
-                ' as ' +
-                this.getColumnSelectAlias(...calledArguments)
+            ' as ' +
+            this.getColumnSelectAlias(...calledArguments)
         );
 
         return this as any;
@@ -1270,8 +1270,8 @@ class TypedQueryBuilder<ModelType, Row = {}>
         for (const columnArguments of columnArgumentsList) {
             this.queryBuilder.select(
                 this.getColumnName(...columnArguments) +
-                    ' as ' +
-                    this.getColumnSelectAlias(...columnArguments)
+                ' as ' +
+                this.getColumnSelectAlias(...columnArguments)
             );
         }
         return this as any;
@@ -1497,8 +1497,8 @@ class TypedQueryBuilder<ModelType, Row = {}>
         for (const columnArguments of columnArgumentsList) {
             this.queryBuilder.select(
                 this.getColumnName(...columnArguments) +
-                    ' as ' +
-                    this.getColumnSelectAlias(...columnArguments)
+                ' as ' +
+                this.getColumnSelectAlias(...columnArguments)
             );
         }
 
@@ -1634,8 +1634,10 @@ class TypedQueryBuilder<ModelType, Row = {}>
             const subQuery = this;
             const { root, memories } = getProxyAndMemories(that);
 
+            const subQB = new TypedQueryBuilder(typeOfSubQuery, that.knex, subQuery);
+            subQB.extraJoinedProperties = that.extraJoinedProperties;
             functionToCall(
-                new TypedQueryBuilder(typeOfSubQuery, that.knex, subQuery),
+                subQB,
                 root,
                 memories
             );
@@ -2095,7 +2097,7 @@ class TypedQueryBuilder<ModelType, Row = {}>
         const tableToJoinAlias = secondColumnAlias;
         const tableToJoinJoinColumnName = `${tableToJoinAlias}.${
             getPrimaryKeyColumn(secondColumnClass).name
-        }`;
+            }`;
 
         if (joinType === 'innerJoin') {
             this.queryBuilder.innerJoin(
