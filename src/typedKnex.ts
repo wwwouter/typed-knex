@@ -200,7 +200,7 @@ export interface ITypedQueryBuilder<Model, Row> {
     limit(value: number): ITypedQueryBuilder<Model, Row>;
     offset(value: number): ITypedQueryBuilder<Model, Row>;
 
-    useKnexQueryBuilder(f: (query: Knex.QueryBuilder) => void): void;
+    useKnexQueryBuilder(f: (query: Knex.QueryBuilder) => void): ITypedQueryBuilder<Model, Row>;
     toQuery(): string;
 
     getFirstOrNull(flattenOption?: FlattenOption): Promise<Row | null>;
@@ -1958,8 +1958,9 @@ class TypedQueryBuilder<ModelType, Row = {}>
         return this;
     }
 
-    public useKnexQueryBuilder(f: (query: Knex.QueryBuilder) => void): void {
+    public useKnexQueryBuilder(f: (query: Knex.QueryBuilder) => void) {
         f(this.queryBuilder);
+        return this;
     }
 
     public getColumnName(...keys: string[]): string {
