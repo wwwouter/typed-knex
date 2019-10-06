@@ -633,9 +633,9 @@ typedKnex.query(User).offset(10);
 Use `useKnexQueryBuilder` to get to the underlying Knex.js query builder.
 
 ```ts
-const query = typedKnex.query(User);
-query.useKnexQueryBuilder(queryBuilder =>
-    queryBuilder.where('somethingelse', 'value')
+const query = typedKnex.query(User)
+    .useKnexQueryBuilder(queryBuilder => queryBuilder.where('somethingelse', 'value')
+    .select(i=>i.name);
 );
 ```
 
@@ -643,6 +643,7 @@ query.useKnexQueryBuilder(queryBuilder =>
 
 ```ts
 const query = typedKnex.query(User);
+
 console.log(query.toQuery()); // select * from "users"
 ```
 
