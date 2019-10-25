@@ -273,9 +273,9 @@ interface IConstructor<T> {
 
 export type AddPropertyWithType<
     Original,
-    NewKey extends keyof TypeWithIndexerOf<NewKeyType>,
+    NewKey extends keyof any,
     NewKeyType
-    > = Original & Pick<TypeWithIndexerOf<NewKeyType>, NewKey>;
+    > = Original & Record<NewKey, NewKeyType>;
 
 interface IColumnParamaterNoRowTransformation<Model, Row> {
     <PropertyType1>(
@@ -284,8 +284,6 @@ interface IColumnParamaterNoRowTransformation<Model, Row> {
         ) => () => PropertyType1
     ): ITypedQueryBuilder<Model, Row>;
 }
-
-export type TypeWithIndexerOf<T> = { [key: string]: T };
 
 interface IJoinOnClause2<Model, JoinedModel> {
     onColumns: <PropertyType1, PropertyType2>(
@@ -319,7 +317,7 @@ interface IWhereCompareTwoColumns<Model, Row> {
 interface IJoinTableMultipleOnClauses<Model, Row> {
     <
         NewPropertyType,
-        NewPropertyKey extends keyof TypeWithIndexerOf<NewPropertyType>
+        NewPropertyKey extends keyof any
         >(
         newPropertyKey: NewPropertyKey,
         newPropertyClass: new () => NewPropertyType,
@@ -338,21 +336,21 @@ interface IJoinTableMultipleOnClauses<Model, Row> {
 interface ISelectRaw<Model, Row> {
     <
         TReturn extends Boolean | String | Number,
-        TName extends keyof TypeWithIndexerOf<TReturn>
+        TName extends keyof any
         >(
         name: TName,
         returnType: IConstructor<TReturn>,
         query: string
     ): ITypedQueryBuilder<
         Model,
-        Pick<TypeWithIndexerOf<ObjectToPrimitive<TReturn>>, TName> & Row
+        Record<TName, ObjectToPrimitive<TReturn>> & Row
     >;
 }
 
 interface ISelectQuery<Model, Row> {
     <
         TReturn extends Boolean | String | Number,
-        TName extends keyof TypeWithIndexerOf<TReturn>,
+        TName extends keyof any,
         SubQueryModel
         >(
         name: TName,
@@ -364,7 +362,7 @@ interface ISelectQuery<Model, Row> {
         ) => void
     ): ITypedQueryBuilder<
         Model,
-        Pick<TypeWithIndexerOf<ObjectToPrimitive<TReturn>>, TName> & Row
+        Record<TName, ObjectToPrimitive<TReturn>> & Row
     >;
 }
 
@@ -657,14 +655,14 @@ interface IOrderBy<Model, Row> {
 }
 
 interface IDbFunctionWithAlias<Model, Row> {
-    <NewPropertyType, TName extends keyof TypeWithIndexerOf<NewPropertyType>>(
+    <NewPropertyType, TName extends keyof any>(
         selectColumnFunction: (
             c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
         ) => () => NewPropertyType,
         name: TName
     ): ITypedQueryBuilder<
         Model,
-        Pick<TypeWithIndexerOf<ObjectToPrimitive<NewPropertyType>>, TName> & Row
+        Record<TName, ObjectToPrimitive<NewPropertyType>> & Row
     >;
 }
 

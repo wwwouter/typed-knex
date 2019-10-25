@@ -13,6 +13,7 @@ Standing on the shoulders of [Knex.js](https://knexjs.org/), but now everything 
 > -   Mirror Knex.js as much a possible, with these exceptions:
 >     -   Don't use `this`.
 >     -   Be selective on what returns a `Promise` and what not.
+>     -   Less overloading, which makes typings easier and code completion better.
 > -   Get the most of the benefits TypeScript provides: type-checking of parameters, typed results, rename refactorings.
 
 Install:
