@@ -50,6 +50,28 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+    it('should handle optional properties', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        typedKnex
+            .query(UserCategory)
+            .select(i => i.phoneNumber)
+            .where(c => c.phoneNumber, 'user1');
+
+        done();
+    });
+
+    it('should handle optional level 2 properties', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        typedKnex
+            .query(User)
+            .select(i => i.category.phoneNumber)
+            .where(c => c.category.phoneNumber, 'user1');
+
+        done();
+    });
+
+
+
     it('should create query with where not on column of own table', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex.query(User).whereNot(c => c.name, 'user1');

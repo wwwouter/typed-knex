@@ -411,7 +411,7 @@ type PickAndTransformLevel3<
             Level2Property,
             Level3Type,
             Level3Property,
-            Level3Type[Level3Property],
+            Required<Level3Type[Level3Property]>,
             keyof Level3Type[Level3Property]
         >
         : (() => PickAndChangeType<
@@ -437,7 +437,7 @@ type PickAndTransformLevel2<
             Level1Property,
             Level2Type,
             Level2Property,
-            Level2Type[Level2Property],
+            Required<Level2Type[Level2Property]>,
             keyof Level2Type[Level2Property]
         >
         : (() => PickAndChangeType<
@@ -481,7 +481,7 @@ type PickAndTransformLevel4ReturnProperyType<
         : (() => Level4Type[Level4Property])
     };
 
-type PickAndTransformLevel3ReturnProperyType<
+type PickAndTransformLevel3ReturnPropertyType<
     Level1Type,
     Level1Property extends keyof Level1Type,
     Level2Type,
@@ -497,42 +497,42 @@ type PickAndTransformLevel3ReturnProperyType<
             Level2Property,
             Level3Type,
             Level3Property,
-            Level3Type[Level3Property],
+            Required<Level3Type[Level3Property]>,
             keyof Level3Type[Level3Property]
         >
         : (() => Level3Type[Level3Property])
     };
 
-type PickAndTransformLevel2ReturnProperyType<
+type PickAndTransformLevel2ReturnPropertyType<
     Level1Type,
     Level1Property extends keyof Level1Type,
     Level2Type,
     Level2Properties extends keyof Level2Type
     > = {
         [Level2Property in Level2Properties]: Level2Type[Level2Property] extends object
-        ? PickAndTransformLevel3ReturnProperyType<
+        ? PickAndTransformLevel3ReturnPropertyType<
             Level1Type,
             Level1Property,
             Level2Type,
             Level2Property,
-            Level2Type[Level2Property],
+            Required<Level2Type[Level2Property]>,
             keyof Level2Type[Level2Property]
         >
         : (() => Level2Type[Level2Property])
     };
 
 type TransformPropsToFunctionsLevel1ReturnProperyType<Level1Type> = {
-    [Level1Property in keyof Level1Type]: Level1Type[Level1Property] extends object
-    ? PickAndTransformLevel2ReturnProperyType<
+    [Level1Property in keyof Required<Level1Type>]: Level1Type[Level1Property] extends object
+    ? PickAndTransformLevel2ReturnPropertyType<
         Level1Type,
         Level1Property,
-        Level1Type[Level1Property],
+        Required<Level1Type[Level1Property]>,
         keyof Level1Type[Level1Property]
     >
     : (() => Level1Type[Level1Property])
 };
 
-type PickAndTransformLevel4ReturnProperyName<
+type PickAndTransformLevel4ReturnPropertyName<
     Level1Type,
     _Level1Property extends keyof Level1Type,
     Level2Type,
@@ -556,7 +556,7 @@ type PickAndTransformLevel3ReturnProperyName<
     Level3Properties extends keyof Level3Type
     > = {
         [Level3Property in Level3Properties]: Level3Type[Level3Property] extends object
-        ? PickAndTransformLevel4ReturnProperyName<
+        ? PickAndTransformLevel4ReturnPropertyName<
             Level1Type,
             Level1Property,
             Level2Type,
@@ -667,11 +667,11 @@ interface IDbFunctionWithAlias<Model, Row> {
 }
 
 type TransformPropsToFunctionsLevel1NextLevel<Level1Type> = {
-    [Level1Property in keyof Level1Type]: Level1Type[Level1Property] extends object
+    [Level1Property in keyof Required<Level1Type>]: Level1Type[Level1Property] extends object
     ? PickAndTransformLevel2<
         Level1Type,
         Level1Property,
-        Level1Type[Level1Property],
+        Required<Level1Type[Level1Property]>,
         keyof Level1Type[Level1Property]
     >
     : (() => Pick<Level1Type, Level1Property>)

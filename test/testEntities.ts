@@ -20,6 +20,8 @@ export class UserCategory {
     public regionId!: string;
     @Column()
     public year!: number;
+    @Column()
+    public phoneNumber?: string;
 }
 
 @Entity('users')
