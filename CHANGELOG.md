@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.4.1
+
+-   Fix: better handling of optional properties
+
 ## 2.1.0
 
 -   Added `selectQuery`

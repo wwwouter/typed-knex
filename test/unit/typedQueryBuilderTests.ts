@@ -55,7 +55,8 @@ describe('TypedKnexQueryBuilder', () => {
         typedKnex
             .query(UserCategory)
             .select(i => i.phoneNumber)
-            .where(c => c.phoneNumber, 'user1');
+            .where(c => c.phoneNumber, 'user1')
+            .select(i => i.backupRegion.code);
 
         done();
     });

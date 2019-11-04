@@ -22,6 +22,8 @@ export class UserCategory {
     public year!: number;
     @Column()
     public phoneNumber?: string;
+    @Column({ name: 'backupRegionId' })
+    public backupRegion?: Region;
 }
 
 @Entity('users')
