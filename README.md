@@ -228,6 +228,14 @@ https://knexjs.org/#Builder-where
 typedKnex.query(User).where(i => i.name, 'name');
 ```
 
+Or with operator
+
+```ts
+typedKnex.query(User).where(c => c.name, 'like', '%user%');
+
+// select * from "users" where "users"."name" like '%user%'
+```
+
 ### andWhere
 
 ```ts

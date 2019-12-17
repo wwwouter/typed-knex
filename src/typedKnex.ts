@@ -119,7 +119,7 @@ export enum FlattenOption {
 export interface ITypedQueryBuilder<Model, Row> {
     columns: { name: string }[];
 
-    where: IWhere<Model, Row>;
+    where: IWhereWithOperator<Model, Row>;
     andWhere: IWhere<Model, Row>;
     orWhere: IWhere<Model, Row>;
     whereNot: IWhere<Model, Row>;
@@ -904,6 +904,23 @@ interface IWhere<Model, Row> {
     ): ITypedQueryBuilder<Model, Row>;
 }
 
+interface IWhereWithOperator<Model, Row> {
+    <PropertyType>(
+        selectColumnFunction: (
+            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
+        ) => () => PropertyType,
+        value: PropertyType
+    ): ITypedQueryBuilder<Model, Row>;
+
+    <PropertyType>(
+        selectColumnFunction: (
+            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
+        ) => () => PropertyType,
+        operator: Operator,
+        value: PropertyType
+    ): ITypedQueryBuilder<Model, Row>;
+}
+
 interface IWhereIn<Model, Row> {
     <PropertyType>(
         selectColumnFunction: (
@@ -1345,69 +1362,6 @@ class TypedQueryBuilder<ModelType, Row = {}>
         return this.joinTableOnFunction(this.queryBuilder.leftOuterJoin.bind(this.queryBuilder), arguments[0], arguments[1], arguments[2]);
     }
 
-    private joinTableOnFunction(queryBuilderJoin: Knex.Join, newPropertyKey: any, newPropertyType: any, onFunction: (join: IJoinOnClause2<any, any>) => void) {
-        // const newPropertyKey = arguments[0];
-        // const newPropertyType = arguments[1];
-
-        this.extraJoinedProperties.push({
-            name: newPropertyKey,
-            propertyType: newPropertyType,
-        });
-
-        const tableToJoinClass = newPropertyType;
-        const tableToJoinName = getTableMetadata(tableToJoinClass).tableName;
-        const tableToJoinAlias = newPropertyKey;
-
-        // const onFunction = arguments[2] as (
-        //     join: IJoinOnClause2<any, any>
-        // ) => void;
-
-        let knexOnObject: any;
-        queryBuilderJoin(
-            `${tableToJoinName} as ${tableToJoinAlias}`,
-            function() {
-                knexOnObject = this;
-            }
-        );
-
-        const onObject = {
-            onColumns: (
-                column1PartsArray: any,
-                operator: any,
-                column2PartsArray: any
-            ) => {
-                const column1Arguments = this.getArgumentsFromColumnFunction(
-                    column1PartsArray
-                );
-                const column2Arguments = this.getArgumentsFromColumnFunction(
-                    column2PartsArray
-                );
-                const column2ArgumentsWithJoinedTable = [
-                    tableToJoinAlias,
-                    ...column2Arguments
-                ];
-                knexOnObject.on(
-                    this.getColumnName(...column1Arguments),
-                    operator,
-                    column2ArgumentsWithJoinedTable.join('.')
-                );
-                return onObject;
-            },
-            onNull: (f: any) => {
-                const column2Arguments = this.getArgumentsFromColumnFunction(f);
-                const column2ArgumentsWithJoinedTable = [
-                    tableToJoinAlias,
-                    ...column2Arguments
-                ];
-
-                knexOnObject.onNull(column2ArgumentsWithJoinedTable.join('.'));
-                return onObject;
-            }
-        };
-        onFunction(onObject as any);
-
-        return this as any;
-    }
 
     public leftOuterJoinTable() {
         const newPropertyKey = arguments[0];
@@ -1521,10 +1475,19 @@ class TypedQueryBuilder<ModelType, Row = {}>
             arguments[0]
         );
 
-        this.queryBuilder.where(
-            this.getColumnName(...columnArguments),
-            arguments[1]
-        );
+        if (arguments[2]) {
+            this.queryBuilder.where(
+                this.getColumnName(...columnArguments),
+                arguments[1],
+                arguments[2]
+            );
+        } else {
+            this.queryBuilder.where(
+                this.getColumnName(...columnArguments),
+                arguments[1]
+            );
+        }
+
         return this;
     }
 
@@ -2195,4 +2158,69 @@ class TypedQueryBuilder<ModelType, Row = {}>
         }
         return setToNull(unflattened);
     }
+
+    private joinTableOnFunction(queryBuilderJoin: Knex.Join, newPropertyKey: any, newPropertyType: any, onFunction: (join: IJoinOnClause2<any, any>) => void) {
+        // const newPropertyKey = arguments[0];
+        // const newPropertyType = arguments[1];
+
+        this.extraJoinedProperties.push({
+            name: newPropertyKey,
+            propertyType: newPropertyType,
+        });
+
+        const tableToJoinClass = newPropertyType;
+        const tableToJoinName = getTableMetadata(tableToJoinClass).tableName;
+        const tableToJoinAlias = newPropertyKey;
+
+        // const onFunction = arguments[2] as (
+        //     join: IJoinOnClause2<any, any>
+        // ) => void;
+
+        let knexOnObject: any;
+        queryBuilderJoin(
+            `${tableToJoinName} as ${tableToJoinAlias}`,
+            function() {
+                knexOnObject = this;
+            }
+        );
+
+        const onObject = {
+            onColumns: (
+                column1PartsArray: any,
+                operator: any,
+                column2PartsArray: any
+            ) => {
+                const column1Arguments = this.getArgumentsFromColumnFunction(
+                    column1PartsArray
+                );
+                const column2Arguments = this.getArgumentsFromColumnFunction(
+                    column2PartsArray
+                );
+                const column2ArgumentsWithJoinedTable = [
+                    tableToJoinAlias,
+                    ...column2Arguments
+                ];
+                knexOnObject.on(
+                    this.getColumnName(...column1Arguments),
+                    operator,
+                    column2ArgumentsWithJoinedTable.join('.')
+                );
+                return onObject;
+            },
+            onNull: (f: any) => {
+                const column2Arguments = this.getArgumentsFromColumnFunction(f);
+                const column2ArgumentsWithJoinedTable = [
+                    tableToJoinAlias,
+                    ...column2Arguments
+                ];
+
+                knexOnObject.onNull(column2ArgumentsWithJoinedTable.join('.'));
+                return onObject;
+            }
+        };
+        onFunction(onObject as any);
+
+        return this as any;
+    }
+
 }

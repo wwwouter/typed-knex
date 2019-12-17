@@ -50,6 +50,19 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+    it('should create query with where on column of own table with LIKE', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex.query(User).where(c => c.name, 'like', '%user%');
+
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select * from "users" where "users"."name" like \'%user%\''
+        );
+
+        done();
+    });
+
     it('should handle optional properties', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         typedKnex
