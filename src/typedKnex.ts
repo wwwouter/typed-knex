@@ -133,10 +133,14 @@ export interface ITypedQueryBuilder<Model, Row> {
 
     whereColumn: IWhereCompareTwoColumns<Model, Row>;
 
-    whereNull: IColumnParamaterNoRowTransformation<Model, Row>;
-    whereNotNull: IColumnParamaterNoRowTransformation<Model, Row>;
+    whereNull: IColumnParameterNoRowTransformation<Model, Row>;
+    whereNotNull: IColumnParameterNoRowTransformation<Model, Row>;
 
     leftOuterJoinTableOnFunction: IJoinTableMultipleOnClauses<
+        Model,
+        Row extends Model ? {} : Row
+    >;
+    innerJoinTableOnFunction: IJoinTableMultipleOnClauses<
         Model,
         Row extends Model ? {} : Row
     >;
@@ -249,9 +253,7 @@ export interface ITypedQueryBuilder<Model, Row> {
 
 type TransformAll<T, IT> = { [Key in keyof T]: IT };
 
-type ReturnNonObjectsNamesOnly<T> = {
-    [K in keyof T]: T[K] extends object ? never : K
-}[keyof T];
+type ReturnNonObjectsNamesOnly<T> = { [K in keyof T]: T[K] extends object ? never : K }[keyof T];
 
 type RemoveObjectsFrom<T> = { [P in ReturnNonObjectsNamesOnly<T>]: T[P] };
 
@@ -277,7 +279,7 @@ export type AddPropertyWithType<
     NewKeyType
     > = Original & Record<NewKey, NewKeyType>;
 
-interface IColumnParamaterNoRowTransformation<Model, Row> {
+interface IColumnParameterNoRowTransformation<Model, Row> {
     <PropertyType1>(
         selectColumn1Function: (
             c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
@@ -1334,25 +1336,34 @@ class TypedQueryBuilder<ModelType, Row = {}>
         return this;
     }
 
+
+    public innerJoinTableOnFunction() {
+        return this.joinTableOnFunction(this.queryBuilder.innerJoin.bind(this.queryBuilder), arguments[0], arguments[1], arguments[2]);
+    }
+
     public leftOuterJoinTableOnFunction() {
-        const newPropertyKey = arguments[0];
-        const newPropertyType = arguments[1];
+        return this.joinTableOnFunction(this.queryBuilder.leftOuterJoin.bind(this.queryBuilder), arguments[0], arguments[1], arguments[2]);
+    }
+
+    private joinTableOnFunction(queryBuilderJoin: Knex.Join, newPropertyKey: any, newPropertyType: any, onFunction: (join: IJoinOnClause2<any, any>) => void) {
+        // const newPropertyKey = arguments[0];
+        // const newPropertyType = arguments[1];
 
         this.extraJoinedProperties.push({
             name: newPropertyKey,
-            propertyType: newPropertyType
+            propertyType: newPropertyType,
         });
 
         const tableToJoinClass = newPropertyType;
         const tableToJoinName = getTableMetadata(tableToJoinClass).tableName;
         const tableToJoinAlias = newPropertyKey;
 
-        const onFunction = arguments[2] as (
-            join: IJoinOnClause2<any, any>
-        ) => void;
+        // const onFunction = arguments[2] as (
+        //     join: IJoinOnClause2<any, any>
+        // ) => void;
 
         let knexOnObject: any;
-        this.queryBuilder.leftOuterJoin(
+        queryBuilderJoin(
             `${tableToJoinName} as ${tableToJoinAlias}`,
             function() {
                 knexOnObject = this;

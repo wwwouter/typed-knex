@@ -1,5 +1,9 @@
 # Changelog
 
+## Next
+
+-   Added `innerJoinTableOnFunction`
+
 ## 2.4.1
 
 -   Fix: better handling of optional properties

@@ -217,6 +217,24 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+
+    it('should inner join with function with other table', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(UserSetting)
+            .innerJoinTableOnFunction('otherUser', User, join => {
+                join.onColumns(i => i.user2Id, '=', j => j.id);
+            });
+
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select * from "userSettings" inner join "users" as "otherUser" on "userSettings"."user2Id" = "otherUser"."id"'
+        );
+
+        done();
+    });
+
     it('should select 2 columns at once', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex.query(User).select(c => [c.id, c.name]);

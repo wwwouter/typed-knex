@@ -150,6 +150,7 @@ const typedKnex = new TypedKnex(knex);
 -   [whereNotNull](#whereNotNull)
 -   [orderBy](#orderBy)
 -   [innerJoinColumn](#innerJoinColumn)
+-   [innerJoinTableOnFunction](#innerJoinTableOnFunction)
 -   [leftOuterJoinColumn](#leftOuterJoinColumn)
 -   [leftOuterJoinTableOnFunction](#leftOuterJoinTableOnFunction)
 -   [selectRaw](#selectRaw)
@@ -287,6 +288,18 @@ typedKnex.query(User).orderBy(i => i.id);
 typedKnex.query(User).innerJoinColumn(i => i.category);
 ```
 
+### innerJoinTableOnFunction
+
+```ts
+typedKnex.query(User).innerJoinTableOnFunction('evilTwin', User, join => {
+    join.onColumns(
+        i => i.id,
+        '=',
+        j => j.id
+    );
+});
+```
+
 ### leftOuterJoinColumn
 
 ```ts
@@ -297,7 +310,11 @@ typedKnex.query(User).leftOuterJoinColumn(i => i.category);
 
 ```ts
 typedKnex.query(User).leftOuterJoinTableOnFunction('evilTwin', User, join => {
-    join.onColumns(i => i.id, '=', j => j.id);
+    join.onColumns(
+        i => i.id,
+        '=',
+        j => j.id
+    );
 });
 ```
 
