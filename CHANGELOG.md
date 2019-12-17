@@ -1,6 +1,6 @@
 # Changelog
 
-## Next
+## 2.5.0
 
 -   Added `innerJoinTableOnFunction`.
 -   Overloaded `where` to also accept an operator.
