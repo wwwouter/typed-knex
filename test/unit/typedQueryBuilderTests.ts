@@ -341,12 +341,13 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(User)
             .where(c => c.name, 'user1')
-            .andWhere(c => c.name, 'user2');
+            .andWhere(c => c.name, 'user2')
+            .andWhere(c => c.name, 'like', '%user%');
 
         const queryString = query.toQuery();
         assert.equal(
             queryString,
-            'select * from "users" where "users"."name" = \'user1\' and "users"."name" = \'user2\''
+            'select * from "users" where "users"."name" = \'user1\' and "users"."name" = \'user2\' and "users"."name" like \'%user%\''
         );
 
         done();
