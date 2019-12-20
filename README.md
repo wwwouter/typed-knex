@@ -147,7 +147,9 @@ const typedKnex = new TypedKnex(knex);
 -   [whereNot](#whereNot)
 -   [whereColumn](#whereColumn)
 -   [whereNull](#whereNull)
+-   [orWhereNull](#orWhereNull)
 -   [whereNotNull](#whereNotNull)
+-   [orWhereNotNull](#orWhereNotNull)
 -   [orderBy](#orderBy)
 -   [innerJoinColumn](#innerJoinColumn)
 -   [innerJoinTableOnFunction](#innerJoinTableOnFunction)
@@ -245,6 +247,13 @@ typedKnex
     .andWhere(i => i.name, 'name');
 ```
 
+```ts
+typedKnex
+    .query(User)
+    .where(i => i.name, 'name')
+    .andWhere(i => i.name, 'like', '%na%');
+```
+
 ### orWhere
 
 ```ts
@@ -252,6 +261,13 @@ typedKnex
     .query(User)
     .where(i => i.name, 'name')
     .orWhere(i => i.name, 'name');
+```
+
+```ts
+typedKnex
+    .query(User)
+    .where(i => i.name, 'name')
+    .orWhere(i => i.name, 'like', '%na%');
 ```
 
 ### whereNot
@@ -278,10 +294,28 @@ typedKnex.query(User).whereNotExists(UserSetting, (subQuery, parentColumn) => {
 typedKnex.query(User).whereNull(i => i.name);
 ```
 
+### orWhereNull
+
+```ts
+typedKnex
+    .query(User)
+    .whereNull(i => i.name)
+    .orWhereNull(i => i.name);
+```
+
 ### whereNotNull
 
 ```ts
 typedKnex.query(User).whereNotNull(i => i.name);
+```
+
+### orWhereNotNull
+
+```ts
+typedKnex
+    .query(User)
+    .whereNotNull(i => i.name)
+    .orWhereNotNull(i => i.name);
 ```
 
 ### orderBy

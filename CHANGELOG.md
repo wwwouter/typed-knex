@@ -3,6 +3,7 @@
 ## 2.6.0
 
 -   Overloaded `orWhere` and `andWhere` as to also accept an operator.
+-   Added `orWhereNull` and `orWhereNotNull`.
 
 ## 2.5.0
 

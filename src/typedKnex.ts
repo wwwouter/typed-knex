@@ -135,6 +135,8 @@ export interface ITypedQueryBuilder<Model, Row> {
 
     whereNull: IColumnParameterNoRowTransformation<Model, Row>;
     whereNotNull: IColumnParameterNoRowTransformation<Model, Row>;
+    orWhereNull: IColumnParameterNoRowTransformation<Model, Row>;
+    orWhereNotNull: IColumnParameterNoRowTransformation<Model, Row>;
 
     leftOuterJoinTableOnFunction: IJoinTableMultipleOnClauses<
         Model,
@@ -1423,22 +1425,30 @@ class TypedQueryBuilder<ModelType, Row = {}>
     }
 
     public whereNull() {
-        const columnArguments = this.getArgumentsFromColumnFunction(
-            arguments[0]
-        );
-
-        this.queryBuilder.whereNull(this.getColumnName(...columnArguments));
-        return this;
+        return this.callKnexFunctionWithColumnFunction(this.queryBuilder.whereNull.bind(this.queryBuilder), ...arguments);
     }
 
     public whereNotNull() {
-        const columnArguments = this.getArgumentsFromColumnFunction(
-            arguments[0]
-        );
-
-        this.queryBuilder.whereNotNull(this.getColumnName(...columnArguments));
-        return this;
+        return this.callKnexFunctionWithColumnFunction(this.queryBuilder.whereNotNull.bind(this.queryBuilder), ...arguments);
     }
+
+
+    public orWhereNull() {
+        return this.callKnexFunctionWithColumnFunction(this.queryBuilder.orWhereNull.bind(this.queryBuilder), ...arguments);
+    }
+
+    public orWhereNotNull() {
+        return this.callKnexFunctionWithColumnFunction(this.queryBuilder.orWhereNotNull.bind(this.queryBuilder), ...arguments);
+    }
+
+
+    // public andWhereNull() {
+    //     return this.callKnexFunctionWithColumnFunction(this.queryBuilder.andWhereNotNull.bind(this.queryBuilder), ...arguments);
+    // }
+
+    // public andWhereNotNull() {
+    //     return this.callKnexFunctionWithColumnFunction(this.queryBuilder.andWhereNotNull.bind(this.queryBuilder), ...arguments);
+    // }
 
     public getArgumentsFromColumnFunction(f: any) {
         const { root, memories } = getProxyAndMemories();
