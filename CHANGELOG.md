@@ -1,9 +1,13 @@
 # Changelog
 
+## 2.6.0
+
+-   Overloaded `orWhere` and `andWhere` as to also accept an operator.
+
 ## 2.5.0
 
 -   Added `innerJoinTableOnFunction`.
--   Overloaded `where` to also accept an operator.
+-   Overloaded `where` as to also accept an operator.
 
 ## 2.4.1
 

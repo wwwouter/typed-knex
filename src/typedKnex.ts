@@ -120,8 +120,8 @@ export interface ITypedQueryBuilder<Model, Row> {
     columns: { name: string }[];
 
     where: IWhereWithOperator<Model, Row>;
-    andWhere: IWhere<Model, Row>;
-    orWhere: IWhere<Model, Row>;
+    andWhere: IWhereWithOperator<Model, Row>;
+    orWhere: IWhereWithOperator<Model, Row>;
     whereNot: IWhere<Model, Row>;
     select: ISelectWithFunctionColumns3<Model, Row extends Model ? {} : Row>;
 
@@ -1470,25 +1470,10 @@ class TypedQueryBuilder<ModelType, Row = {}>
         return await this.queryBuilder.first();
     }
 
+
+
     public where() {
-        const columnArguments = this.getArgumentsFromColumnFunction(
-            arguments[0]
-        );
-
-        if (arguments[2]) {
-            this.queryBuilder.where(
-                this.getColumnName(...columnArguments),
-                arguments[1],
-                arguments[2]
-            );
-        } else {
-            this.queryBuilder.where(
-                this.getColumnName(...columnArguments),
-                arguments[1]
-            );
-        }
-
-        return this;
+        return this.callKnexFunctionWithColumnFunction(this.queryBuilder.where.bind(this.queryBuilder), ...arguments);
     }
 
     public whereNot() {
@@ -1504,27 +1489,11 @@ class TypedQueryBuilder<ModelType, Row = {}>
     }
 
     public andWhere() {
-        const columnArguments = this.getArgumentsFromColumnFunction(
-            arguments[0]
-        );
-
-        this.queryBuilder.andWhere(
-            this.getColumnName(...columnArguments),
-            arguments[1]
-        );
-        return this;
+        return this.callKnexFunctionWithColumnFunction(this.queryBuilder.andWhere.bind(this.queryBuilder), ...arguments);
     }
 
     public orWhere() {
-        const columnArguments = this.getArgumentsFromColumnFunction(
-            arguments[0]
-        );
-
-        this.queryBuilder.orWhere(
-            this.getColumnName(...columnArguments),
-            arguments[1]
-        );
-        return this;
+        return this.callKnexFunctionWithColumnFunction(this.queryBuilder.orWhere.bind(this.queryBuilder), ...arguments);
     }
 
     public whereIn() {
@@ -2222,5 +2191,27 @@ class TypedQueryBuilder<ModelType, Row = {}>
 
         return this as any;
     }
+
+    private callKnexFunctionWithColumnFunction(knexFunction: any, ...args: any[]) {
+        const columnArguments = this.getArgumentsFromColumnFunction(
+            args[0]
+        );
+
+        if (args.length === 3) {
+            knexFunction(
+                this.getColumnName(...columnArguments),
+                args[1],
+                args[2]
+            );
+        } else {
+            knexFunction(
+                this.getColumnName(...columnArguments),
+                args[1]
+            );
+        }
+
+        return this;
+    }
+
 
 }
