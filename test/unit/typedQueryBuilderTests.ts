@@ -1,8 +1,9 @@
 import { assert } from 'chai';
 import * as knex from 'knex';
-import { getEntities } from '../../src';
+import { getEntities, getTableName } from '../../src';
 import { setToNull, TypedKnex, unflatten } from '../../src/typedKnex';
 import { User, UserCategory, UserSetting } from '../testEntities';
+import { getColumnName } from '../../src/decorators';
 
 describe('TypedKnexQueryBuilder', () => {
     it('should return select * from "users"', done => {
@@ -1240,6 +1241,26 @@ describe('TypedKnexQueryBuilder', () => {
 
         done();
     });
+
+    it('should get name of the table', done => {
+
+        const tableName = getTableName(User);
+
+        assert.equal(tableName, 'users');
+
+        done();
+    });
+
+    it('should get name of the column', done => {
+
+        const columnName = getColumnName(User, 'id');
+
+        assert.equal(columnName, 'id');
+
+        done();
+    });
+
+
 
     //
 

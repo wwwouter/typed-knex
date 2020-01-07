@@ -41,6 +41,15 @@ export function getTableMetadata(tableClass: Function): { tableName: string } {
     return Reflect.getMetadata(tableyMetadataKey, tableClass);
 }
 
+
+export function getTableName(tableClass: Function): string {
+    return Reflect.getMetadata(tableyMetadataKey, tableClass).tableName;
+}
+
+export function getColumnName<T>(tableClass: new () => T, propertyName: keyof T): string {
+    return getColumnInformation(tableClass, propertyName as string).name;
+}
+
 // function registerEntity(target: any, propertyKey: string): void {
 
 //     Reflect.metadata(columnMetadataKey, { isColumn: true })(target);
@@ -93,7 +102,7 @@ function getRegisterColumn(options?: IColumnOptions) {
         );
         const isForeignKey = designType
             ? ['String', 'Number', 'Boolean'].includes(designType.name) ===
-              false
+            false
             : false;
 
         const columns = tableColumns.get(target.constructor) || [];
@@ -133,7 +142,7 @@ export function getColumnInformation(
     if (!property) {
         throw new Error(
             `Cannot get column data. Did you set @Column() attribute on ${
-                target.name
+            target.name
             }.${propertyKey}?`
         );
     }
@@ -156,7 +165,7 @@ export function getColumnProperties(tableClass: Function): IColumnData[] {
     if (!columns) {
         throw new Error(
             `Cannot get column data from ${
-                tableClass.constructor.name
+            tableClass.constructor.name
             }, did you set @Column() attribute?`
         );
     }
@@ -169,7 +178,7 @@ export function getPrimaryKeyColumn(tableClass: Function): IColumnData {
     if (!columns) {
         throw new Error(
             `Cannot get column data from ${
-                tableClass.constructor.name
+            tableClass.constructor.name
             }, did you set @Column() attribute?`
         );
     }
@@ -177,7 +186,7 @@ export function getPrimaryKeyColumn(tableClass: Function): IColumnData {
     if (primaryKeyColumn === undefined) {
         throw new Error(
             `Cannot get primary key column ${
-                tableClass.constructor.name
+            tableClass.constructor.name
             }, did you set @Column({primary:true}) attribute?`
         );
     }

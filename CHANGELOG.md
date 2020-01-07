@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.7.0
+
+-   Added `getTableName` and `getColumnName`.
+
 ## 2.6.0
 
 -   Overloaded `orWhere` and `andWhere` as to also accept an operator.

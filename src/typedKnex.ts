@@ -82,6 +82,8 @@ export class TypedKnex {
                 .catch(_e => { });
         });
     }
+
+
 }
 
 let beforeInsertTransform = undefined as

@@ -111,6 +111,11 @@ const knex = Knex({
 const typedKnex = new TypedKnex(knex);
 ```
 
+## Helper
+
+-   [getTableName](#getTableName)
+-   [getColumnName](#getColumnName)
+
 ## Querybuilder
 
 ### General
@@ -201,6 +206,22 @@ const typedKnex = new TypedKnex(knex);
 -   [distinct](#distinct)
 -   [clone](#clone)
 -   [groupByRaw](#groupByRaw)
+
+### getTableName
+
+```ts
+const tableName = getTableName(User);
+
+// tableName = 'users'
+```
+
+### getTableName
+
+```ts
+const columnName = getColumnName(User, 'id');
+
+// columnName = 'id'
+```
 
 ### query
 
