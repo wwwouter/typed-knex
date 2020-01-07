@@ -1,6 +1,6 @@
 // tslint:disable:no-multiline-string
 import { assert } from 'chai';
-import { Project, SourceFile } from 'ts-simple-ast';
+import { Project, SourceFile } from 'ts-morph';
 
 describe('compile time typed-knex', function() {
     this.timeout(1000000);

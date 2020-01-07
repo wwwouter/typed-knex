@@ -88,7 +88,7 @@ export class TypedKnex {
 
 let beforeInsertTransform = undefined as
     | undefined
-    | ((item: any, typedQueryBuilder: ITypedQueryBuilder<any, any>) => any);
+    | ((item: any, typedQueryBuilder: any) => any);
 
 export function registerBeforeInsertTransform<T>(
     f: (item: T, typedQueryBuilder: ITypedQueryBuilder<{}, {}>) => T
@@ -98,7 +98,7 @@ export function registerBeforeInsertTransform<T>(
 
 let beforeUpdateTransform = undefined as
     | undefined
-    | ((item: any, typedQueryBuilder: ITypedQueryBuilder<any, any>) => any);
+    | ((item: any, typedQueryBuilder: any) => any);
 
 export function registerBeforeUpdateTransform<T>(
     f: (item: T, typedQueryBuilder: ITypedQueryBuilder<{}, {}>) => T

@@ -4,6 +4,7 @@
 
 -   Added `getTableName` and `getColumnName`.
 -   Added `keepFlat`.
+-   Upgraded packages.
 
 ## 2.6.0
 

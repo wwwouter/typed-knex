@@ -3,7 +3,7 @@
     "version": "2.7.0",
     "description": "Makes knex better by working with TypeScript",
     "dependencies": {
-        "flat": "4.1.0",
+        "flat": "5.0.0",
         "reflect-metadata": "0.1.13"
     },
     "main": "./dist/src/index.js",
@@ -35,21 +35,21 @@
     },
     "homepage": "https://github.com/wwwouter/typed-knex#readme",
     "devDependencies": {
-        "@types/chai": "4.1.7",
-        "@types/chai-as-promised": "7.1.0",
+        "@types/chai": "4.2.7",
+        "@types/chai-as-promised": "7.1.2",
         "@types/flat": "0.0.28",
-        "@types/mocha": "5.2.6",
-        "@types/sqlite3": "3.1.5",
+        "@types/mocha": "5.2.7",
+        "@types/sqlite3": "3.1.6",
         "@wwwouter/tslint-contrib": "1.0.0",
         "chai": "4.2.0",
         "chai-as-promised": "7.1.1",
-        "knex": "0.16.3",
-        "mocha": "6.0.2",
-        "sqlite3": "4.0.6",
-        "npm-check-updates": "3.1.1",
-        "ts-simple-ast": "21.0.4",
-        "tslint": "5.14.0",
-        "tslint-microsoft-contrib": "6.1.0",
-        "typescript": "3.3.4000"
+        "knex": "0.20.7",
+        "mocha": "7.0.0",
+        "sqlite3": "4.1.1",
+        "npm-check-updates": "4.0.1",
+        "ts-morph": "6.0.2",
+        "tslint": "5.20.1",
+        "tslint-microsoft-contrib": "6.2.0",
+        "typescript": "3.7.4"
     }
 }
