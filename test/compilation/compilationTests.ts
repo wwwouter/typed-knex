@@ -14,7 +14,7 @@ describe('compile time typed-knex', function() {
         try {
             file.delete();
             // tslint:disable-next-line: no-empty
-        } catch (_e) {}
+        } catch (_e) { }
     });
 
     it('should return type with properties from the selectColumn method', done => {
@@ -602,6 +602,43 @@ describe('compile time typed-knex', function() {
         );
 
         assert.notEqual(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
+
+
+    it('should  return any when keepFlat() is used', done => {
+        file = project.createSourceFile(
+            'test/test4.ts',
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User, UserSetting } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+
+                const item = await typedKnex
+                .query(UserSetting)
+                .leftOuterJoinTableOnFunction('otherUser', User, join => {
+                    join.onColumns(i => i.user2Id, '=', j => j.id);
+                })
+                .select(i => [i.otherUser.name, i.user2.numericValue])
+                .keepFlat()
+                .getSingle();
+
+
+                console.log(item.doesNotExist);
+
+
+            })();
+        `
+        );
+
+        assert.equal(project.getPreEmitDiagnostics().length, 0);
 
         file.delete();
         done();

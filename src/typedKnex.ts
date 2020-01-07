@@ -253,6 +253,8 @@ export interface ITypedQueryBuilder<Model, Row> {
         sql: string,
         ...bindings: string[]
     ): ITypedQueryBuilder<Model, Row>;
+
+    keepFlat(): ITypedQueryBuilder<Model, any>;
 }
 
 type TransformAll<T, IT> = { [Key in keyof T]: IT };
@@ -1074,6 +1076,7 @@ class TypedQueryBuilder<ModelType, Row = {}>
 
     private queryBuilder: Knex.QueryBuilder;
     private tableName: string;
+    private shouldUnflatten: boolean;
     private extraJoinedProperties: {
         name: string;
         propertyType: new () => any;
@@ -1097,6 +1100,12 @@ class TypedQueryBuilder<ModelType, Row = {}>
         }
 
         this.extraJoinedProperties = [];
+        this.shouldUnflatten = true;
+    }
+
+    public keepFlat() {
+        this.shouldUnflatten = false;
+        return this;
     }
 
     public async del() {
@@ -2127,7 +2136,7 @@ class TypedQueryBuilder<ModelType, Row = {}>
     }
 
     private flattenByOption(o: any, flattenOption?: FlattenOption) {
-        if (flattenOption === FlattenOption.noFlatten) {
+        if (flattenOption === FlattenOption.noFlatten || this.shouldUnflatten === false) {
             return o;
         }
         const unflattened = unflatten(o);

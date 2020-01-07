@@ -3,6 +3,7 @@
 ## 2.7.0
 
 -   Added `getTableName` and `getColumnName`.
+-   Added `keepFlat`.
 
 ## 2.6.0
 

@@ -124,6 +124,7 @@ const typedKnex = new TypedKnex(knex);
 -   [transacting](#transacting)
 -   [toQuery](#toQuery)
 -   [useKnexQueryBuilder](#useKnexQueryBuilder)
+-   [keepFlat](#keepFlat)
 
 ### Getting the results (Promises)
 
@@ -718,6 +719,31 @@ const query = typedKnex.query(User)
     .useKnexQueryBuilder(queryBuilder => queryBuilder.where('somethingelse', 'value')
     .select(i=>i.name);
 );
+```
+
+### keepFlat
+
+Use `keepFlat` to prevent unflattening of the result.
+
+```ts
+const item = await typedKnex
+    .query(User)
+    .where(i => i.name, 'name')
+    .innerJoinColumn(i => i.category);
+    .select(i=>[i.name, i.category.name)
+    .getFirst();
+
+// returns { name: 'user name', category: { name: 'category name' }}
+
+const item = await typedKnex
+    .query(User)
+    .where(i => i.name, 'name')
+    .innerJoinColumn(i => i.category);
+    .select(i=>[i.name, i.category.name)
+    .keepFlat()
+    .getFirst();
+
+// returns { name: 'user name', category.name: 'category name' }
 ```
 
 ### toQuery
