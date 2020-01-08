@@ -42,6 +42,8 @@ export class User {
     public categoryId!: string;
     @Column({ name: 'category2Id' })
     public category2!: UserCategory;
+    @Column()
+    public nickName!: string | null;
 }
 
 @Entity('userSettings')

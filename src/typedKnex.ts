@@ -127,6 +127,10 @@ export interface ITypedQueryBuilder<Model, Row> {
     whereNot: IWhere<Model, Row>;
     select: ISelectWithFunctionColumns3<Model, Row extends Model ? {} : Row>;
 
+    // select2: ISelectWithFunctionColumns4<Model, Row extends Model ? {} : Row>;
+
+
+
     selectQuery: ISelectQuery<Model, Row>;
 
     orderBy: IOrderBy<Model, Row>;
@@ -374,98 +378,6 @@ interface ISelectQuery<Model, Row> {
     >;
 }
 
-type PickAndChangeType<T, K extends keyof T, NewType> = { [P in K]: NewType };
-
-type PickAndTransformLevel4<
-    Level1Type,
-    Level1Property extends keyof Level1Type,
-    Level2Type,
-    Level2Property extends keyof Level2Type,
-    Level3Type,
-    Level3Property extends keyof Level3Type,
-    Level4Type,
-    Level4Properties extends keyof Level4Type
-    > = {
-        [Level4Property in Level4Properties]: Required<Level4Type>[Level4Property] extends object
-        ? any
-        : (() => PickAndChangeType<
-            Level1Type,
-            Level1Property,
-            PickAndChangeType<
-                Level2Type,
-                Level2Property,
-                PickAndChangeType<
-                    Level3Type,
-                    Level3Property,
-                    Pick<Required<Level4Type>, Level4Property>
-                >
-            >
-        >)
-    };
-
-type PickAndTransformLevel3<
-    Level1Type,
-    Level1Property extends keyof Level1Type,
-    Level2Type,
-    Level2Property extends keyof Level2Type,
-    Level3Type,
-    Level3Properties extends keyof Level3Type
-    > = {
-        [Level3Property in Level3Properties]: Required<Level3Type>[Level3Property] extends object
-        ? PickAndTransformLevel4<
-            Level1Type,
-            Level1Property,
-            Level2Type,
-            Level2Property,
-            Required<Level3Type>,
-            Level3Property,
-            Required<Required<Level3Type>[Level3Property]>,
-            keyof Required<Level3Type>[Level3Property]
-        >
-        : (() => PickAndChangeType<
-            Level1Type,
-            Level1Property,
-            PickAndChangeType<
-                Level2Type,
-                Level2Property,
-                Pick<Required<Level3Type>, Level3Property>
-            >
-        >)
-    };
-
-type PickAndTransformLevel2<
-    Level1Type,
-    Level1Property extends keyof Level1Type,
-    Level2Type,
-    Level2Properties extends keyof Level2Type
-    > = {
-        [Level2Property in Level2Properties]: Required<Level2Type>[Level2Property] extends object
-        ? PickAndTransformLevel3<
-            Required<Level1Type>,
-            Level1Property,
-            Required<Level2Type>,
-            Level2Property,
-            Required<Required<Level2Type>[Level2Property]>,
-            keyof Required<Level2Type>[Level2Property]
-        >
-        : (() => PickAndChangeType<
-            Required<Level1Type>,
-            Level1Property,
-            Pick<Required<Level2Type>, Level2Property>
-        >)
-    };
-
-type TransformPropsToFunctionsLevel1<Level1Type> = {
-    [Level1Property in keyof Level1Type]: Level1Type[Level1Property] extends object
-    ? PickAndTransformLevel2<
-        Level1Type,
-        Level1Property,
-        Level1Type[Level1Property],
-        keyof Level1Type[Level1Property]
-    >
-    : (() => Pick<Level1Type, Level1Property>)
-};
-
 type TransformPropsToFunctionsOnlyLevel1<Level1Type> = {
     [Level1Property in keyof RemoveObjectsFrom<
         Level1Type
@@ -656,7 +568,7 @@ export function a(i: [string, string?]) {
 interface IOrderBy<Model, Row> {
     <NewRow>(
         selectColumnFunction: (
-            c: TransformPropsToFunctionsLevel1<Model>
+            c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
         ) => () => NewRow,
         direction?: 'asc' | 'desc'
     ): ITypedQueryBuilder<Model, Row>;
@@ -674,16 +586,26 @@ interface IDbFunctionWithAlias<Model, Row> {
     >;
 }
 
-type TransformPropsToFunctionsLevel1NextLevel<Level1Type> = {
-    [Level1Property in keyof Required<Level1Type>]: Required<Level1Type>[Level1Property] extends object
-    ? PickAndTransformLevel2<
-        Required<Level1Type>,
-        Level1Property,
-        Required<Required<Level1Type>[Level1Property]>,
-        keyof Required<Level1Type>[Level1Property]
-    >
-    : (() => Pick<Required<Level1Type>, Level1Property>)
+
+type NonNullableRecursive<T> = { [P in keyof T]-?: T[P] extends object ? NonNullableRecursive<T[P]> : Required<NonNullable<T[P]>> };
+
+type TransformPropertiesToFunction<Model, Result extends any[] = []> = {
+    [P in keyof Model]: Model[P] extends object ?
+    TransformPropertiesToFunction<Model[P], AddToArray<Result, P>>
+    :
+    () => RecordFromArray<AddToArray<Result, P>, Model[P]>
 };
+
+type RecordFromArray<Keys extends any[], LeafType> =
+    Keys extends { 5: any } ? Record<Keys[5], Record<Keys[4], Record<Keys[3], Record<Keys[2], Record<Keys[1], Record<Keys[0], LeafType>>>>>> :
+    Keys extends { 4: any } ? Record<Keys[4], Record<Keys[3], Record<Keys[2], Record<Keys[1], Record<Keys[0], LeafType>>>>> :
+    Keys extends { 3: any } ? Record<Keys[3], Record<Keys[2], Record<Keys[1], Record<Keys[0], LeafType>>>> :
+    Keys extends { 2: any } ? Record<Keys[2], Record<Keys[1], Record<Keys[0], LeafType>>> :
+    Keys extends { 1: any } ? Record<Keys[1], Record<Keys[0], LeafType>> :
+    Keys extends { 0: any } ? Record<Keys[0], LeafType> :
+    never;
+
+type AddToArray<T extends string[], A extends any> = ((a: A, ...t: T) => void) extends ((...u: infer U) => void) ? U : never;
 
 interface ISelectWithFunctionColumns3<Model, Row> {
     <
@@ -718,7 +640,7 @@ interface ISelectWithFunctionColumns3<Model, Row> {
         R29
         >(
         selectColumnFunction: (
-            c: TransformPropsToFunctionsLevel1NextLevel<Model>
+            c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
         ) => [
                 () => R1,
                 (() => R2)?,
@@ -786,7 +708,7 @@ interface ISelectWithFunctionColumns3<Model, Row> {
     >;
     <R1>(
         selectColumnFunction: (
-            c: TransformPropsToFunctionsLevel1NextLevel<Model>
+            c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
         ) => () => R1
     ): ITypedQueryBuilder<Model, Row & R1>;
 }
@@ -896,8 +818,15 @@ interface IFindByPrimaryKey<Model, Row> {
 interface IKeyFunctionAsParametersReturnQueryBuider<Model, Row> {
     (
         selectColumnFunction: (
-            c: TransformPropsToFunctionsLevel1<Model>
+            c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
         ) => void
+    ): ITypedQueryBuilder<Model, Row>;
+
+    (
+        selectColumnFunction: (
+            c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
+        ) => void,
+        setToNullIfNullFunction: (r: Row) => void
     ): ITypedQueryBuilder<Model, Row>;
 }
 
@@ -1290,6 +1219,21 @@ class TypedQueryBuilder<ModelType, Row = {}>
         f(root);
 
         return result;
+    }
+
+    public select2() {
+        const f = arguments[0];
+
+        const columnArgumentsList = this.getArgumentsFromColumnFunction3(f);
+
+        for (const columnArguments of columnArgumentsList) {
+            this.queryBuilder.select(
+                this.getColumnName(...columnArguments) +
+                ' as ' +
+                this.getColumnSelectAlias(...columnArguments)
+            );
+        }
+        return this as any;
     }
 
     public select() {

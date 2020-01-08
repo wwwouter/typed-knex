@@ -64,18 +64,20 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should handle optional properties', done => {
+    it('should handle nullable properties', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        typedKnex
+        const queryString = typedKnex
             .query(UserCategory)
             .select(i => i.phoneNumber)
             .where(c => c.phoneNumber, 'user1')
-            .select(i => i.backupRegion.code);
+            .select(i => i.backupRegion.code)
+            .toQuery();
+        console.log('queryString: ', queryString);
 
         done();
     });
 
-    it('should handle optional level 2 properties', done => {
+    it('should handle nullable level 2 properties', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         typedKnex
             .query(User)
@@ -1258,6 +1260,7 @@ describe('TypedKnexQueryBuilder', () => {
         assert.equal(columnName, 'id');
 
         done();
+
     });
 
 
