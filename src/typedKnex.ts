@@ -127,10 +127,6 @@ export interface ITypedQueryBuilder<Model, Row> {
     whereNot: IWhere<Model, Row>;
     select: ISelectWithFunctionColumns3<Model, Row extends Model ? {} : Row>;
 
-    // select2: ISelectWithFunctionColumns4<Model, Row extends Model ? {} : Row>;
-
-
-
     selectQuery: ISelectQuery<Model, Row>;
 
     orderBy: IOrderBy<Model, Row>;
@@ -1231,15 +1227,6 @@ class TypedQueryBuilder<ModelType, Row = {}>
         return this.callKnexFunctionWithColumnFunction(this.queryBuilder.orWhereNotNull.bind(this.queryBuilder), ...arguments);
     }
 
-
-    // public andWhereNull() {
-    //     return this.callKnexFunctionWithColumnFunction(this.queryBuilder.andWhereNotNull.bind(this.queryBuilder), ...arguments);
-    // }
-
-    // public andWhereNotNull() {
-    //     return this.callKnexFunctionWithColumnFunction(this.queryBuilder.andWhereNotNull.bind(this.queryBuilder), ...arguments);
-    // }
-
     public getArgumentsFromColumnFunction(f: any) {
         const { root, memories } = getProxyAndMemories();
 
@@ -1929,9 +1916,6 @@ class TypedQueryBuilder<ModelType, Row = {}>
     }
 
     private joinTableOnFunction(queryBuilderJoin: Knex.Join, newPropertyKey: any, newPropertyType: any, onFunction: (join: IJoinOnClause2<any, any>) => void) {
-        // const newPropertyKey = arguments[0];
-        // const newPropertyType = arguments[1];
-
         this.extraJoinedProperties.push({
             name: newPropertyKey,
             propertyType: newPropertyType,
@@ -1940,10 +1924,6 @@ class TypedQueryBuilder<ModelType, Row = {}>
         const tableToJoinClass = newPropertyType;
         const tableToJoinName = getTableMetadata(tableToJoinClass).tableName;
         const tableToJoinAlias = newPropertyKey;
-
-        // const onFunction = arguments[2] as (
-        //     join: IJoinOnClause2<any, any>
-        // ) => void;
 
         let knexOnObject: any;
         queryBuilderJoin(
@@ -2012,6 +1992,4 @@ class TypedQueryBuilder<ModelType, Row = {}>
 
         return this;
     }
-
-
 }
