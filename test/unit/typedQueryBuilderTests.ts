@@ -66,13 +66,12 @@ describe('TypedKnexQueryBuilder', () => {
 
     it('should handle nullable properties', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const queryString = typedKnex
+        typedKnex
             .query(UserCategory)
             .select(i => i.phoneNumber)
             .where(c => c.phoneNumber, 'user1')
             .select(i => i.backupRegion.code)
             .toQuery();
-        console.log('queryString: ', queryString);
 
         done();
     });
@@ -1263,24 +1262,19 @@ describe('TypedKnexQueryBuilder', () => {
 
     });
 
-
-
-    //
-
     // it('should stay commented out', async done => {
     //     const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
 
-    //     const item = await typedKnex
-    //         .query(UserSetting)
-    //         .insertItem({ id: '1', key:  });
-
     //     // const item = await typedKnex
     //     //     .query(UserSetting)
-    //     //     .leftOuterJoinTableOnFunction('otherUser', User, join => {
-    //     //         join.onColumns(i => i.user2Id, '=', j => j.id);
-    //     //     })
-    //     //     .select(i => [i.otherUser.name, i.user2.numericValue])
-    //     //     .firstItem();
+    //     //     .insertItem({ id: '1', key:  });
+
+    //     const item = await typedKnex
+    //         .query(User)
+    //         .select(i => i.category.name)
+    //         .getFirst();
+
+    //     console.log('item: ', item.category.name);
 
     //     // if (item !== undefined) {
     //     //     console.log(item.user2.numericValue);

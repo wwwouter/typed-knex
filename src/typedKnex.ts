@@ -419,15 +419,17 @@ interface IDbFunctionWithAlias<Model, Row> {
 
 
 type NonNullableRecursive<T> = { [P in keyof T]-?: T[P] extends object ? NonNullableRecursive<T[P]> : Required<NonNullable<T[P]>> };
+// type NonNullableRecursive<T> = { [P in keyof T]: T[P] };
 
 type TransformPropertiesToFunction<Model, Result extends any[] = []> = {
-    [P in keyof Model]: Model[P] extends object ?
+    [P in keyof Model]-?: Model[P] extends (object | undefined) ?
     TransformPropertiesToFunction<Model[P], AddToArray<Result, P>>
     :
-    () => RecordFromArray<AddToArray<Result, P>, Model[P]>
+    () => RecordFromArray<AddToArray<Result, P>, ({} extends { [P2 in P]: Model[P] } ? NonNullable<Model[P]> | null : Model[P])>
 };
 
 type RecordFromArray<Keys extends any[], LeafType> =
+    Keys extends { 6: any } ? Record<Keys[6], Record<Keys[5], Record<Keys[4], Record<Keys[3], Record<Keys[2], Record<Keys[1], Record<Keys[0], LeafType>>>>>>> :
     Keys extends { 5: any } ? Record<Keys[5], Record<Keys[4], Record<Keys[3], Record<Keys[2], Record<Keys[1], Record<Keys[0], LeafType>>>>>> :
     Keys extends { 4: any } ? Record<Keys[4], Record<Keys[3], Record<Keys[2], Record<Keys[1], Record<Keys[0], LeafType>>>>> :
     Keys extends { 3: any } ? Record<Keys[3], Record<Keys[2], Record<Keys[1], Record<Keys[0], LeafType>>>> :
@@ -471,7 +473,7 @@ interface ISelectWithFunctionColumns3<Model, Row> {
         R29
         >(
         selectColumnFunction: (
-            c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
+            c: TransformPropertiesToFunction<Model>
         ) => [
                 () => R1,
                 (() => R2)?,
@@ -539,7 +541,7 @@ interface ISelectWithFunctionColumns3<Model, Row> {
     >;
     <R1>(
         selectColumnFunction: (
-            c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
+            c: TransformPropertiesToFunction<Model>
         ) => () => R1
     ): ITypedQueryBuilder<Model, Row & R1>;
 }
