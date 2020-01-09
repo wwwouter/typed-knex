@@ -23,7 +23,7 @@ describe('validateEntitiesTests', () => {
 
         }
 
-        knex.destroy();
+        await knex.destroy();
 
     });
 });
