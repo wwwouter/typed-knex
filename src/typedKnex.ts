@@ -370,7 +370,7 @@ interface ISelectQuery<Model, Row> {
         subQueryModel: new () => SubQueryModel,
         code: (
             subQuery: ITypedQueryBuilder<SubQueryModel, {}>,
-            parent: TransformPropsToFunctionsLevel1ReturnProperyName<Model>
+            parent: TransformPropsToFunctionsReturnPropertyName<Model>
         ) => void
     ): ITypedQueryBuilder<
         Model,
@@ -385,6 +385,14 @@ type TransformPropsToFunctionsOnlyLevel1<Level1Type> = {
     ? never
     : (() => Pick<Level1Type, Level1Property>)
 };
+
+type TransformPropsToFunctionsReturnPropertyName<Model> = {
+    [P in keyof Model]: Model[P] extends object ?
+    TransformPropsToFunctionsReturnPropertyName<Model[P]>
+    :
+    () => P
+};
+
 
 type PickAndTransformLevel4ReturnProperyType<
     Level1Type,
@@ -450,72 +458,6 @@ type TransformPropsToFunctionsLevel1ReturnProperyType<Level1Type> = {
         keyof Level1Type[Level1Property]
     >
     : (() => Level1Type[Level1Property])
-};
-
-type PickAndTransformLevel4ReturnPropertyName<
-    Level1Type,
-    _Level1Property extends keyof Level1Type,
-    Level2Type,
-    _Level2Property extends keyof Level2Type,
-    Level3Type,
-    _Level3Property extends keyof Level3Type,
-    Level4Type,
-    Level4Properties extends keyof Level4Type
-    > = {
-        [Level4Property in Level4Properties]: Level4Type[Level4Property] extends object
-        ? any
-        : (() => Level4Property)
-    };
-
-type PickAndTransformLevel3ReturnProperyName<
-    Level1Type,
-    Level1Property extends keyof Level1Type,
-    Level2Type,
-    Level2Property extends keyof Level2Type,
-    Level3Type,
-    Level3Properties extends keyof Level3Type
-    > = {
-        [Level3Property in Level3Properties]: Level3Type[Level3Property] extends object
-        ? PickAndTransformLevel4ReturnPropertyName<
-            Level1Type,
-            Level1Property,
-            Level2Type,
-            Level2Property,
-            Level3Type,
-            Level3Property,
-            Level3Type[Level3Property],
-            keyof Level3Type[Level3Property]
-        >
-        : (() => Level3Property)
-    };
-
-type PickAndTransformLevel2ReturnProperyName<
-    Level1Type,
-    Level1Property extends keyof Level1Type,
-    Level2Type,
-    Level2Properties extends keyof Level2Type
-    > = {
-        [Level2Property in Level2Properties]: Level2Type[Level2Property] extends object
-        ? PickAndTransformLevel3ReturnProperyName<
-            Level1Type,
-            Level1Property,
-            Level2Type,
-            Level2Property,
-            Level2Type[Level2Property],
-            keyof Level2Type[Level2Property]
-        >
-        : (() => Level2Property)
-    };
-
-type TransformPropsToFunctionsLevel1ReturnProperyName<Level1Type> = {
-    [Level1Property in keyof Level1Type]: Level1Type[Level1Property] extends object
-    ? PickAndTransformLevel2ReturnProperyName<
-        Level1Type,
-        Level1Property,
-        Level1Type[Level1Property],
-        keyof Level1Type[Level1Property]
-    >
-    : (() => Level1Property)
 };
 
 interface IColumnFunctionReturnNewRow<Model> {
@@ -901,7 +843,7 @@ interface IWhereExists<Model, Row> {
         subQueryModel: new () => SubQueryModel,
         code: (
             subQuery: ITypedQueryBuilder<SubQueryModel, {}>,
-            parent: TransformPropsToFunctionsLevel1ReturnProperyName<Model>
+            parent: TransformPropsToFunctionsReturnPropertyName<Model>
         ) => void
     ): ITypedQueryBuilder<Model, Row>;
 }

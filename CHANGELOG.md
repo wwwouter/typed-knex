@@ -5,6 +5,7 @@
 -   Added `getTableName` and `getColumnName`.
 -   Added `keepFlat`.
 -   Upgraded packages.
+- Rewritten some internal helper types.
 
 ## 2.6.0
 
