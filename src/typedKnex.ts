@@ -261,8 +261,6 @@ export interface ITypedQueryBuilder<Model, Row> {
     keepFlat(): ITypedQueryBuilder<Model, any>;
 }
 
-type TransformAll<T, IT> = { [Key in keyof T]: IT };
-
 type ReturnNonObjectsNamesOnly<T> = { [K in keyof T]: T[K] extends object ? never : K }[keyof T];
 
 type RemoveObjectsFrom<T> = { [P in ReturnNonObjectsNamesOnly<T>]: T[P] };
@@ -292,7 +290,7 @@ export type AddPropertyWithType<
 interface IColumnParameterNoRowTransformation<Model, Row> {
     <PropertyType1>(
         selectColumn1Function: (
-            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
+            c: TransformPropsToFunctionsReturnPropertyType<Model>
         ) => () => PropertyType1
     ): ITypedQueryBuilder<Model, Row>;
 }
@@ -300,16 +298,16 @@ interface IColumnParameterNoRowTransformation<Model, Row> {
 interface IJoinOnClause2<Model, JoinedModel> {
     onColumns: <PropertyType1, PropertyType2>(
         selectColumn1Function: (
-            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
+            c: TransformPropsToFunctionsReturnPropertyType<Model>
         ) => () => PropertyType1,
         operator: Operator,
         selectColumn2Function: (
-            c: TransformPropsToFunctionsLevel1ReturnProperyType<JoinedModel>
+            c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
         ) => () => PropertyType2
     ) => void;
     onNull: <X>(
         selectColumn1Function: (
-            c: TransformPropsToFunctionsLevel1ReturnProperyType<JoinedModel>
+            c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
         ) => () => X
     ) => void;
 }
@@ -317,11 +315,11 @@ interface IJoinOnClause2<Model, JoinedModel> {
 interface IWhereCompareTwoColumns<Model, Row> {
     <PropertyType1, _PropertyType2, Model2>(
         selectColumn1Function: (
-            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
+            c: TransformPropsToFunctionsReturnPropertyType<Model>
         ) => () => PropertyType1,
         operator: Operator,
         selectColumn2Function: (
-            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model2>
+            c: TransformPropsToFunctionsReturnPropertyType<Model2>
         ) => any
     ): ITypedQueryBuilder<Model, Row>;
 }
@@ -394,118 +392,13 @@ type TransformPropsToFunctionsReturnPropertyName<Model> = {
 };
 
 
-type PickAndTransformLevel4ReturnProperyType<
-    Level1Type,
-    _Level1Property extends keyof Level1Type,
-    Level2Type,
-    _Level2Property extends keyof Level2Type,
-    Level3Type,
-    _Level3Property extends keyof Level3Type,
-    Level4Type,
-    Level4Properties extends keyof Level4Type
-    > = {
-        [Level4Property in Level4Properties]: Level4Type[Level4Property] extends object
-        ? any
-        : (() => Level4Type[Level4Property])
-    };
-
-type PickAndTransformLevel3ReturnPropertyType<
-    Level1Type,
-    Level1Property extends keyof Level1Type,
-    Level2Type,
-    Level2Property extends keyof Level2Type,
-    Level3Type,
-    Level3Properties extends keyof Level3Type
-    > = {
-        [Level3Property in Level3Properties]: Level3Type[Level3Property] extends object
-        ? PickAndTransformLevel4ReturnProperyType<
-            Level1Type,
-            Level1Property,
-            Level2Type,
-            Level2Property,
-            Level3Type,
-            Level3Property,
-            Required<Level3Type[Level3Property]>,
-            keyof Level3Type[Level3Property]
-        >
-        : (() => Level3Type[Level3Property])
-    };
-
-type PickAndTransformLevel2ReturnPropertyType<
-    Level1Type,
-    Level1Property extends keyof Level1Type,
-    Level2Type,
-    Level2Properties extends keyof Level2Type
-    > = {
-        [Level2Property in Level2Properties]: Level2Type[Level2Property] extends object
-        ? PickAndTransformLevel3ReturnPropertyType<
-            Level1Type,
-            Level1Property,
-            Level2Type,
-            Level2Property,
-            Required<Level2Type[Level2Property]>,
-            keyof Level2Type[Level2Property]
-        >
-        : (() => Level2Type[Level2Property])
-    };
-
-type TransformPropsToFunctionsLevel1ReturnProperyType<Level1Type> = {
-    [Level1Property in keyof Required<Level1Type>]: Level1Type[Level1Property] extends object
-    ? PickAndTransformLevel2ReturnPropertyType<
-        Level1Type,
-        Level1Property,
-        Required<Level1Type[Level1Property]>,
-        keyof Level1Type[Level1Property]
-    >
-    : (() => Level1Type[Level1Property])
+type TransformPropsToFunctionsReturnPropertyType<Model> = {
+    [P in keyof Model]: Model[P] extends object ?
+    TransformPropsToFunctionsReturnPropertyType<Model[P]>
+    :
+    () => Model[P]
 };
 
-interface IColumnFunctionReturnNewRow<Model> {
-    <
-        K1 extends keyof Model,
-        K2 extends keyof Model[K1],
-        K3 extends keyof Model[K1][K2]
-        >(
-        key1: K1,
-        key2: K2,
-        key3: K3,
-        ...keys: string[]
-    ): TransformAll<
-        Pick<Model, K1>,
-        TransformAll<
-            Pick<Model[K1], K2>,
-            TransformAll<Pick<Model[K1][K2], K3>, any>
-        >
-    >;
-    <
-        K1 extends keyof Model,
-        K2 extends keyof Model[K1],
-        K3 extends keyof Model[K1][K2]
-        >(
-        key1: K1,
-        key2: K2,
-        key3: K3
-    ): TransformAll<
-        Pick<Model, K1>,
-        TransformAll<Pick<Model[K1], K2>, Pick<Model[K1][K2], K3>>
-    >;
-    <K1 extends keyof Model, K2 extends keyof Model[K1]>(
-        key1: K1,
-        key2: K2
-    ): TransformAll<Pick<Model, K1>, Pick<Model[K1], K2>>;
-    <K extends keyof Model>(key1: K): Pick<Model, K>;
-}
-
-export type Lit = string | number | boolean | undefined | null | void | {};
-export const tuple = <T extends Lit[]>(...args: T) => args;
-
-export type ListOfFunc<Model> =
-    | IColumnFunctionReturnNewRow<Model>
-    | IColumnFunctionReturnNewRow<Model>;
-
-export function a(i: [string, string?]) {
-    return i;
-}
 
 interface IOrderBy<Model, Row> {
     <NewRow>(
@@ -519,7 +412,7 @@ interface IOrderBy<Model, Row> {
 interface IDbFunctionWithAlias<Model, Row> {
     <NewPropertyType, TName extends keyof any>(
         selectColumnFunction: (
-            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
+            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
         ) => () => NewPropertyType,
         name: TName
     ): ITypedQueryBuilder<
@@ -775,7 +668,7 @@ interface IKeyFunctionAsParametersReturnQueryBuider<Model, Row> {
 interface IWhere<Model, Row> {
     <PropertyType>(
         selectColumnFunction: (
-            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
+            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
         ) => () => PropertyType,
         value: PropertyType
     ): ITypedQueryBuilder<Model, Row>;
@@ -784,14 +677,14 @@ interface IWhere<Model, Row> {
 interface IWhereWithOperator<Model, Row> {
     <PropertyType>(
         selectColumnFunction: (
-            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
+            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
         ) => () => PropertyType,
         value: PropertyType
     ): ITypedQueryBuilder<Model, Row>;
 
     <PropertyType>(
         selectColumnFunction: (
-            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
+            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
         ) => () => PropertyType,
         operator: Operator,
         value: PropertyType
@@ -801,7 +694,7 @@ interface IWhereWithOperator<Model, Row> {
 interface IWhereIn<Model, Row> {
     <PropertyType>(
         selectColumnFunction: (
-            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
+            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
         ) => () => PropertyType,
         values: PropertyType[]
     ): ITypedQueryBuilder<Model, Row>;
@@ -810,7 +703,7 @@ interface IWhereIn<Model, Row> {
 interface IWhereBetween<Model, Row> {
     <PropertyType>(
         selectColumnFunction: (
-            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
+            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
         ) => () => PropertyType,
         range: [PropertyType, PropertyType]
     ): ITypedQueryBuilder<Model, Row>;
@@ -819,7 +712,7 @@ interface IWhereBetween<Model, Row> {
 interface IHaving<Model, Row> {
     <PropertyType>(
         selectColumnFunction: (
-            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
+            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
         ) => () => PropertyType,
         operator: Operator,
         value: PropertyType
@@ -829,11 +722,11 @@ interface IHaving<Model, Row> {
 interface IWhereCompareTwoColumns<Model, Row> {
     <PropertyType1, _PropertyType2, Model2>(
         selectColumn1Function: (
-            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model>
+            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
         ) => () => PropertyType1,
         operator: Operator,
         selectColumn2Function: (
-            c: TransformPropsToFunctionsLevel1ReturnProperyType<Model2>
+            c: TransformPropsToFunctionsReturnPropertyType<Model2>
         ) => any
     ): ITypedQueryBuilder<Model, Row>;
 }
