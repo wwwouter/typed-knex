@@ -69,8 +69,8 @@ export function flattenByOption(o: any, flattenOption?: FlattenOption) {
 export class TypedKnex {
     constructor(private knex: Knex) { }
 
-    public query<T>(tableClass: new () => T): ITypedQueryBuilder<T, T> {
-        return new TypedQueryBuilder<T, T>(tableClass, this.knex);
+    public query<T>(tableClass: new () => T): ITypedQueryBuilder<T, RemoveObjectsFrom<T>, T> {
+        return new TypedQueryBuilder<T, RemoveObjectsFrom<T>, T>(tableClass, this.knex);
     }
 
     public beginTransaction(): Promise<Knex.Transaction> {
@@ -91,7 +91,7 @@ let beforeInsertTransform = undefined as
     | ((item: any, typedQueryBuilder: any) => any);
 
 export function registerBeforeInsertTransform<T>(
-    f: (item: T, typedQueryBuilder: ITypedQueryBuilder<{}, {}>) => T
+    f: (item: T, typedQueryBuilder: ITypedQueryBuilder<{}, {}, {}>) => T
 ) {
     beforeInsertTransform = f;
 }
@@ -101,7 +101,7 @@ let beforeUpdateTransform = undefined as
     | ((item: any, typedQueryBuilder: any) => any);
 
 export function registerBeforeUpdateTransform<T>(
-    f: (item: T, typedQueryBuilder: ITypedQueryBuilder<{}, {}>) => T
+    f: (item: T, typedQueryBuilder: ITypedQueryBuilder<{}, {}, {}>) => T
 ) {
     beforeUpdateTransform = f;
 }
@@ -118,97 +118,99 @@ export enum FlattenOption {
     flattenAndSetToNull = 'flattenAndSetToNull'
 }
 
-export interface ITypedQueryBuilder<Model, Row> {
+export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     columns: { name: string }[];
 
-    where: IWhereWithOperator<Model, Row>;
-    andWhere: IWhereWithOperator<Model, Row>;
-    orWhere: IWhereWithOperator<Model, Row>;
-    whereNot: IWhere<Model, Row>;
-    select: ISelectWithFunctionColumns3<Model, Row extends Model ? {} : Row>;
+    where: IWhereWithOperator<Model, SelectableModel, Row>;
+    andWhere: IWhereWithOperator<Model, SelectableModel, Row>;
+    orWhere: IWhereWithOperator<Model, SelectableModel, Row>;
+    whereNot: IWhere<Model, SelectableModel, Row>;
+    select: ISelectWithFunctionColumns3<Model, SelectableModel, Row extends Model ? {} : Row>;
 
-    selectQuery: ISelectQuery<Model, Row>;
+    selectQuery: ISelectQuery<Model, SelectableModel, Row>;
 
-    orderBy: IOrderBy<Model, Row>;
-    innerJoinColumn: IKeyFunctionAsParametersReturnQueryBuider<Model, Row>;
-    leftOuterJoinColumn: IKeyFunctionAsParametersReturnQueryBuider<Model, Row>;
+    orderBy: IOrderBy<Model, SelectableModel, Row>;
+    innerJoinColumn: IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
+    leftOuterJoinColumn: IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
 
-    whereColumn: IWhereCompareTwoColumns<Model, Row>;
+    whereColumn: IWhereCompareTwoColumns<Model, SelectableModel, Row>;
 
-    whereNull: IColumnParameterNoRowTransformation<Model, Row>;
-    whereNotNull: IColumnParameterNoRowTransformation<Model, Row>;
-    orWhereNull: IColumnParameterNoRowTransformation<Model, Row>;
-    orWhereNotNull: IColumnParameterNoRowTransformation<Model, Row>;
+    whereNull: IColumnParameterNoRowTransformation<Model, SelectableModel, Row>;
+    whereNotNull: IColumnParameterNoRowTransformation<Model, SelectableModel, Row>;
+    orWhereNull: IColumnParameterNoRowTransformation<Model, SelectableModel, Row>;
+    orWhereNotNull: IColumnParameterNoRowTransformation<Model, SelectableModel, Row>;
 
     leftOuterJoinTableOnFunction: IJoinTableMultipleOnClauses<
         Model,
+        SelectableModel,
         Row extends Model ? {} : Row
     >;
     innerJoinTableOnFunction: IJoinTableMultipleOnClauses<
         Model,
+        SelectableModel,
         Row extends Model ? {} : Row
     >;
 
-    selectRaw: ISelectRaw<Model, Row extends Model ? {} : Row>;
+    selectRaw: ISelectRaw<Model, SelectableModel, Row extends Model ? {} : Row>;
 
-    findByPrimaryKey: IFindByPrimaryKey<Model, Row extends Model ? {} : Row>;
+    findByPrimaryKey: IFindByPrimaryKey<Model, SelectableModel, Row extends Model ? {} : Row>;
 
-    whereIn: IWhereIn<Model, Row>;
-    whereNotIn: IWhereIn<Model, Row>;
+    whereIn: IWhereIn<Model, SelectableModel, Row>;
+    whereNotIn: IWhereIn<Model, SelectableModel, Row>;
 
-    orWhereIn: IWhereIn<Model, Row>;
-    orWhereNotIn: IWhereIn<Model, Row>;
+    orWhereIn: IWhereIn<Model, SelectableModel, Row>;
+    orWhereNotIn: IWhereIn<Model, SelectableModel, Row>;
 
-    whereBetween: IWhereBetween<Model, Row>;
-    whereNotBetween: IWhereBetween<Model, Row>;
-    orWhereBetween: IWhereBetween<Model, Row>;
-    orWhereNotBetween: IWhereBetween<Model, Row>;
+    whereBetween: IWhereBetween<Model, SelectableModel, Row>;
+    whereNotBetween: IWhereBetween<Model, SelectableModel, Row>;
+    orWhereBetween: IWhereBetween<Model, SelectableModel, Row>;
+    orWhereNotBetween: IWhereBetween<Model, SelectableModel, Row>;
 
-    whereExists: IWhereExists<Model, Row>;
+    whereExists: IWhereExists<Model, SelectableModel, Row>;
 
-    orWhereExists: IWhereExists<Model, Row>;
-    whereNotExists: IWhereExists<Model, Row>;
-    orWhereNotExists: IWhereExists<Model, Row>;
+    orWhereExists: IWhereExists<Model, SelectableModel, Row>;
+    whereNotExists: IWhereExists<Model, SelectableModel, Row>;
+    orWhereNotExists: IWhereExists<Model, SelectableModel, Row>;
 
-    whereParentheses: IWhereParentheses<Model, Row>;
+    whereParentheses: IWhereParentheses<Model, SelectableModel, Row>;
 
-    groupBy: IKeyFunctionAsParametersReturnQueryBuider<Model, Row>;
+    groupBy: IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
 
-    having: IHaving<Model, Row>;
+    having: IHaving<Model, SelectableModel, Row>;
 
-    havingNull: IKeyFunctionAsParametersReturnQueryBuider<Model, Row>;
-    havingNotNull: IKeyFunctionAsParametersReturnQueryBuider<Model, Row>;
+    havingNull: IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
+    havingNotNull: IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
 
-    havingIn: IWhereIn<Model, Row>;
-    havingNotIn: IWhereIn<Model, Row>;
+    havingIn: IWhereIn<Model, SelectableModel, Row>;
+    havingNotIn: IWhereIn<Model, SelectableModel, Row>;
 
-    havingExists: IWhereExists<Model, Row>;
-    havingNotExists: IWhereExists<Model, Row>;
+    havingExists: IWhereExists<Model, SelectableModel, Row>;
+    havingNotExists: IWhereExists<Model, SelectableModel, Row>;
 
-    havingBetween: IWhereBetween<Model, Row>;
-    havingNotBetween: IWhereBetween<Model, Row>;
+    havingBetween: IWhereBetween<Model, SelectableModel, Row>;
+    havingNotBetween: IWhereBetween<Model, SelectableModel, Row>;
 
-    union: IUnion<Model, Row>;
-    unionAll: IUnion<Model, Row>;
+    union: IUnion<Model, SelectableModel, Row>;
+    unionAll: IUnion<Model, SelectableModel, Row>;
 
-    min: IDbFunctionWithAlias<Model, Row extends Model ? {} : Row>;
+    min: IDbFunctionWithAlias<Model, SelectableModel, Row extends Model ? {} : Row>;
 
-    count: IDbFunctionWithAlias<Model, Row extends Model ? {} : Row>;
-    countDistinct: IDbFunctionWithAlias<Model, Row extends Model ? {} : Row>;
-    max: IDbFunctionWithAlias<Model, Row extends Model ? {} : Row>;
-    sum: IDbFunctionWithAlias<Model, Row extends Model ? {} : Row>;
-    sumDistinct: IDbFunctionWithAlias<Model, Row extends Model ? {} : Row>;
-    avg: IDbFunctionWithAlias<Model, Row extends Model ? {} : Row>;
-    avgDistinct: IDbFunctionWithAlias<Model, Row extends Model ? {} : Row>;
+    count: IDbFunctionWithAlias<Model, SelectableModel, Row extends Model ? {} : Row>;
+    countDistinct: IDbFunctionWithAlias<Model, SelectableModel, Row extends Model ? {} : Row>;
+    max: IDbFunctionWithAlias<Model, SelectableModel, Row extends Model ? {} : Row>;
+    sum: IDbFunctionWithAlias<Model, SelectableModel, Row extends Model ? {} : Row>;
+    sumDistinct: IDbFunctionWithAlias<Model, SelectableModel, Row extends Model ? {} : Row>;
+    avg: IDbFunctionWithAlias<Model, SelectableModel, Row extends Model ? {} : Row>;
+    avgDistinct: IDbFunctionWithAlias<Model, SelectableModel, Row extends Model ? {} : Row>;
 
-    clearSelect(): ITypedQueryBuilder<Model, Model>;
-    clearWhere(): ITypedQueryBuilder<Model, Row>;
-    clearOrder(): ITypedQueryBuilder<Model, Row>;
+    clearSelect(): ITypedQueryBuilder<Model, SelectableModel, Model>;
+    clearWhere(): ITypedQueryBuilder<Model, SelectableModel, Row>;
+    clearOrder(): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
-    limit(value: number): ITypedQueryBuilder<Model, Row>;
-    offset(value: number): ITypedQueryBuilder<Model, Row>;
+    limit(value: number): ITypedQueryBuilder<Model, SelectableModel, Row>;
+    offset(value: number): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
-    useKnexQueryBuilder(f: (query: Knex.QueryBuilder) => void): ITypedQueryBuilder<Model, Row>;
+    useKnexQueryBuilder(f: (query: Knex.QueryBuilder) => void): ITypedQueryBuilder<Model, SelectableModel, Row>;
     toQuery(): string;
 
     getFirstOrNull(flattenOption?: FlattenOption): Promise<Row | null>;
@@ -236,25 +238,25 @@ export interface ITypedQueryBuilder<Model, Row> {
     whereRaw(
         sql: string,
         ...bindings: string[]
-    ): ITypedQueryBuilder<Model, Row>;
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
     havingRaw(
         sql: string,
         ...bindings: string[]
-    ): ITypedQueryBuilder<Model, Row>;
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
-    transacting(trx: Knex.Transaction): ITypedQueryBuilder<Model, Row>;
+    transacting(trx: Knex.Transaction): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
     truncate(): Promise<void>;
-    distinct(): ITypedQueryBuilder<Model, Row>;
+    distinct(): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
-    clone(): ITypedQueryBuilder<Model, Row>;
+    clone(): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
     groupByRaw(
         sql: string,
         ...bindings: string[]
-    ): ITypedQueryBuilder<Model, Row>;
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
-    keepFlat(): ITypedQueryBuilder<Model, any>;
+    keepFlat(): ITypedQueryBuilder<Model, SelectableModel, any>;
 }
 
 type ReturnNonObjectsNamesOnly<T> = { [K in keyof T]: T[K] extends object ? never : K }[keyof T];
@@ -283,12 +285,12 @@ export type AddPropertyWithType<
     NewKeyType
     > = Original & Record<NewKey, NewKeyType>;
 
-interface IColumnParameterNoRowTransformation<Model, Row> {
+interface IColumnParameterNoRowTransformation<Model, SelectableModel, Row> {
     <PropertyType1>(
         selectColumn1Function: (
             c: TransformPropsToFunctionsReturnPropertyType<Model>
         ) => () => PropertyType1
-    ): ITypedQueryBuilder<Model, Row>;
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
 interface IJoinOnClause2<Model, JoinedModel> {
@@ -308,7 +310,7 @@ interface IJoinOnClause2<Model, JoinedModel> {
     ) => void;
 }
 
-interface IWhereCompareTwoColumns<Model, Row> {
+interface IWhereCompareTwoColumns<Model, SelectableModel, Row> {
     <PropertyType1, _PropertyType2, Model2>(
         selectColumn1Function: (
             c: TransformPropsToFunctionsReturnPropertyType<Model>
@@ -317,10 +319,10 @@ interface IWhereCompareTwoColumns<Model, Row> {
         selectColumn2Function: (
             c: TransformPropsToFunctionsReturnPropertyType<Model2>
         ) => any
-    ): ITypedQueryBuilder<Model, Row>;
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
-interface IJoinTableMultipleOnClauses<Model, Row> {
+interface IJoinTableMultipleOnClauses<Model, SelectableModel, Row> {
     <
         NewPropertyType,
         NewPropertyKey extends keyof any
@@ -335,11 +337,12 @@ interface IJoinTableMultipleOnClauses<Model, Row> {
         ) => void
     ): ITypedQueryBuilder<
         AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>,
+        SelectableModel,
         Row
     >;
 }
 
-interface ISelectRaw<Model, Row> {
+interface ISelectRaw<Model, SelectableModel, Row> {
     <
         TReturn extends Boolean | String | Number,
         TName extends keyof any
@@ -349,11 +352,12 @@ interface ISelectRaw<Model, Row> {
         query: string
     ): ITypedQueryBuilder<
         Model,
+        SelectableModel,
         Record<TName, ObjectToPrimitive<TReturn>> & Row
     >;
 }
 
-interface ISelectQuery<Model, Row> {
+interface ISelectQuery<Model, SelectableModel, Row> {
     <
         TReturn extends Boolean | String | Number,
         TName extends keyof any,
@@ -363,11 +367,12 @@ interface ISelectQuery<Model, Row> {
         returnType: IConstructor<TReturn>,
         subQueryModel: new () => SubQueryModel,
         code: (
-            subQuery: ITypedQueryBuilder<SubQueryModel, {}>,
+            subQuery: ITypedQueryBuilder<SubQueryModel, SelectableModel, {}>,
             parent: TransformPropsToFunctionsReturnPropertyName<Model>
         ) => void
     ): ITypedQueryBuilder<
         Model,
+        SelectableModel,
         Record<TName, ObjectToPrimitive<TReturn>> & Row
     >;
 }
@@ -396,16 +401,16 @@ type TransformPropsToFunctionsReturnPropertyType<Model> = {
 };
 
 
-interface IOrderBy<Model, Row> {
+interface IOrderBy<Model, SelectableModel, Row> {
     <NewRow>(
         selectColumnFunction: (
             c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
         ) => () => NewRow,
         direction?: 'asc' | 'desc'
-    ): ITypedQueryBuilder<Model, Row>;
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
-interface IDbFunctionWithAlias<Model, Row> {
+interface IDbFunctionWithAlias<Model, SelectableModel, Row> {
     <NewPropertyType, TName extends keyof any>(
         selectColumnFunction: (
             c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
@@ -413,6 +418,7 @@ interface IDbFunctionWithAlias<Model, Row> {
         name: TName
     ): ITypedQueryBuilder<
         Model,
+        SelectableModel,
         Record<TName, ObjectToPrimitive<NewPropertyType>> & Row
     >;
 }
@@ -440,7 +446,7 @@ type RecordFromArray<Keys extends any[], LeafType> =
 
 type AddToArray<T extends string[], A extends any> = ((a: A, ...t: T) => void) extends ((...u: infer U) => void) ? U : never;
 
-interface ISelectWithFunctionColumns3<Model, Row> {
+interface ISelectWithFunctionColumns3<Model, SelectableModel, Row> {
     <
         R1,
         R2,
@@ -505,6 +511,7 @@ interface ISelectWithFunctionColumns3<Model, Row> {
             ]
     ): ITypedQueryBuilder<
         Model,
+        SelectableModel,
         Row &
         R1 &
         R2 &
@@ -543,10 +550,10 @@ interface ISelectWithFunctionColumns3<Model, Row> {
         selectColumnFunction: (
             c: TransformPropertiesToFunction<Model>
         ) => () => R1
-    ): ITypedQueryBuilder<Model, Row & R1>;
+    ): ITypedQueryBuilder<Model, SelectableModel, Row & R1>;
 }
 
-interface IFindByPrimaryKey<Model, Row> {
+interface IFindByPrimaryKey<Model, _SelectableModel, Row> {
     <
         R1,
         R2,
@@ -648,37 +655,37 @@ interface IFindByPrimaryKey<Model, Row> {
     >;
 }
 
-interface IKeyFunctionAsParametersReturnQueryBuider<Model, Row> {
+interface IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row> {
     (
         selectColumnFunction: (
             c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
         ) => void
-    ): ITypedQueryBuilder<Model, Row>;
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
     (
         selectColumnFunction: (
             c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
         ) => void,
         setToNullIfNullFunction: (r: Row) => void
-    ): ITypedQueryBuilder<Model, Row>;
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
-interface IWhere<Model, Row> {
+interface IWhere<Model, SelectableModel, Row> {
     <PropertyType>(
         selectColumnFunction: (
             c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
         ) => () => PropertyType,
         value: PropertyType
-    ): ITypedQueryBuilder<Model, Row>;
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
-interface IWhereWithOperator<Model, Row> {
+interface IWhereWithOperator<Model, SelectableModel, Row> {
     <PropertyType>(
         selectColumnFunction: (
             c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
         ) => () => PropertyType,
         value: PropertyType
-    ): ITypedQueryBuilder<Model, Row>;
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
     <PropertyType>(
         selectColumnFunction: (
@@ -686,38 +693,38 @@ interface IWhereWithOperator<Model, Row> {
         ) => () => PropertyType,
         operator: Operator,
         value: PropertyType
-    ): ITypedQueryBuilder<Model, Row>;
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
-interface IWhereIn<Model, Row> {
+interface IWhereIn<Model, SelectableModel, Row> {
     <PropertyType>(
         selectColumnFunction: (
             c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
         ) => () => PropertyType,
         values: PropertyType[]
-    ): ITypedQueryBuilder<Model, Row>;
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
-interface IWhereBetween<Model, Row> {
+interface IWhereBetween<Model, SelectableModel, Row> {
     <PropertyType>(
         selectColumnFunction: (
             c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
         ) => () => PropertyType,
         range: [PropertyType, PropertyType]
-    ): ITypedQueryBuilder<Model, Row>;
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
-interface IHaving<Model, Row> {
+interface IHaving<Model, SelectableModel, Row> {
     <PropertyType>(
         selectColumnFunction: (
             c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
         ) => () => PropertyType,
         operator: Operator,
         value: PropertyType
-    ): ITypedQueryBuilder<Model, Row>;
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
-interface IWhereCompareTwoColumns<Model, Row> {
+interface IWhereCompareTwoColumns<Model, SelectableModel, Row> {
     <PropertyType1, _PropertyType2, Model2>(
         selectColumn1Function: (
             c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
@@ -726,30 +733,30 @@ interface IWhereCompareTwoColumns<Model, Row> {
         selectColumn2Function: (
             c: TransformPropsToFunctionsReturnPropertyType<Model2>
         ) => any
-    ): ITypedQueryBuilder<Model, Row>;
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
-interface IWhereExists<Model, Row> {
+interface IWhereExists<Model, SelectableModel, Row> {
     <SubQueryModel>(
         subQueryModel: new () => SubQueryModel,
         code: (
-            subQuery: ITypedQueryBuilder<SubQueryModel, {}>,
+            subQuery: ITypedQueryBuilder<SubQueryModel, SelectableModel, {}>,
             parent: TransformPropsToFunctionsReturnPropertyName<Model>
         ) => void
-    ): ITypedQueryBuilder<Model, Row>;
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
-interface IWhereParentheses<Model, Row> {
+interface IWhereParentheses<Model, SelectableModel, Row> {
     (
-        code: (subQuery: ITypedQueryBuilder<Model, Row>) => void
-    ): ITypedQueryBuilder<Model, Row>;
+        code: (subQuery: ITypedQueryBuilder<Model, SelectableModel, Row>) => void
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
-interface IUnion<Model, Row> {
+interface IUnion<Model, SelectableModel, Row> {
     <SubQueryModel>(
         subQueryModel: new () => SubQueryModel,
-        code: (subQuery: ITypedQueryBuilder<SubQueryModel, {}>) => void
-    ): ITypedQueryBuilder<Model, Row>;
+        code: (subQuery: ITypedQueryBuilder<SubQueryModel, SelectableModel, {}>) => void
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
 function getProxyAndMemories<ModelType, Row>(
@@ -832,8 +839,8 @@ function getProxyAndMemoriesForArray<ModelType, Row>(
     return { root, result };
 }
 
-class TypedQueryBuilder<ModelType, Row = {}>
-    implements ITypedQueryBuilder<ModelType, Row> {
+class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
+    implements ITypedQueryBuilder<ModelType, SelectableModel, Row> {
     public columns: { name: string }[];
 
     private queryBuilder: Knex.QueryBuilder;
