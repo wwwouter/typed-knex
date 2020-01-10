@@ -1232,12 +1232,13 @@ describe('TypedKnexQueryBuilder', () => {
             .leftOuterJoinTableOnFunction('evilTwin', UserSetting, join => {
                 join.onColumns(i => i.id, '=', j => j.id);
             })
+            .where(i => i.evilTwin.value, 'value')
             .select(i => i.evilTwin.key);
 
         const queryString = query.toQuery();
         assert.equal(
             queryString,
-            'select "evilTwin"."key" as "evilTwin.key" from "userSettings" left outer join "userSettings" as "evilTwin" on "userSettings"."id" = "evilTwin"."id"'
+            'select "evilTwin"."key" as "evilTwin.key" from "userSettings" left outer join "userSettings" as "evilTwin" on "userSettings"."id" = "evilTwin"."id" where "evilTwin"."value" = \'value\''
         );
 
         done();

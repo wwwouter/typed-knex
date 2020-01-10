@@ -322,7 +322,7 @@ interface IWhereCompareTwoColumns<Model, SelectableModel, Row> {
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
-interface IJoinTableMultipleOnClauses<Model, SelectableModel, Row> {
+interface IJoinTableMultipleOnClauses<Model, _SelectableModel, Row> {
     <
         NewPropertyType,
         NewPropertyKey extends keyof any
@@ -336,8 +336,8 @@ interface IJoinTableMultipleOnClauses<Model, SelectableModel, Row> {
             >
         ) => void
     ): ITypedQueryBuilder<
+        Model,
         AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>,
-        SelectableModel,
         Row
     >;
 }
@@ -479,7 +479,7 @@ interface ISelectWithFunctionColumns3<Model, SelectableModel, Row> {
         R29
         >(
         selectColumnFunction: (
-            c: TransformPropertiesToFunction<Model>
+            c: TransformPropertiesToFunction<SelectableModel>
         ) => [
                 () => R1,
                 (() => R2)?,
@@ -548,12 +548,12 @@ interface ISelectWithFunctionColumns3<Model, SelectableModel, Row> {
     >;
     <R1>(
         selectColumnFunction: (
-            c: TransformPropertiesToFunction<Model>
+            c: TransformPropertiesToFunction<SelectableModel>
         ) => () => R1
     ): ITypedQueryBuilder<Model, SelectableModel, Row & R1>;
 }
 
-interface IFindByPrimaryKey<Model, _SelectableModel, Row> {
+interface IFindByPrimaryKey<_Model, SelectableModel, Row> {
     <
         R1,
         R2,
@@ -587,7 +587,7 @@ interface IFindByPrimaryKey<Model, _SelectableModel, Row> {
         >(
         primaryKeyValue: any,
         selectColumnFunction: (
-            c: TransformPropsToFunctionsOnlyLevel1<Model>
+            c: TransformPropsToFunctionsOnlyLevel1<SelectableModel>
         ) => [
                 () => R1,
                 (() => R2)?,
@@ -673,7 +673,7 @@ interface IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>
 interface IWhere<Model, SelectableModel, Row> {
     <PropertyType>(
         selectColumnFunction: (
-            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
+            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<SelectableModel>>
         ) => () => PropertyType,
         value: PropertyType
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
@@ -682,14 +682,14 @@ interface IWhere<Model, SelectableModel, Row> {
 interface IWhereWithOperator<Model, SelectableModel, Row> {
     <PropertyType>(
         selectColumnFunction: (
-            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
+            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<SelectableModel>>
         ) => () => PropertyType,
         value: PropertyType
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
     <PropertyType>(
         selectColumnFunction: (
-            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
+            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<SelectableModel>>
         ) => () => PropertyType,
         operator: Operator,
         value: PropertyType
@@ -699,7 +699,7 @@ interface IWhereWithOperator<Model, SelectableModel, Row> {
 interface IWhereIn<Model, SelectableModel, Row> {
     <PropertyType>(
         selectColumnFunction: (
-            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
+            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<SelectableModel>>
         ) => () => PropertyType,
         values: PropertyType[]
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
@@ -708,7 +708,7 @@ interface IWhereIn<Model, SelectableModel, Row> {
 interface IWhereBetween<Model, SelectableModel, Row> {
     <PropertyType>(
         selectColumnFunction: (
-            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
+            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<SelectableModel>>
         ) => () => PropertyType,
         range: [PropertyType, PropertyType]
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
@@ -717,7 +717,7 @@ interface IWhereBetween<Model, SelectableModel, Row> {
 interface IHaving<Model, SelectableModel, Row> {
     <PropertyType>(
         selectColumnFunction: (
-            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
+            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<SelectableModel>>
         ) => () => PropertyType,
         operator: Operator,
         value: PropertyType
@@ -741,7 +741,7 @@ interface IWhereExists<Model, SelectableModel, Row> {
         subQueryModel: new () => SubQueryModel,
         code: (
             subQuery: ITypedQueryBuilder<SubQueryModel, SelectableModel, {}>,
-            parent: TransformPropsToFunctionsReturnPropertyName<Model>
+            parent: TransformPropsToFunctionsReturnPropertyName<SelectableModel>
         ) => void
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
