@@ -69,8 +69,8 @@ export function flattenByOption(o: any, flattenOption?: FlattenOption) {
 export class TypedKnex {
     constructor(private knex: Knex) { }
 
-    public query<T>(tableClass: new () => T): ITypedQueryBuilder<T, RemoveObjectsFrom<T>, T> {
-        return new TypedQueryBuilder<T, RemoveObjectsFrom<T>, T>(tableClass, this.knex);
+    public query<T>(tableClass: new () => T): ITypedQueryBuilder<T, T, T> {
+        return new TypedQueryBuilder<T, T, T>(tableClass, this.knex);
     }
 
     public beginTransaction(): Promise<Knex.Transaction> {
