@@ -51,6 +51,23 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+
+    it('should create query with Date column', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex.query(User)
+            .select(i => i.birthDate)
+            .where(c => c.birthDate, new Date(1979, 0, 1));
+
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select "users"."birthDate" as "birthDate" from "users" where "users"."birthDate" = \'1979-01-01 00:00:00.000\''
+        );
+
+        done();
+    });
+
+
     it('should create query with where on column of own table with LIKE', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex.query(User).where(c => c.name, 'like', '%user%');
