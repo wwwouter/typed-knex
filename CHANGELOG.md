@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.8.0
+
+-   Updated support for `Date` to also include nullable values.
+
 ## 2.7.0
 
 -   Added `getTableName` and `getColumnName`.

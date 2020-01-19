@@ -45,7 +45,7 @@ export class User {
     @Column()
     public nickName?: string;
     @Column()
-    public birthDate: Date;
+    public birthDate?: Date;
 }
 
 @Entity('userSettings')

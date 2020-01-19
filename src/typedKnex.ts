@@ -432,7 +432,7 @@ type NonNullableRecursive<T> = { [P in keyof T]-?: T[P] extends object ? T[P] ex
 
 type TransformPropertiesToFunction<Model, Result extends any[] = []> = {
     [P in keyof Model]-?: Model[P] extends (object | undefined) ?
-    Model[P] extends Date ? () => RecordFromArray<AddToArray<Result, P>, ({} extends { [P2 in P]: Model[P] } ? NonNullable<Model[P]> | null : Model[P])> :
+    Model[P] extends (Date | undefined) ? () => RecordFromArray<AddToArray<Result, P>, ({} extends { [P2 in P]: Model[P] } ? NonNullable<Model[P]> | null : Model[P])> :
     TransformPropertiesToFunction<Model[P], AddToArray<Result, P>>
     :
     () => RecordFromArray<AddToArray<Result, P>, ({} extends { [P2 in P]: Model[P] } ? NonNullable<Model[P]> | null : Model[P])>
