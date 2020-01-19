@@ -68,6 +68,22 @@ describe('TypedKnexQueryBuilder', () => {
     });
 
 
+    it('should create query with array column', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex.query(User)
+            .select(i => i.tags)
+            .where(c => c.tags, ['tag1']);
+
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select "users"."tags" as "tags" from "users" where "users"."tags" = \'{"tag1"}\''
+        );
+
+        done();
+    });
+
+
     it('should create query with where on column of own table with LIKE', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex.query(User).where(c => c.name, 'like', '%user%');

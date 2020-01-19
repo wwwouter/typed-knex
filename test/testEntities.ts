@@ -46,6 +46,8 @@ export class User {
     public nickName?: string;
     @Column()
     public birthDate?: Date;
+    @Column()
+    public tags?: string[];
 }
 
 @Entity('userSettings')

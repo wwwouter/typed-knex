@@ -3,6 +3,7 @@
 ## 2.8.0
 
 -   Updated support for `Date` to also include nullable values.
+-   Added support for array type in entities.
 
 ## 2.7.0
 

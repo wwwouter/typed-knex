@@ -387,16 +387,22 @@ type TransformPropsToFunctionsOnlyLevel1<Level1Type> = {
 
 type TransformPropsToFunctionsReturnPropertyName<Model> = {
     [P in keyof Model]: Model[P] extends object ?
+    Model[P] extends Required<NonForeignKeyObjects> ?
+    () => P
+    :
     TransformPropsToFunctionsReturnPropertyName<Model[P]>
     :
     () => P
 };
 
+type NonForeignKeyObjects = any[] | Date;
+
+
 
 type TransformPropsToFunctionsReturnPropertyType<Model> = {
     [P in keyof Model]:
     Model[P] extends object ?
-    Model[P] extends Required<Date> ?
+    Model[P] extends Required<NonForeignKeyObjects> ?
     () => Model[P]
     :
     TransformPropsToFunctionsReturnPropertyType<Model[P]>
@@ -428,11 +434,11 @@ interface IDbFunctionWithAlias<Model, SelectableModel, Row> {
 }
 
 
-type NonNullableRecursive<T> = { [P in keyof T]-?: T[P] extends object ? T[P] extends Date ? Required<NonNullable<T[P]>> : NonNullableRecursive<T[P]> : Required<NonNullable<T[P]>> };
+type NonNullableRecursive<T> = { [P in keyof T]-?: T[P] extends object ? T[P] extends NonForeignKeyObjects ? Required<NonNullable<T[P]>> : NonNullableRecursive<T[P]> : Required<NonNullable<T[P]>> };
 
 type TransformPropertiesToFunction<Model, Result extends any[] = []> = {
     [P in keyof Model]-?: Model[P] extends (object | undefined) ?
-    Model[P] extends (Date | undefined) ? () => RecordFromArray<AddToArray<Result, P>, ({} extends { [P2 in P]: Model[P] } ? NonNullable<Model[P]> | null : Model[P])> :
+    Model[P] extends (NonForeignKeyObjects | undefined) ? () => RecordFromArray<AddToArray<Result, P>, ({} extends { [P2 in P]: Model[P] } ? NonNullable<Model[P]> | null : Model[P])> :
     TransformPropertiesToFunction<Model[P], AddToArray<Result, P>>
     :
     () => RecordFromArray<AddToArray<Result, P>, ({} extends { [P2 in P]: Model[P] } ? NonNullable<Model[P]> | null : Model[P])>
