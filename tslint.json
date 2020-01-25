@@ -4,6 +4,7 @@
         "node_modules/@wwwouter/tslint-contrib"
     ],
     "rules": {
+        "deprecation": true,
         "no-promise-as-boolean": true,
         "no-floating-promises": true,
         "no-irregular-whitespace": true,

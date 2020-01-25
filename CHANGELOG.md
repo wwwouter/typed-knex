@@ -1,5 +1,10 @@
 # Changelog
 
+
+## 2.8.1
+
+- Add deprecation warning for `FlattenOption.noFlatten`.
+
 ## 2.8.0
 
 -   Updated support for `Date` to also include nullable values.

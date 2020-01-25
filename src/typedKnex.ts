@@ -114,8 +114,11 @@ class NotImplementedError extends Error {
 
 export enum FlattenOption {
     flatten = 'flatten',
+    /**
+     * @deprecated since version 2.8.1, use .keepFlat()
+     */
     noFlatten = 'noFlatten',
-    flattenAndSetToNull = 'flattenAndSetToNull'
+    flattenAndSetToNull = 'flattenAndSetToNull',
 }
 
 export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
