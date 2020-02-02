@@ -55,9 +55,9 @@ async function example() {
 
     const query = typedKnex
         .query(User)
-        .innerJoin(i=>i.category)
-        .where(i => i.name, 'Hejlsberg');
-        .select(i => [i.id, i.category.name])
+        .innerJoin(i => i.category)
+        .where(i => i.name, 'Hejlsberg')
+        .select(i => [i.id, i.category.name]);
 
     const oneUser = await query.getSingle();
 
