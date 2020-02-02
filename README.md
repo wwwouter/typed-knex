@@ -55,12 +55,14 @@ async function example() {
 
     const query = typedKnex
         .query(User)
-        .select(i => i.id)
+        .innerJoin(i=>i.category)
         .where(i => i.name, 'Hejlsberg');
+        .select(i => [i.id, i.category.name])
 
     const oneUser = await query.getSingle();
 
     console.log(oneUser.id); // Ok
+    console.log(oneUser.category.name); // Ok
     console.log(oneUser.name); // Compilation error
 }
 ```
