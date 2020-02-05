@@ -524,7 +524,7 @@ describe('compile time typed-knex', function() {
 
                 if (item !== undefined) {
                     console.log(item.user2.numericValue);
-                    console.log(item.otherUser.name);
+                    console.log(item.otherUser?.name);
                 }
 
             })();
@@ -532,6 +532,43 @@ describe('compile time typed-knex', function() {
         );
 
         assert.equal(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
+
+
+    it('should fail leftOuterJoinTableOnFunction result if it is used as not null', done => {
+        file = project.createSourceFile(
+            'test/test4.ts',
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User, UserSetting } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+
+                const item = await typedKnex
+                .query(UserSetting)
+                .leftOuterJoinTableOnFunction('otherUser', User, join => {
+                    join.onColumns(i => i.user2Id, '=', j => j.id);
+                })
+                .select(i => [i.otherUser.name, i.user2.numericValue])
+                .getFirst();
+
+                if (item !== undefined) {
+                    console.log(item.user2.numericValue);
+                    console.log(item.otherUser.name);
+                }
+
+            })();
+        `
+        );
+
+        assert.equal(project.getPreEmitDiagnostics().length, 1);
 
         file.delete();
         done();

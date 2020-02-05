@@ -7,6 +7,9 @@ import {
     getPrimaryKeyColumn,
     getTableMetadata
 } from './decorators';
+import { NonForeignKeyObjects } from './NonForeignKeyObjects';
+import { NonNullableRecursive } from './NonNullableRecursive';
+import { TransformPropertiesToFunction } from './TransformPropertiesToFunction';
 
 export function unflatten(o: any): any {
     if (o instanceof Array) {
@@ -360,7 +363,7 @@ interface IOuterJoinTableMultipleOnClauses<Model, _SelectableModel, Row> {
         ) => void
     ): ITypedQueryBuilder<
         Model,
-        AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>,
+        AddPropertyWithType<Model, NewPropertyKey, NewPropertyType | null>,
         Row
     >;
 }
@@ -419,10 +422,6 @@ type TransformPropsToFunctionsReturnPropertyName<Model> = {
     () => P
 };
 
-type NonForeignKeyObjects = any[] | Date;
-
-
-
 type TransformPropsToFunctionsReturnPropertyType<Model> = {
     [P in keyof Model]:
     Model[P] extends object ?
@@ -456,51 +455,6 @@ interface IDbFunctionWithAlias<Model, SelectableModel, Row> {
         Record<TName, ObjectToPrimitive<NewPropertyType>> & Row
     >;
 }
-
-
-// Removes all optional, undefined and null from type
-type NonNullableRecursive<T> = { [P in keyof T]-?: T[P] extends object ? T[P] extends NonForeignKeyObjects ? Required<NonNullable<T[P]>> : NonNullableRecursive<T[P]> : Required<NonNullable<T[P]>> };
-
-
-
-// take { a : string, b : { c : string }} and return { a : ()=> {a: string}, b : { c : ()=> { b: { c: string } }}}
-// Special cases:
-//   { a: User, b : string[] } returns { a: () => User, b : () => { b: string[] } }
-//   { a?: string[]  } returns { a : () => (null|string[]) }
-//   { a: User | null } returns { a : () => User }
-// Result contains the path to one leaf. {a : { b: string }} will have a Result of ['b', 'a']
-type TransformPropertiesToFunction<Model, Result extends any[] = []> = {
-    [P in keyof Model]-?:
-    // if it's an object
-    Model[P] extends (object | undefined) ?
-    // and if it isn't a foreign key
-    Model[P] extends (NonForeignKeyObjects | undefined) ?
-    // create leaf with this type
-    () => RecordFromArray<AddToArray<Result, P>, ({} extends { [P2 in P]: Model[P] } ? NonNullable<Model[P]> | null : Model[P])> :
-    // if it is a foreign key, transform it's properties
-    TransformPropertiesToFunction<Model[P], AddToArray<Result, P>>
-    :
-    // if it isn't an object, create leaf with this type
-    () => RecordFromArray<AddToArray<Result, P>, ({} extends { [P2 in P]: Model[P] } ? NonNullable<Model[P]> | null : Model[P])>
-};
-
-// Creates a type from an array of strings (in reversed order)
-// input ['c','b','a'] and string returns { a : { b:  { c : string }}}
-type RecordFromArray<Keys extends any[], LeafType> =
-    Keys extends { 6: any } ? Record<Keys[6], Record<Keys[5], Record<Keys[4], Record<Keys[3], Record<Keys[2], Record<Keys[1], Record<Keys[0], LeafType>>>>>>> :
-    Keys extends { 5: any } ? Record<Keys[5], Record<Keys[4], Record<Keys[3], Record<Keys[2], Record<Keys[1], Record<Keys[0], LeafType>>>>>> :
-    Keys extends { 4: any } ? Record<Keys[4], Record<Keys[3], Record<Keys[2], Record<Keys[1], Record<Keys[0], LeafType>>>>> :
-    Keys extends { 3: any } ? Record<Keys[3], Record<Keys[2], Record<Keys[1], Record<Keys[0], LeafType>>>> :
-    Keys extends { 2: any } ? Record<Keys[2], Record<Keys[1], Record<Keys[0], LeafType>>> :
-    Keys extends { 1: any } ? Record<Keys[1], Record<Keys[0], LeafType>> :
-    Keys extends { 0: any } ? Record<Keys[0], LeafType> :
-    never;
-
-
-
-
-
-type AddToArray<T extends string[], A extends any> = ((a: A, ...t: T) => void) extends ((...u: infer U) => void) ? U : never;
 
 
 
@@ -820,7 +774,7 @@ interface IUnion<Model, SelectableModel, Row> {
 function getProxyAndMemories<ModelType, Row>(
     typedQueryBuilder?: TypedQueryBuilder<ModelType, Row>
 ) {
-    let memories = [] as string[];
+    const memories = [] as string[];
 
     function allGet(_target: any, name: any): any {
         if (name === 'memories') {
@@ -837,7 +791,7 @@ function getProxyAndMemories<ModelType, Row>(
         return new Proxy(
             {},
             {
-                get: allGet
+                get: allGet,
             }
         );
     }
@@ -845,7 +799,7 @@ function getProxyAndMemories<ModelType, Row>(
     const root = new Proxy(
         {},
         {
-            get: allGet
+            get: allGet,
         }
     );
 
@@ -882,7 +836,7 @@ function getProxyAndMemoriesForArray<ModelType, Row>(
         return new Proxy(
             {},
             {
-                get: allGet
+                get: allGet,
             }
         );
     }
@@ -890,7 +844,7 @@ function getProxyAndMemoriesForArray<ModelType, Row>(
     const root = new Proxy(
         { level: 0 },
         {
-            get: allGet
+            get: allGet,
         }
     );
 
@@ -1188,7 +1142,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
         this.extraJoinedProperties.push({
             name: newPropertyKey,
-            propertyType: newPropertyType
+            propertyType: newPropertyType,
         });
 
         const tableToJoinClass = newPropertyType;
@@ -1227,7 +1181,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
         this.extraJoinedProperties.push({
             name: newPropertyKey,
-            propertyType: newPropertyType
+            propertyType: newPropertyType,
         });
 
         const tableToJoinClass = newPropertyType;
@@ -1267,7 +1221,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
         this.queryBuilder.whereRaw(`?? ${operator} ??`, [
             column1Name,
-            column2Name
+            column2Name,
         ]);
 
         return this;
@@ -2014,7 +1968,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
                 );
                 const column2ArgumentsWithJoinedTable = [
                     tableToJoinAlias,
-                    ...column2Arguments
+                    ...column2Arguments,
                 ];
                 knexOnObject.on(
                     this.getColumnName(...column1Arguments),
@@ -2027,12 +1981,12 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
                 const column2Arguments = this.getArgumentsFromColumnFunction(f);
                 const column2ArgumentsWithJoinedTable = [
                     tableToJoinAlias,
-                    ...column2Arguments
+                    ...column2Arguments,
                 ];
 
                 knexOnObject.onNull(column2ArgumentsWithJoinedTable.join('.'));
                 return onObject;
-            }
+            },
         };
         onFunction(onObject as any);
 
