@@ -143,7 +143,7 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     orWhereNull: IColumnParameterNoRowTransformation<Model, SelectableModel, Row>;
     orWhereNotNull: IColumnParameterNoRowTransformation<Model, SelectableModel, Row>;
 
-    leftOuterJoinTableOnFunction: IJoinTableMultipleOnClauses<
+    leftOuterJoinTableOnFunction: IOuterJoinTableMultipleOnClauses<
         Model,
         SelectableModel,
         Row extends Model ? {} : Row
@@ -345,6 +345,27 @@ interface IJoinTableMultipleOnClauses<Model, _SelectableModel, Row> {
     >;
 }
 
+interface IOuterJoinTableMultipleOnClauses<Model, _SelectableModel, Row> {
+    <
+        NewPropertyType,
+        NewPropertyKey extends keyof any
+        >(
+        newPropertyKey: NewPropertyKey,
+        newPropertyClass: new () => NewPropertyType,
+        on: (
+            join: IJoinOnClause2<
+                AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>,
+                NewPropertyType
+            >
+        ) => void
+    ): ITypedQueryBuilder<
+        Model,
+        AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>,
+        Row
+    >;
+}
+
+
 interface ISelectRaw<Model, SelectableModel, Row> {
     <
         TReturn extends Boolean | String | Number,
@@ -437,16 +458,34 @@ interface IDbFunctionWithAlias<Model, SelectableModel, Row> {
 }
 
 
+// Removes all optional, undefined and null from type
 type NonNullableRecursive<T> = { [P in keyof T]-?: T[P] extends object ? T[P] extends NonForeignKeyObjects ? Required<NonNullable<T[P]>> : NonNullableRecursive<T[P]> : Required<NonNullable<T[P]>> };
 
+
+
+// take { a : string, b : { c : string }} and return { a : ()=> {a: string}, b : { c : ()=> { b: { c: string } }}}
+// Special cases:
+//   { a: User, b : string[] } returns { a: () => User, b : () => { b: string[] } }
+//   { a?: string[]  } returns { a : () => (null|string[]) }
+//   { a: User | null } returns { a : () => User }
+// Result contains the path to one leaf. {a : { b: string }} will have a Result of ['b', 'a']
 type TransformPropertiesToFunction<Model, Result extends any[] = []> = {
-    [P in keyof Model]-?: Model[P] extends (object | undefined) ?
-    Model[P] extends (NonForeignKeyObjects | undefined) ? () => RecordFromArray<AddToArray<Result, P>, ({} extends { [P2 in P]: Model[P] } ? NonNullable<Model[P]> | null : Model[P])> :
+    [P in keyof Model]-?:
+    // if it's an object
+    Model[P] extends (object | undefined) ?
+    // and if it isn't a foreign key
+    Model[P] extends (NonForeignKeyObjects | undefined) ?
+    // create leaf with this type
+    () => RecordFromArray<AddToArray<Result, P>, ({} extends { [P2 in P]: Model[P] } ? NonNullable<Model[P]> | null : Model[P])> :
+    // if it is a foreign key, transform it's properties
     TransformPropertiesToFunction<Model[P], AddToArray<Result, P>>
     :
+    // if it isn't an object, create leaf with this type
     () => RecordFromArray<AddToArray<Result, P>, ({} extends { [P2 in P]: Model[P] } ? NonNullable<Model[P]> | null : Model[P])>
 };
 
+// Creates a type from an array of strings (in reversed order)
+// input ['c','b','a'] and string returns { a : { b:  { c : string }}}
 type RecordFromArray<Keys extends any[], LeafType> =
     Keys extends { 6: any } ? Record<Keys[6], Record<Keys[5], Record<Keys[4], Record<Keys[3], Record<Keys[2], Record<Keys[1], Record<Keys[0], LeafType>>>>>>> :
     Keys extends { 5: any } ? Record<Keys[5], Record<Keys[4], Record<Keys[3], Record<Keys[2], Record<Keys[1], Record<Keys[0], LeafType>>>>>> :
