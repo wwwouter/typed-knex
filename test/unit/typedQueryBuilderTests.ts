@@ -1154,8 +1154,9 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(UserSetting)
             .leftOuterJoinTableOnFunction('otherUser', User, join => {
-                join.onColumns(i => i.user2Id, '=', j => j.id);
-                join.onNull(i => i.name);
+                join
+                    .onColumns(i => i.user2Id, '=', j => j.id)
+                    .onNull(i => i.name);
             });
 
         const queryString = query.toQuery();

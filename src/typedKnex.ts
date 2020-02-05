@@ -305,12 +305,12 @@ interface IJoinOnClause2<Model, JoinedModel> {
         selectColumn2Function: (
             c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
         ) => () => PropertyType2
-    ) => void;
+    ) => IJoinOnClause2<Model, JoinedModel>;
     onNull: <X>(
         selectColumn1Function: (
             c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
         ) => () => X
-    ) => void;
+    ) => IJoinOnClause2<Model, JoinedModel>;
 }
 
 interface IWhereCompareTwoColumns<Model, SelectableModel, Row> {
