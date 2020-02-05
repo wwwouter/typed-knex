@@ -358,11 +358,13 @@ typedKnex.query(User).innerJoinColumn(i => i.category);
 
 ```ts
 typedKnex.query(User).innerJoinTableOnFunction('evilTwin', User, join => {
-    join.onColumns(
-        i => i.id,
-        '=',
-        j => j.id
-    );
+    join.on(j => j.id, '=', i => i.id)
+        .andOn(j => j.name, '=', i => i.id)
+        .orOn(j => j.someValue, '=', i => i.id)
+        .onVal(j => j.name, '=', '1')
+        .andOnVal(j => j.name, '=', '2')
+        .orOnVal(j => j.name, '=', '3')
+        .onNull(j => j.name);
 });
 ```
 
@@ -376,11 +378,13 @@ typedKnex.query(User).leftOuterJoinColumn(i => i.category);
 
 ```ts
 typedKnex.query(User).leftOuterJoinTableOnFunction('evilTwin', User, join => {
-    join.onColumns(
-        i => i.id,
-        '=',
-        j => j.id
-    );
+    join.on(j => j.id, '=', i => i.id)
+        .andOn(j => j.name, '=', i => i.id)
+        .orOn(j => j.someValue, '=', i => i.id)
+        .onVal(j => j.name, '=', '1')
+        .andOnVal(j => j.name, '=', '2')
+        .orOnVal(j => j.name, '=', '3')
+        .onNull(j => j.name);
 });
 ```
 
@@ -759,7 +763,7 @@ console.log(query.toQuery()); // select * from "users"
 ### getFirstOrNull
 
 | Result            | No item | One item | Many items |
-| ----------------- | ------- | -------- | ---------- |
+|-------------------|---------|----------|------------|
 | `getFirst`        | `Error` | Item     | First item |
 | `getSingle`       | `Error` | Item     | `Error`    |
 | `getFirstOrNull`  | `null`  | Item     | First item |
@@ -775,7 +779,7 @@ const user = await typedKnex
 ### getFirst
 
 | Result            | No item | One item | Many items |
-| ----------------- | ------- | -------- | ---------- |
+|-------------------|---------|----------|------------|
 | `getFirst`        | `Error` | Item     | First item |
 | `getSingle`       | `Error` | Item     | `Error`    |
 | `getFirstOrNull`  | `null`  | Item     | First item |
@@ -791,7 +795,7 @@ const user = await typedKnex
 ### getSingleOrNull
 
 | Result            | No item | One item | Many items |
-| ----------------- | ------- | -------- | ---------- |
+|-------------------|---------|----------|------------|
 | `getFirst`        | `Error` | Item     | First item |
 | `getSingle`       | `Error` | Item     | `Error`    |
 | `getFirstOrNull`  | `null`  | Item     | First item |
@@ -807,7 +811,7 @@ const user = await typedKnex
 ### getSingle
 
 | Result            | No item | One item | Many items |
-| ----------------- | ------- | -------- | ---------- |
+|-------------------|---------|----------|------------|
 | `getFirst`        | `Error` | Item     | First item |
 | `getSingle`       | `Error` | Item     | `Error`    |
 | `getFirstOrNull`  | `null`  | Item     | First item |
