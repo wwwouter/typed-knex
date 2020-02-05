@@ -1,6 +1,11 @@
 # Changelog
 
 
+## 2.9.0
+- Updated on clauses for joins:
+    - Deprecated `.onColumns`.
+    - Added `.on`, `andOn`, `orOn`, `onVal`, `andOnVal`, `orOnVal`.
+
 ## 2.8.1
 
 - Add deprecation warning for `FlattenOption.noFlatten`.
