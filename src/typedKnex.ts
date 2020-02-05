@@ -296,21 +296,55 @@ interface IColumnParameterNoRowTransformation<Model, SelectableModel, Row> {
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
+
+type JoinOnColumns<Model, JoinedModel> = <PropertyType1, PropertyType2>(
+    selectColumn1Function: (
+        c: TransformPropsToFunctionsReturnPropertyType<Model>
+    ) => () => PropertyType1,
+    operator: Operator,
+    selectColumn2Function: (
+        c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
+    ) => () => PropertyType2
+) => IJoinOnClause2<Model, JoinedModel>;
+
+
+
+type JoinOn<Model, JoinedModel> = <PropertyType1, PropertyType2>(
+    selectColumn1Function: (
+        c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
+    ) => () => PropertyType1,
+    operator: Operator,
+    selectColumn2Function: (
+        c: TransformPropsToFunctionsReturnPropertyType<Model>
+    ) => () => PropertyType2
+) => IJoinOnClause2<Model, JoinedModel>;
+
+
+type JoinOnVal<Model, JoinedModel> = <PropertyType1>(
+    selectColumn1Function: (
+        c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
+    ) => () => PropertyType1,
+    operator: Operator,
+    value: any
+) => IJoinOnClause2<Model, JoinedModel>;
+
 interface IJoinOnClause2<Model, JoinedModel> {
-    onColumns: <PropertyType1, PropertyType2>(
-        selectColumn1Function: (
-            c: TransformPropsToFunctionsReturnPropertyType<Model>
-        ) => () => PropertyType1,
-        operator: Operator,
-        selectColumn2Function: (
-            c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
-        ) => () => PropertyType2
-    ) => void;
+    /**
+     * @deprecated since version 2.9, use .on(). Remember that the columns are switched eg .onColumns(i=>i.prop, '=' j=>j.prop) should become .onColumns(j=>j.prop, '=', i=>i.prop)
+     */
+    onColumns: JoinOnColumns<Model, JoinedModel>;
+    on: JoinOn<Model, JoinedModel>;
+    orOn: JoinOn<Model, JoinedModel>;
+    andOn: JoinOn<Model, JoinedModel>;
+    onVal: JoinOnVal<Model, JoinedModel>;
+    andOnVal: JoinOnVal<Model, JoinedModel>;
+    orOnVal: JoinOnVal<Model, JoinedModel>;
+
     onNull: <X>(
         selectColumn1Function: (
             c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
         ) => () => X
-    ) => void;
+    ) => IJoinOnClause2<Model, JoinedModel>;
 }
 
 interface IWhereCompareTwoColumns<Model, SelectableModel, Row> {
@@ -781,7 +815,7 @@ interface IUnion<Model, SelectableModel, Row> {
 function getProxyAndMemories<ModelType, Row>(
     typedQueryBuilder?: TypedQueryBuilder<ModelType, Row>
 ) {
-    let memories = [] as string[];
+    const memories = [] as string[];
 
     function allGet(_target: any, name: any): any {
         if (name === 'memories') {
@@ -798,7 +832,7 @@ function getProxyAndMemories<ModelType, Row>(
         return new Proxy(
             {},
             {
-                get: allGet
+                get: allGet,
             }
         );
     }
@@ -806,7 +840,7 @@ function getProxyAndMemories<ModelType, Row>(
     const root = new Proxy(
         {},
         {
-            get: allGet
+            get: allGet,
         }
     );
 
@@ -843,7 +877,7 @@ function getProxyAndMemoriesForArray<ModelType, Row>(
         return new Proxy(
             {},
             {
-                get: allGet
+                get: allGet,
             }
         );
     }
@@ -851,7 +885,7 @@ function getProxyAndMemoriesForArray<ModelType, Row>(
     const root = new Proxy(
         { level: 0 },
         {
-            get: allGet
+            get: allGet,
         }
     );
 
@@ -1149,7 +1183,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
         this.extraJoinedProperties.push({
             name: newPropertyKey,
-            propertyType: newPropertyType
+            propertyType: newPropertyType,
         });
 
         const tableToJoinClass = newPropertyType;
@@ -1188,7 +1222,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
         this.extraJoinedProperties.push({
             name: newPropertyKey,
-            propertyType: newPropertyType
+            propertyType: newPropertyType,
         });
 
         const tableToJoinClass = newPropertyType;
@@ -1228,7 +1262,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
         this.queryBuilder.whereRaw(`?? ${operator} ??`, [
             column1Name,
-            column2Name
+            column2Name,
         ]);
 
         return this;
@@ -1961,40 +1995,85 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
             }
         );
 
+        const onWithJoinedColumnOperatorColumn = (joinedColumn: any, operator: any, modelColumn: any, functionName: string) => {
+            const column1Arguments = this.getArgumentsFromColumnFunction(
+                modelColumn
+            );
+            const column2Arguments = this.getArgumentsFromColumnFunction(
+                joinedColumn
+            );
+            const column2ArgumentsWithJoinedTable = [
+                tableToJoinAlias,
+                ...column2Arguments,
+            ];
+            knexOnObject[functionName](
+                this.getColumnName(...column1Arguments),
+                operator,
+                column2ArgumentsWithJoinedTable.join('.')
+            );
+        }
+
+        const onWithColumnOperatorValue = (joinedColumn: any, operator: any, value: any, functionName: string) => {
+            // const column1Arguments = this.getArgumentsFromColumnFunction(
+            //     joinedColumn
+            // );
+            const column2Arguments = this.getArgumentsFromColumnFunction(
+                joinedColumn
+            );
+            const column2ArgumentsWithJoinedTable = [
+                tableToJoinAlias,
+                ...column2Arguments,
+            ];
+            knexOnObject[functionName](
+                // this.getColumnName(...column1Arguments),
+                column2ArgumentsWithJoinedTable.join('.'),
+                operator,
+                value
+                // column2ArgumentsWithJoinedTable.join('.')
+            );
+        }
+
         const onObject = {
-            onColumns: (
-                column1PartsArray: any,
-                operator: any,
-                column2PartsArray: any
-            ) => {
-                const column1Arguments = this.getArgumentsFromColumnFunction(
-                    column1PartsArray
-                );
-                const column2Arguments = this.getArgumentsFromColumnFunction(
-                    column2PartsArray
-                );
-                const column2ArgumentsWithJoinedTable = [
-                    tableToJoinAlias,
-                    ...column2Arguments
-                ];
-                knexOnObject.on(
-                    this.getColumnName(...column1Arguments),
-                    operator,
-                    column2ArgumentsWithJoinedTable.join('.')
-                );
+            onColumns: (column1: any, operator: any, column2: any) => {
+                onWithJoinedColumnOperatorColumn(column2, operator, column1, 'on');
+                return onObject;
+            },
+            on: (column1: any, operator: any, column2: any) => {
+                onWithJoinedColumnOperatorColumn(column1, operator, column2, 'on');
+                return onObject;
+            },
+            andOn: (column1: any, operator: any, column2: any) => {
+                onWithJoinedColumnOperatorColumn(column1, operator, column2, 'andOn');
+                return onObject;
+            },
+            orOn: (column1: any, operator: any, column2: any) => {
+                onWithJoinedColumnOperatorColumn(column1, operator, column2, 'orOn');
+                return onObject;
+            },
+            onVal: (column1: any, operator: any, value: any) => {
+                onWithColumnOperatorValue(column1, operator, value, 'onVal');
+                return onObject;
+            },
+            andOnVal: (column1: any, operator: any, value: any) => {
+                onWithColumnOperatorValue(column1, operator, value, 'andOnVal');
+                return onObject;
+            },
+            orOnVal: (column1: any, operator: any, value: any) => {
+                onWithColumnOperatorValue(column1, operator, value, 'orOnVal');
                 return onObject;
             },
             onNull: (f: any) => {
                 const column2Arguments = this.getArgumentsFromColumnFunction(f);
                 const column2ArgumentsWithJoinedTable = [
                     tableToJoinAlias,
-                    ...column2Arguments
+                    ...column2Arguments,
                 ];
 
                 knexOnObject.onNull(column2ArgumentsWithJoinedTable.join('.'));
                 return onObject;
-            }
-        };
+            },
+        } as any;
+
         onFunction(onObject as any);
 
         return this as any;
