@@ -1,9 +1,9 @@
 import { assert } from 'chai';
 import * as knex from 'knex';
 import { getEntities, getTableName } from '../../src';
+import { getColumnName } from '../../src/decorators';
 import { setToNull, TypedKnex, unflatten } from '../../src/typedKnex';
 import { User, UserCategory, UserSetting } from '../testEntities';
-import { getColumnName } from '../../src/decorators';
 
 describe('TypedKnexQueryBuilder', () => {
     it('should return select * from "users"', done => {
@@ -1168,21 +1168,42 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should left outer join with function with other table and more ONs', done => {
+    it('should left outer join with function with other table with on and on or on', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
             .leftOuterJoinTableOnFunction('otherUser', User, join => {
                 join
-                    .on(i => i.user2Id, '=', j => j.id)
-                    .andOn(i => i.user2Id, '=', j => j.name)
-                    .orOn(i => i.user2Id, '=', j => j.someValue)
+                    .on(j => j.id, '=', i => i.user2Id)
+                    .andOn(j => j.name, '=', i => i.user2Id)
+                    .orOn(j => j.someValue, '=', i => i.user2Id);
             });
 
         const queryString = query.toQuery();
         assert.equal(
             queryString,
             'select * from "userSettings" left outer join "users" as "otherUser" on "userSettings"."user2Id" = "otherUser"."id" and "userSettings"."user2Id" = "otherUser"."name" or "userSettings"."user2Id" = "otherUser"."someValue"'
+        );
+
+        done();
+    });
+
+
+    it('should left outer join with function with other table with onVal', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(UserSetting)
+            .leftOuterJoinTableOnFunction('otherUser', User, join => {
+                join
+                    .onVal(i => i.name, '=', '1')
+                    .andOnVal(i => i.name, '=', '2')
+                    .orOnVal(i => i.name, '=', '3');
+            });
+
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select * from "userSettings" left outer join "users" as "otherUser" on "otherUser"."name" = \'1\' and "otherUser"."name" = \'2\' or "otherUser"."name" = \'3\''
         );
 
         done();
@@ -1227,7 +1248,7 @@ describe('TypedKnexQueryBuilder', () => {
             'element.id': null,
             'element.category.id': null,
             'unit.category.id': null,
-            'category.name': 'cat name'
+            'category.name': 'cat name',
         };
         const flattened = unflatten([result]);
         assert.isNull(flattened[0].element.id);
