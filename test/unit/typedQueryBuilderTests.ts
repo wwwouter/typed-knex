@@ -1330,5 +1330,37 @@ describe('TypedKnexQueryBuilder', () => {
     //     console.log('a: ', a.otherUser?.birthDate);
 
     //     done();
-    // });
+    // })
+
+
+    it('should stay commented out', async done => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(UserSetting)
+            .innerJoinColumn(i => i.user3)
+            .select(i => i.user3.birthDate);
+
+        const a = await query.getFirst();
+        console.log('a: ', a.user3.birthDate);
+        console.log('a: ', a.user3?.birthDate);
+
+        done();
+    });
+
+    it('should stay commented out', async done => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(UserSetting)
+            .leftOuterJoinColumn(i => i.user3)
+            .select(i => i.user3.birthDate);
+
+        const a = await query.getFirst();
+        console.log('a: ', a.user3.birthDate);
+        console.log('a: ', a.user3?.birthDate);
+
+        done();
+    });
+
 });

@@ -137,7 +137,7 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
 
     orderBy: IOrderBy<Model, SelectableModel, Row>;
     innerJoinColumn: IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
-    leftOuterJoinColumn: IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
+    leftOuterJoinColumn: IOuterJoin<Model, SelectableModel, Row>;
 
     whereColumn: IWhereCompareTwoColumns<Model, SelectableModel, Row>;
 
@@ -367,6 +367,19 @@ interface IOuterJoinTableMultipleOnClauses<Model, _SelectableModel, Row> {
         Row
     >;
 }
+
+
+
+interface IOuterJoin<Model, SelectableModel, Row> {
+    (
+        selectColumnFunction: (
+            c: TransformPropertiesToFunction<Model>
+        ) => void
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+
+}
+
 
 
 interface ISelectRaw<Model, SelectableModel, Row> {
@@ -674,12 +687,6 @@ interface IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>
         ) => void
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
-    (
-        selectColumnFunction: (
-            c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
-        ) => void,
-        setToNullIfNullFunction: (r: Row) => void
-    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
 interface IWhere<Model, SelectableModel, Row> {

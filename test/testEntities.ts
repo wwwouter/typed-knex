@@ -68,4 +68,6 @@ export class UserSetting {
     public value!: string;
     @Column()
     public initialValue!: string;
+    @Column({ name: 'user3Id' })
+    public user3?: User;
 }
