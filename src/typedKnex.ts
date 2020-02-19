@@ -1,5 +1,4 @@
 // tslint:disable:use-named-parameter
-import * as flat from 'flat';
 import * as Knex from 'knex';
 import {
     getColumnInformation,
@@ -10,64 +9,8 @@ import {
 import { NonForeignKeyObjects } from './NonForeignKeyObjects';
 import { NonNullableRecursive } from './NonNullableRecursive';
 import { TransformPropertiesToFunction } from './TransformPropertiesToFunction';
+import { FlattenOption, setToNull, unflatten } from './unflatten';
 
-export function unflatten(o: any): any {
-    if (o instanceof Array) {
-        return o.map(i => unflatten(i));
-    }
-    return flat.unflatten(o);
-}
-
-function areAllPropertiesNull(o: any) {
-    if (o === null || o === undefined) {
-        return false;
-    }
-    const keys = Object.keys(o);
-    if (keys.length === 0) {
-        return false;
-    }
-    let allNull = true;
-    for (const key of keys) {
-        if (o[key] !== null) {
-            allNull = false;
-            break;
-        }
-    }
-    return allNull;
-}
-
-export function setToNull(o: any): any {
-    if (o instanceof Array) {
-        return o.map(i => setToNull(i));
-    } else {
-        if (o !== null && o !== undefined) {
-            const keys = Object.keys(o);
-            for (const key of keys) {
-                if (typeof o[key] === 'object') {
-                    setToNull(o[key]);
-                    if (areAllPropertiesNull(o[key])) {
-                        o[key] = null;
-                    }
-                }
-            }
-        }
-    }
-    return o;
-}
-
-export function flattenByOption(o: any, flattenOption?: FlattenOption) {
-    if (flattenOption === FlattenOption.noFlatten) {
-        return o;
-    }
-    const unflattened = unflatten(o);
-    if (
-        flattenOption === undefined ||
-        flattenOption === FlattenOption.flatten
-    ) {
-        return unflattened;
-    }
-    return setToNull(unflattened);
-}
 
 export class TypedKnex {
     constructor(private knex: Knex) { }
@@ -113,15 +56,6 @@ class NotImplementedError extends Error {
     constructor() {
         super('Not implemented');
     }
-}
-
-export enum FlattenOption {
-    flatten = 'flatten',
-    /**
-     * @deprecated since version 2.8.1, use .keepFlat()
-     */
-    noFlatten = 'noFlatten',
-    flattenAndSetToNull = 'flattenAndSetToNull',
 }
 
 export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
@@ -469,6 +403,8 @@ type TransformPropsToFunctionsReturnPropertyName<Model> = {
     () => P
 };
 
+
+
 type TransformPropsToFunctionsReturnPropertyType<Model> = {
     [P in keyof Model]:
     Model[P] extends object ?
@@ -502,6 +438,9 @@ interface IDbFunctionWithAlias<Model, SelectableModel, Row> {
         Record<TName, ObjectToPrimitive<NewPropertyType>> & Row
     >;
 }
+
+
+
 
 
 
@@ -2011,7 +1950,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
                 operator,
                 column2ArgumentsWithJoinedTable.join('.')
             );
-        }
+        };
 
         const onWithColumnOperatorValue = (joinedColumn: any, operator: any, value: any, functionName: string) => {
             // const column1Arguments = this.getArgumentsFromColumnFunction(
@@ -2031,7 +1970,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
                 value
                 // column2ArgumentsWithJoinedTable.join('.')
             );
-        }
+        };
 
         const onObject = {
             onColumns: (column1: any, operator: any, column2: any) => {

@@ -47,14 +47,11 @@ export type TransformPropertiesToFunction<Model, PropertyPath extends {
 // Creates a type from an array of strings (in reversed order)
 // input [{ name: 'c'} ,{name: 'b'},{ name:'a'}] and string returns { a : { b:  { c : string }}}
 type RecordFromArray<Keys extends { name: any }[], LeafType> =
-    // Keys extends { 6: any } ? Record<Keys[6], Record<Keys[5], Record<Keys[4], Record<Keys[3], Record<Keys[2], Record<Keys[1], Record<Keys[0], LeafType>>>>>>> :
-    // Keys extends { 5: any } ? Record<Keys[5], Record<Keys[4], Record<Keys[3], Record<Keys[2], Record<Keys[1], Record<Keys[0], LeafType>>>>>> :
-    // Keys extends { 4: any } ? Record<Keys[4], Record<Keys[3], Record<Keys[2], Record<Keys[1], Record<Keys[0], LeafType>>>>> :
+    Keys extends { 6: any } ? Record<GetName<Keys[6]>, Record<GetName<Keys[5]>, Record<GetName<Keys[4]>, Record<GetName<Keys[3]>, GetNullIfNullable<Keys[3]> | Record<GetName<Keys[2]>, GetNullIfNullable<Keys[2]> | Record<GetName<Keys[1]>, GetNullIfNullable<Keys[1]> | Record<GetName<Keys[0]>, LeafType>>>>>>> :
+    Keys extends { 5: any } ? Record<GetName<Keys[5]>, Record<GetName<Keys[4]>, Record<GetName<Keys[3]>, GetNullIfNullable<Keys[3]> | Record<GetName<Keys[2]>, GetNullIfNullable<Keys[2]> | Record<GetName<Keys[1]>, GetNullIfNullable<Keys[1]> | Record<GetName<Keys[0]>, LeafType>>>>>> :
+    Keys extends { 4: any } ? Record<GetName<Keys[4]>, Record<GetName<Keys[3]>, GetNullIfNullable<Keys[3]> | Record<GetName<Keys[2]>, GetNullIfNullable<Keys[2]> | Record<GetName<Keys[1]>, GetNullIfNullable<Keys[1]> | Record<GetName<Keys[0]>, LeafType>>>>> :
     Keys extends { 3: any } ? Record<GetName<Keys[3]>, GetNullIfNullable<Keys[3]> | Record<GetName<Keys[2]>, GetNullIfNullable<Keys[2]> | Record<GetName<Keys[1]>, GetNullIfNullable<Keys[1]> | Record<GetName<Keys[0]>, LeafType>>>> :
     Keys extends { 2: any } ? Record<GetName<Keys[2]>, GetNullIfNullable<Keys[2]> | Record<GetName<Keys[1]>, GetNullIfNullable<Keys[1]> | Record<GetName<Keys[0]>, LeafType>>> :
     Keys extends { 1: any } ? Record<GetName<Keys[1]>, GetNullIfNullable<Keys[1]> | Record<GetName<Keys[0]>, LeafType>> :
     Keys extends { 0: any } ? Record<GetName<Keys[0]>, LeafType> :
     never;
-
-
-
