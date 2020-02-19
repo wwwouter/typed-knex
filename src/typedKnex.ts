@@ -1,5 +1,4 @@
 // tslint:disable:use-named-parameter
-import { unflatten } from 'flat';
 import * as Knex from 'knex';
 import {
     getColumnInformation,
@@ -10,7 +9,7 @@ import {
 import { NonForeignKeyObjects } from './NonForeignKeyObjects';
 import { NonNullableRecursive } from './NonNullableRecursive';
 import { TransformPropertiesToFunction } from './TransformPropertiesToFunction';
-import { FlattenOption, setToNull } from './unflatten';
+import { FlattenOption, setToNull, unflatten } from './unflatten';
 
 
 export class TypedKnex {
