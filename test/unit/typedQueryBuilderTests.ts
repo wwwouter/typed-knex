@@ -2,8 +2,9 @@ import { assert } from 'chai';
 import * as knex from 'knex';
 import { getEntities, getTableName } from '../../src';
 import { getColumnName } from '../../src/decorators';
-import { setToNull, TypedKnex, unflatten } from '../../src/typedKnex';
+import { TypedKnex } from '../../src/typedKnex';
 import { User, UserCategory, UserSetting } from '../testEntities';
+import { setToNull, unflatten } from '../../src/unflatten';
 
 describe('TypedKnexQueryBuilder', () => {
     it('should return select * from "users"', done => {

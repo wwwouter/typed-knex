@@ -1,5 +1,5 @@
 // tslint:disable:use-named-parameter
-import * as flat from 'flat';
+import { unflatten } from 'flat';
 import * as Knex from 'knex';
 import {
     getColumnInformation,
@@ -7,64 +7,11 @@ import {
     getPrimaryKeyColumn,
     getTableMetadata
 } from './decorators';
+import { NonForeignKeyObjects } from './NonForeignKeyObjects';
+import { NonNullableRecursive } from './NonNullableRecursive';
+import { TransformPropertiesToFunction } from './TransformPropertiesToFunction';
+import { FlattenOption, setToNull } from './unflatten';
 
-export function unflatten(o: any): any {
-    if (o instanceof Array) {
-        return o.map(i => unflatten(i));
-    }
-    return flat.unflatten(o);
-}
-
-function areAllPropertiesNull(o: any) {
-    if (o === null || o === undefined) {
-        return false;
-    }
-    const keys = Object.keys(o);
-    if (keys.length === 0) {
-        return false;
-    }
-    let allNull = true;
-    for (const key of keys) {
-        if (o[key] !== null) {
-            allNull = false;
-            break;
-        }
-    }
-    return allNull;
-}
-
-export function setToNull(o: any): any {
-    if (o instanceof Array) {
-        return o.map(i => setToNull(i));
-    } else {
-        if (o !== null && o !== undefined) {
-            const keys = Object.keys(o);
-            for (const key of keys) {
-                if (typeof o[key] === 'object') {
-                    setToNull(o[key]);
-                    if (areAllPropertiesNull(o[key])) {
-                        o[key] = null;
-                    }
-                }
-            }
-        }
-    }
-    return o;
-}
-
-export function flattenByOption(o: any, flattenOption?: FlattenOption) {
-    if (flattenOption === FlattenOption.noFlatten) {
-        return o;
-    }
-    const unflattened = unflatten(o);
-    if (
-        flattenOption === undefined ||
-        flattenOption === FlattenOption.flatten
-    ) {
-        return unflattened;
-    }
-    return setToNull(unflattened);
-}
 
 export class TypedKnex {
     constructor(private knex: Knex) { }
@@ -110,15 +57,6 @@ class NotImplementedError extends Error {
     constructor() {
         super('Not implemented');
     }
-}
-
-export enum FlattenOption {
-    flatten = 'flatten',
-    /**
-     * @deprecated since version 2.8.1, use .keepFlat()
-     */
-    noFlatten = 'noFlatten',
-    flattenAndSetToNull = 'flattenAndSetToNull',
 }
 
 export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
@@ -432,8 +370,6 @@ type TransformPropsToFunctionsReturnPropertyName<Model> = {
     () => P
 };
 
-type NonForeignKeyObjects = any[] | Date;
-
 
 
 type TransformPropsToFunctionsReturnPropertyType<Model> = {
@@ -471,31 +407,7 @@ interface IDbFunctionWithAlias<Model, SelectableModel, Row> {
 }
 
 
-type NonNullableRecursive<T> = { [P in keyof T]-?: T[P] extends object ? T[P] extends NonForeignKeyObjects ? Required<NonNullable<T[P]>> : NonNullableRecursive<T[P]> : Required<NonNullable<T[P]>> };
 
-type TransformPropertiesToFunction<Model, Result extends any[] = []> = {
-    [P in keyof Model]-?: Model[P] extends (object | undefined) ?
-    Model[P] extends (NonForeignKeyObjects | undefined) ? () => RecordFromArray<AddToArray<Result, P>, ({} extends { [P2 in P]: Model[P] } ? NonNullable<Model[P]> | null : Model[P])> :
-    TransformPropertiesToFunction<Model[P], AddToArray<Result, P>>
-    :
-    () => RecordFromArray<AddToArray<Result, P>, ({} extends { [P2 in P]: Model[P] } ? NonNullable<Model[P]> | null : Model[P])>
-};
-
-type RecordFromArray<Keys extends any[], LeafType> =
-    Keys extends { 6: any } ? Record<Keys[6], Record<Keys[5], Record<Keys[4], Record<Keys[3], Record<Keys[2], Record<Keys[1], Record<Keys[0], LeafType>>>>>>> :
-    Keys extends { 5: any } ? Record<Keys[5], Record<Keys[4], Record<Keys[3], Record<Keys[2], Record<Keys[1], Record<Keys[0], LeafType>>>>>> :
-    Keys extends { 4: any } ? Record<Keys[4], Record<Keys[3], Record<Keys[2], Record<Keys[1], Record<Keys[0], LeafType>>>>> :
-    Keys extends { 3: any } ? Record<Keys[3], Record<Keys[2], Record<Keys[1], Record<Keys[0], LeafType>>>> :
-    Keys extends { 2: any } ? Record<Keys[2], Record<Keys[1], Record<Keys[0], LeafType>>> :
-    Keys extends { 1: any } ? Record<Keys[1], Record<Keys[0], LeafType>> :
-    Keys extends { 0: any } ? Record<Keys[0], LeafType> :
-    never;
-
-
-
-
-
-type AddToArray<T extends string[], A extends any> = ((a: A, ...t: T) => void) extends ((...u: infer U) => void) ? U : never;
 
 
 
@@ -2011,7 +1923,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
                 operator,
                 column2ArgumentsWithJoinedTable.join('.')
             );
-        }
+        };
 
         const onWithColumnOperatorValue = (joinedColumn: any, operator: any, value: any, functionName: string) => {
             // const column1Arguments = this.getArgumentsFromColumnFunction(
@@ -2031,7 +1943,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
                 value
                 // column2ArgumentsWithJoinedTable.join('.')
             );
-        }
+        };
 
         const onObject = {
             onColumns: (column1: any, operator: any, column2: any) => {
