@@ -1,5 +1,7 @@
 # Changelog
 
+## 2.10.0
+- Added `insertSelect` for inserting selects  (eg `INSERT INTO table (column) SELECT 'value'`)
 
 ## 2.9.0
 - Updated on clauses for joins:

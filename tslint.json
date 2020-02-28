@@ -174,7 +174,7 @@
         "no-invalid-regexp": true,
         "no-for-in": true,
         "no-missing-visibility-modifiers": false,
-        "no-multiline-string": true,
+        "no-multiline-string": false,
         "no-multiple-var-decl": true,
         "no-unnecessary-bind": true,
         "no-unnecessary-semicolons": true,

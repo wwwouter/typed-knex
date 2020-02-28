@@ -139,6 +139,7 @@ const typedKnex = new TypedKnex(knex);
 -   [getCount](#getCount)
 -   [insertItem](#insertItem)
 -   [insertItems](#insertItems)
+-   [insertSelect](#insertSelect)
 -   [del](#del)
 -   [delByPrimaryKey](#delByPrimaryKey)
 -   [updateItem](#updateItem)
@@ -850,6 +851,21 @@ typedKnex.query(User);
 ```ts
 typedKnex.query(User);
 ```
+
+
+### insertSelect
+
+```ts
+await typedKnex.query(User);
+    .selectRaw('f', String, '\'fixedValue\'')
+    .select(u => [u.name])
+    .distinct()
+    .whereNotNull(u => u.name)
+    .insertSelect(UserSetting, i => [i.id, i.initialValue]);
+
+// insert into "userSettings" ("userSettings"."id","userSettings"."initialValue") select distinct ('fixedValue') as "f", "users"."name" as "name" from "users" where "users"."name" is not null
+```
+
 
 ### del
 

@@ -1339,6 +1339,29 @@ describe('TypedKnexQueryBuilder', () => {
 
     });
 
+    it('should insert a select', async () => {
+        const k = knex({ client: 'postgresql' })
+        const typedKnex = new TypedKnex(k);
+        const query = typedKnex
+            .query(User);
+        try {
+
+            await query
+                .selectRaw('f', String, '\'fixedValue\'')
+                .select(u => [u.name])
+                .distinct()
+                .whereNotNull(u => u.name)
+                .insertSelect(UserSetting, i => [i.id, i.initialValue]);
+        } catch (_e) {
+            assert.equal(
+                query.toQuery(),
+                `insert into "userSettings" ("userSettings"."id","userSettings"."initialValue") select distinct ('fixedValue') as "f", "users"."name" as "name" from "users" where "users"."name" is not null`
+            );
+        }
+    });
+
+
+
     // it('should stay commented out', async done => {
     //     const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
 

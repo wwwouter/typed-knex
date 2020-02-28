@@ -143,6 +143,8 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     avg: IDbFunctionWithAlias<Model, SelectableModel, Row extends Model ? {} : Row>;
     avgDistinct: IDbFunctionWithAlias<Model, SelectableModel, Row extends Model ? {} : Row>;
 
+    insertSelect: IInsertSelect;
+
     clearSelect(): ITypedQueryBuilder<Model, SelectableModel, Model>;
     clearWhere(): ITypedQueryBuilder<Model, SelectableModel, Row>;
     clearOrder(): ITypedQueryBuilder<Model, SelectableModel, Row>;
@@ -294,6 +296,15 @@ interface IWhereCompareTwoColumns<Model, SelectableModel, Row> {
             c: TransformPropsToFunctionsReturnPropertyType<Model2>
         ) => any
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+}
+
+interface IInsertSelect {
+    <NewPropertyType>(
+        newPropertyClass: new () => NewPropertyType,
+        selectColumn1Function: (
+            c: TransformPropsToFunctionsReturnPropertyType<NewPropertyType>
+        ) => any
+    ): Promise<void>;
 }
 
 interface IJoinTableMultipleOnClauses<Model, _SelectableModel, Row> {
@@ -1617,6 +1628,30 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
     public async truncate() {
         await this.queryBuilder.truncate();
+    }
+
+    public async insertSelect() {
+        const tableName = getTableMetadata(arguments[0]).tableName;
+
+        const typedQueryBuilderForInsert = new TypedQueryBuilder<any, any>(
+            arguments[0],
+            this.knex
+
+        );
+
+        const f = arguments[1];
+        const columnArgumentsList = typedQueryBuilderForInsert.getArgumentsFromColumnFunction3(f);
+        const insertColumns = columnArgumentsList.map(i => typedQueryBuilderForInsert.getColumnName(...i));
+
+        // https://github.com/knex/knex/issues/1056
+        const qb = this.knex.from(this.knex.raw(`?? (${insertColumns.map(() => '??').join(',')})`, [tableName, ...insertColumns]))
+            .insert(this.knex.raw(this.toQuery()));
+
+        const finalQuery = qb.toString();
+        this.toQuery = () => finalQuery;
+
+        await qb;
+
     }
 
     public clearSelect() {
