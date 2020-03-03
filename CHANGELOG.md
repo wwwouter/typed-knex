@@ -1,5 +1,7 @@
 # Changelog
 
+-   Fix `getCount` result.
+
 ## 2.12.0
 
 -   Fix: export `validateTables`.

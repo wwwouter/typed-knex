@@ -969,7 +969,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     }
 
     public async getCount() {
-        const query = this.queryBuilder.count();
+        const query = this.queryBuilder.count({ count: '*' });
         const result = await query;
         if (result.length === 0) {
             return 0;
