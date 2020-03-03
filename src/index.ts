@@ -5,4 +5,4 @@ export {
     registerBeforeInsertTransform,
     registerBeforeUpdateTransform
 } from './typedKnex';
-export { validateEntities } from './validateEntities';
+export { validateEntities, validateTables } from './validateEntities';

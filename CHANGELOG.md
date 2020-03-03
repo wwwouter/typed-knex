@@ -1,20 +1,25 @@
 # Changelog
 
+-   Fix: export `validateTables`
+
 ## 2.11.0
-- Fix: Table joined with `leftOuterJoinTableOnFunction` could not be referenced in a following `leftOuterJoinTableOnFunction`.
-- Add `Table` as alias for `Entity` and `validateTables` for `validateEntities`.
+
+-   Fix: Table joined with `leftOuterJoinTableOnFunction` could not be referenced in a following `leftOuterJoinTableOnFunction`.
+-   Add `Table` as alias for `Entity` and `validateTables` for `validateEntities`.
 
 ## 2.10.0
-- Added `insertSelect` for inserting selects  (eg `INSERT INTO table (column) SELECT 'value'`)
+
+-   Added `insertSelect` for inserting selects (eg `INSERT INTO table (column) SELECT 'value'`)
 
 ## 2.9.0
-- Updated on clauses for joins:
-    - Deprecated `.onColumns`.
-    - Added `.on`, `andOn`, `orOn`, `onVal`, `andOnVal`, `orOnVal`.
+
+-   Updated on clauses for joins:
+    -   Deprecated `.onColumns`.
+    -   Added `.on`, `andOn`, `orOn`, `onVal`, `andOnVal`, `orOnVal`.
 
 ## 2.8.1
 
-- Add deprecation warning for `FlattenOption.noFlatten`.
+-   Add deprecation warning for `FlattenOption.noFlatten`.
 
 ## 2.8.0
 
