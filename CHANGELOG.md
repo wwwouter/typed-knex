@@ -1,5 +1,7 @@
 # Changelog
 
+## 2.12.1
+
 -   Fix `getCount` result.
 
 ## 2.12.0
