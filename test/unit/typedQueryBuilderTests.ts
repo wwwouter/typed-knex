@@ -1381,6 +1381,20 @@ describe('TypedKnexQueryBuilder', () => {
         }
     });
 
+    it('should create query with order by raw', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .orderByRaw('SUM(??) DESC', 'users.year');
+
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select * from "users" order by SUM("users"."year") DESC'
+        );
+
+        done();
+    });
 
 
     // it('should stay commented out', async done => {

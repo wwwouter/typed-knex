@@ -198,6 +198,11 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
         ...bindings: string[]
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
+    orderByRaw(
+        sql: string,
+        ...bindings: string[]
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
     keepFlat(): ITypedQueryBuilder<Model, SelectableModel, any>;
 }
 
@@ -1526,6 +1531,12 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
         );
         return this;
     }
+
+    public orderByRaw(sql: string, ...bindings: string[]) {
+        this.queryBuilder.orderByRaw(sql, bindings);
+        return this;
+    }
+
 
     public union() {
         const typeOfSubQuery = arguments[0];

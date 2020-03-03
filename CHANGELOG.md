@@ -1,6 +1,7 @@
 # Changelog
 
--   Fix: export `validateTables`
+-   Fix: export `validateTables`.
+-   Added `orderByRaw`.
 
 ## 2.11.0
 
