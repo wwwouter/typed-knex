@@ -1,6 +1,6 @@
-import { Column, Entity } from '../src/decorators';
+import { Column, Table } from '../src/decorators';
 
-@Entity('regions')
+@Table('regions')
 export class Region {
     @Column({ primary: true })
     public id!: string;
@@ -8,7 +8,7 @@ export class Region {
     public code: number;
 }
 
-@Entity('userCategories')
+@Table('userCategories')
 export class UserCategory {
     @Column({ primary: true })
     public id!: string;
@@ -26,7 +26,7 @@ export class UserCategory {
     public backupRegion?: Region;
 }
 
-@Entity('users')
+@Table('users')
 export class User {
     @Column({ primary: true })
     public id!: string;
@@ -50,7 +50,7 @@ export class User {
     public tags?: string[];
 }
 
-@Entity('userSettings')
+@Table('userSettings')
 export class UserSetting {
     @Column({ primary: true })
     public id!: string;

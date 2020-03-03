@@ -67,18 +67,18 @@ async function example() {
 }
 ```
 
-## Define entities
+## Define tables
 
-Use the `Entity` decorator to refence a table and use the `Column` decorator to reference a column.
+Use the `Table` decorator to reference a table and use the `Column` decorator to reference a column.
 
 Use `@Column({ primary: true })` for primary key columns.
 
-Use `@Column({ name: '[column name]' })` on property with the type of another `Entity` to reference another table.
+Use `@Column({ name: '[column name]' })` on property with the type of another `Table` to reference another table.
 
 ```ts
-import { Column, Entity } from '@wwwouter/typed-knex';
+import { Column, Table } from '@wwwouter/typed-knex';
 
-@Entity('userCategories')
+@Table('userCategories')
 export class UserCategory {
     @Column({ primary: true })
     public id: string;
@@ -88,7 +88,7 @@ export class UserCategory {
     public year: number;
 }
 
-@Entity('users')
+@Table('users')
 export class User {
     @Column({ primary: true })
     public id: string;
@@ -981,20 +981,20 @@ try {
 }
 ```
 
-## Validate Entities
+## Validate tables
 
-Use the `validateEntities` function to make sure that the `Entitiy`'s and `Column`'s in TypeScript exist in the database.
+Use the `validateTables` function to make sure that the `Table`'s and `Column`'s in TypeScript exist in the database.
 
 ```ts
 import * as Knex from 'knex';
-import { validateEntities } from '@wwwouter/typed-knex';
+import { validateTables } from '@wwwouter/typed-knex';
 
 const knex = Knex({
     client: 'pg',
     connection: 'postgres://user:pass@localhost:5432/dbname'
 });
 
-await validateEntities(knex);
+await validateTables(knex);
 ```
 
 ## Test

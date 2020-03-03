@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.11.0
+- Fix: Table joined with `leftOuterJoinTableOnFunction` could not be referenced in a following `leftOuterJoinTableOnFunction`.
+- Add `Table` as alias for `Entity` and `validateTables` for `validateEntities`.
+
 ## 2.10.0
 - Added `insertSelect` for inserting selects  (eg `INSERT INTO table (column) SELECT 'value'`)
 

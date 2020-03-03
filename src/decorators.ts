@@ -29,6 +29,8 @@ export function getEntities() {
     return entities;
 }
 
+
+
 export function Entity(tableName: string) {
     return (target: Function) => {
         Reflect.metadata(tableyMetadataKey, { tableName: tableName })(target);
@@ -36,6 +38,9 @@ export function Entity(tableName: string) {
         entities.push({ tableName: tableName, entityClass: target });
     };
 }
+
+// tslint:disable-next-line: variable-name
+export const Table = Entity;
 
 export function getTableMetadata(tableClass: Function): { tableName: string } {
     return Reflect.getMetadata(tableyMetadataKey, tableClass);

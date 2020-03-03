@@ -1,4 +1,4 @@
-export { Column, Entity, getEntities, getTableName } from './decorators';
+export { Column, Entity, Table, getEntities, getTableName } from './decorators';
 export {
     ITypedQueryBuilder,
     TypedKnex,

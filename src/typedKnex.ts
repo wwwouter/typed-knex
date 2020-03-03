@@ -321,7 +321,7 @@ interface IJoinTableMultipleOnClauses<Model, _SelectableModel, Row> {
             >
         ) => void
     ): ITypedQueryBuilder<
-        Model,
+        AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>,
         AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>,
         Row
     >;

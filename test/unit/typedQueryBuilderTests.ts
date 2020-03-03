@@ -1210,6 +1210,27 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+
+    it('should be able to use joined column in another leftOuterJoinTableOnFunction', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(UserSetting)
+            .leftOuterJoinTableOnFunction('evilTwin', UserSetting, join => {
+                join.on(i => i.id, '=', j => j.id);
+            }).leftOuterJoinTableOnFunction('evilTwin2', UserSetting, join => {
+                join.on(i => i.id, '=', j => j.evilTwin.id);
+            });
+
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select * from "userSettings" left outer join "userSettings" as "evilTwin" on "userSettings"."id" = "evilTwin"."id" left outer join "userSettings" as "evilTwin2" on "evilTwin"."id" = "evilTwin2"."id"'
+        );
+
+        done();
+    });
+
+
     it('should return select * from "users"', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex.query(User).limit(10);
