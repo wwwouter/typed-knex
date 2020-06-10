@@ -1,6 +1,6 @@
 # Changelog
 
-## XXX
+## 2.13.0
 
 -   Added `FlattenOption` to the default import.
 -   Make `tableName` optional for `@Table`.
