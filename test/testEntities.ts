@@ -69,3 +69,13 @@ export class UserSetting {
     @Column()
     public initialValue!: string;
 }
+
+
+@Table()
+// tslint:disable-next-line: class-name
+export class correctTableName {
+    @Column({ primary: true })
+    public id!: string;
+    @Column()
+    public code: number;
+}

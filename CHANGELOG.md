@@ -3,6 +3,7 @@
 ## XXX
 
 -   Added `FlattenOption` to the default import.
+-   Make `tableName` optional for `@Table`.
 
 ## 2.12.1
 

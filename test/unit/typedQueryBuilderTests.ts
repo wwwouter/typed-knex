@@ -1058,8 +1058,9 @@ describe('TypedKnexQueryBuilder', () => {
     it('should return metadata from Entities', done => {
         const entities = getEntities();
 
-        assert.equal(entities.length, 4);
+        assert.equal(entities.length, 5);
         assert.exists(entities.find(i => i.tableName === 'users'));
+        assert.exists(entities.find(i => i.tableName === 'correctTableName'));
 
         done();
     });

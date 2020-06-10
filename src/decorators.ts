@@ -31,11 +31,11 @@ export function getEntities() {
 
 
 
-export function Entity(tableName: string) {
+export function Entity(tableName?: string) {
     return (target: Function) => {
-        Reflect.metadata(tableyMetadataKey, { tableName: tableName })(target);
+        Reflect.metadata(tableyMetadataKey, { tableName: tableName ?? target.name })(target);
 
-        entities.push({ tableName: tableName, entityClass: target });
+        entities.push({ tableName: tableName ?? target.name, entityClass: target });
     };
 }
 
