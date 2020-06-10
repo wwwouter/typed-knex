@@ -1399,24 +1399,70 @@ describe('TypedKnexQueryBuilder', () => {
 
 
     // it('should stay commented out', async done => {
+
     //     const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    //     const query = typedKnex
+    //         .query(UserSetting)
+    //         .innerJoinTableOnFunction('otherUser', User, join => {
+    //             join.onColumns(i => i.user2Id, '=', j => j.id);
+    //             join.onNull(i => i.name);
+    //         })
+    //         .select(i => i.otherUser.birthDate);
 
-    //     // const item = await typedKnex
-    //     //     .query(UserSetting)
-    //     //     .insertItem({ id: '1', key:  });
-
-    //     const item = await typedKnex
-    //         .query(User)
-    //         .select(i => i.category.name)
-    //         .getFirst();
-
-    //     console.log('item: ', item.category.name);
-
-    //     // if (item !== undefined) {
-    //     //     console.log(item.user2.numericValue);
-    //     //     console.log(item.otherUser.name);
-    //     // }
+    //     const a = await query.getFirst();
+    //     console.log('a: ', a.otherUser.birthDate);
+    //     console.log('a: ', a.otherUser?.birthDate);
 
     //     done();
     // });
+
+    // it('should stay commented out', async done => {
+
+    //     const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    //     const query = typedKnex
+    //         .query(UserSetting)
+    //         .leftOuterJoinTableOnFunction('otherUser', User, join => {
+    //             join.onColumns(i => i.user2Id, '=', j => j.id);
+    //             join.onNull(i => i.name);
+    //         })
+    //         .select(i => i.otherUser.birthDate);
+
+    //     const a = await query.getFirst();
+    //     console.log('a: ', a.otherUser.birthDate);
+    //     console.log('a: ', a.otherUser?.birthDate);
+
+    //     done();
+    // })
+
+
+    // it('should stay commented out', async done => {
+
+    //     const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    //     const query = typedKnex
+    //         .query(UserSetting)
+    //         .innerJoinColumn(i => i.user3)
+    //         .select(i => i.user3.birthDate);
+
+    //     const a = await query.getFirst();
+    //     console.log('a: ', a.user3.birthDate);
+    //     console.log('a: ', a.user3?.birthDate);
+
+    //     done();
+    // });
+
+    // it('should stay commented out', async done => {
+
+    //     const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    //     const query = typedKnex
+    //         .query(UserSetting)
+    //         .leftOuterJoinColumn(i => i.user3)
+    //         .select(i => i.user3.birthDate);
+
+    //     const a = await query.getFirst();
+    //     console.log('a: ', a.user3.birthDate);
+    //     console.log('a: ', a.user3?.birthDate);
+
+    //     done();
+    // });
+
 });

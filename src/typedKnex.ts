@@ -71,7 +71,7 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
 
     orderBy: IOrderBy<Model, SelectableModel, Row>;
     innerJoinColumn: IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
-    leftOuterJoinColumn: IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
+    leftOuterJoinColumn: IOuterJoin<Model, SelectableModel, Row>;
 
     whereColumn: IWhereCompareTwoColumns<Model, SelectableModel, Row>;
 
@@ -80,7 +80,7 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     orWhereNull: IColumnParameterNoRowTransformation<Model, SelectableModel, Row>;
     orWhereNotNull: IColumnParameterNoRowTransformation<Model, SelectableModel, Row>;
 
-    leftOuterJoinTableOnFunction: IJoinTableMultipleOnClauses<
+    leftOuterJoinTableOnFunction: IOuterJoinTableMultipleOnClauses<
         Model,
         SelectableModel,
         Row extends Model ? {} : Row
@@ -331,6 +331,40 @@ interface IJoinTableMultipleOnClauses<Model, _SelectableModel, Row> {
         Row
     >;
 }
+
+interface IOuterJoinTableMultipleOnClauses<Model, _SelectableModel, Row> {
+    <
+        NewPropertyType,
+        NewPropertyKey extends keyof any
+        >(
+        newPropertyKey: NewPropertyKey,
+        newPropertyClass: new () => NewPropertyType,
+        on: (
+            join: IJoinOnClause2<
+                AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>,
+                NewPropertyType
+            >
+        ) => void
+    ): ITypedQueryBuilder<
+        Model,
+        AddPropertyWithType<Model, NewPropertyKey, NewPropertyType | null>,
+        Row
+    >;
+}
+
+
+
+interface IOuterJoin<Model, SelectableModel, Row> {
+    (
+        selectColumnFunction: (
+            c: TransformPropertiesToFunction<Model>
+        ) => void
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+
+}
+
+
 
 interface ISelectRaw<Model, SelectableModel, Row> {
     <
@@ -642,12 +676,6 @@ interface IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>
         ) => void
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
-    (
-        selectColumnFunction: (
-            c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
-        ) => void,
-        setToNullIfNullFunction: (r: Row) => void
-    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
 interface IWhere<Model, SelectableModel, Row> {

@@ -8,6 +8,7 @@ type GetNullIfNullable<T> = T extends { nullable: never } ? never : null;
 type AddToArray<T extends { name: string }[], A extends any> = ((a: A, ...t: T) => void) extends ((...u: infer U) => void) ? U : never;
 
 
+
 // Take { a : string, b : { c : string }} and return { a : ()=> {a: string}, b : { c : ()=> { b: { c: string } }}}
 // PropertyPath contains the path to one leaf. {a : { b: string }} will have a PropertyPath of [{name:'b'}, {name:'a'}]
 // Special cases:
