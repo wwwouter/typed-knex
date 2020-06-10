@@ -6,3 +6,4 @@ export {
     registerBeforeUpdateTransform
 } from './typedKnex';
 export { validateEntities, validateTables } from './validateEntities';
+export { FlattenOption } from './unflatten';

@@ -1,5 +1,9 @@
 # Changelog
 
+## XXX
+
+-   Added `FlattenOption` to the default import.
+
 ## 2.12.1
 
 -   Fix `getCount` result.
