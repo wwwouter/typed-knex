@@ -357,7 +357,7 @@ interface ISelectQuery<Model, SelectableModel, Row> {
         returnType: IConstructor<TReturn>,
         subQueryModel: new () => SubQueryModel,
         code: (
-            subQuery: ITypedQueryBuilder<SubQueryModel, SelectableModel, {}>,
+            subQuery: ITypedQueryBuilder<SubQueryModel, SubQueryModel, {}>,
             parent: TransformPropsToFunctionsReturnPropertyName<Model>
         ) => void
     ): ITypedQueryBuilder<
@@ -720,7 +720,7 @@ interface IWhereExists<Model, SelectableModel, Row> {
     <SubQueryModel>(
         subQueryModel: new () => SubQueryModel,
         code: (
-            subQuery: ITypedQueryBuilder<SubQueryModel, SelectableModel, {}>,
+            subQuery: ITypedQueryBuilder<SubQueryModel, SubQueryModel, {}>,
             parent: TransformPropsToFunctionsReturnPropertyName<SelectableModel>
         ) => void
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
@@ -735,7 +735,7 @@ interface IWhereParentheses<Model, SelectableModel, Row> {
 interface IUnion<Model, SelectableModel, Row> {
     <SubQueryModel>(
         subQueryModel: new () => SubQueryModel,
-        code: (subQuery: ITypedQueryBuilder<SubQueryModel, SelectableModel, {}>) => void
+        code: (subQuery: ITypedQueryBuilder<SubQueryModel, SubQueryModel, {}>) => void
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 

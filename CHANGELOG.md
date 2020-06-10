@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.14.0
+
+-   Fixed compilation errors for sub-queries using `code` (`whereExists`, `union`, `selectQuery`)
+
 ## 2.13.0
 
 -   Added `FlattenOption` to the default import.
