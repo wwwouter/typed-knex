@@ -491,9 +491,6 @@ describe('TypedKnexQueryBuilder', () => {
             .orWhereExists(UserSetting, (subQuery, parentColumn) => {
                 subQuery.whereColumn(c => c.userId, '=', parentColumn.id);
             });
-        // .orWhereExists(UserSetting, (subQuery, parentColumn) => {
-        //     subQuery.whereColumn(c => c.userId, '=', parentColumn.id);
-        // });
 
         const queryString = query.toQuery();
         assert.equal(
@@ -1396,6 +1393,128 @@ describe('TypedKnexQueryBuilder', () => {
 
         done();
     });
+
+
+    it('should create query with where in with subquery', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .whereExists(UserSetting, (subQuery, parentColumn) => {
+                subQuery.whereColumn(c => c.userId, '=', parentColumn.id);
+            });
+
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select * from "users" where exists (select * from "userSettings" where "userSettings"."userId" = "users"."id")'
+        );
+
+        done();
+    });
+
+    it('should create insert query', async () => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex
+            .query(User);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.insertItem({ id: 'newId' });
+
+
+        assert.equal(
+            (query as any).queryLog.trim(),
+            `insert into "users" ("id") values ('newId')`
+        );
+
+    });
+
+    it('should create multiple insert queries', async () => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex
+            .query(User);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.insertItems([{ id: 'newId1' }, { id: 'newId2' }]);
+
+
+        assert.equal(
+            (query as any).queryLog.trim(),
+            `insert into "users" ("id") values ('newId1'), ('newId2')`
+        );
+
+    });
+
+
+    it('should create update query', async () => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex
+            .query(User);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.updateItem({ id: 'newId' });
+
+
+        assert.equal(
+            (query as any).queryLog.trim(),
+            `update "users" set "id" = 'newId'`
+        );
+
+    });
+
+    it('should create update query by id', async () => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex
+            .query(User);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.updateItemByPrimaryKey('userId', { name: 'newName' });
+
+
+        assert.equal(
+            (query as any).queryLog.trim(),
+            `update "users" set "name" = 'newName' where "id" = 'userId'`
+        );
+
+    });
+
+
+    it('should create multiple update queries by id', async () => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex
+            .query(User);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.updateItemsByPrimaryKey(
+            [
+                { primaryKeyValue: 'userId1', data: { name: 'newName1' } },
+                { primaryKeyValue: 'userId2', data: { name: 'newName2' } }
+            ]
+        );
+
+
+        assert.equal(
+            (query as any).queryLog.trim(),
+            `update "users" set "name" = 'newName1' where "id" = 'userId1';\nupdate "users" set "name" = 'newName2' where "id" = 'userId2';`
+        );
+
+    });
+
+
 
 
     // it('should stay commented out', async done => {

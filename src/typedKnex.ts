@@ -823,6 +823,9 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     implements ITypedQueryBuilder<ModelType, SelectableModel, Row> {
     public columns: { name: string }[];
 
+    public onlyLogQuery = false;
+    public queryLog = "";
+
     private queryBuilder: Knex.QueryBuilder;
     private tableName: string;
     private shouldUnflatten: boolean;
@@ -886,7 +889,11 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
             if (this.transaction !== undefined) {
                 query.transacting(this.transaction);
             }
-            await query;
+            if (this.onlyLogQuery) {
+                this.queryLog += query.toQuery() + '\n';
+            } else {
+                await query;
+            }
         }
     }
 
@@ -895,7 +902,12 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
             item = beforeUpdateTransform(item, this);
         }
 
-        await this.queryBuilder.update(item);
+        if (this.onlyLogQuery) {
+            this.queryLog += this.queryBuilder.update(item).toQuery() + '\n';
+        } else {
+            await this.queryBuilder.update(item);
+        }
+
     }
 
     public async updateItemByPrimaryKey(
@@ -908,9 +920,15 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
         const primaryKeyColumnInfo = getPrimaryKeyColumn(this.tableClass);
 
-        await this.queryBuilder
+        const query = this.queryBuilder
             .update(item)
             .where(primaryKeyColumnInfo.name, primaryKeyValue);
+
+        if (this.onlyLogQuery) {
+            this.queryLog += query.toQuery() + '\n';
+        } else {
+            await query;
+        }
     }
 
     public async updateItemsByPrimaryKey(
@@ -943,7 +961,13 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
             if (this.transaction !== undefined) {
                 finalQuery.transacting(this.transaction);
             }
-            await finalQuery;
+
+            if (this.onlyLogQuery) {
+                this.queryLog += finalQuery.toQuery() + '\n';
+            } else {
+                await finalQuery;
+            }
+
         }
     }
 
