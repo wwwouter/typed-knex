@@ -1431,6 +1431,7 @@ describe('TypedKnexQueryBuilder', () => {
 
     });
 
+
     it('should create multiple insert queries', async () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         (typedKnex as any).onlyLogQuery = true;

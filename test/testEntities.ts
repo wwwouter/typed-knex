@@ -48,6 +48,8 @@ export class User {
     public birthDate?: Date;
     @Column()
     public tags?: string[];
+    @Column({ name: 'weirdDatabaseName' })
+    public status?: string;
 }
 
 @Table('userSettings')
