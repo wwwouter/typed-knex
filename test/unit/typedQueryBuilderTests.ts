@@ -1431,6 +1431,24 @@ describe('TypedKnexQueryBuilder', () => {
 
     });
 
+    it('should create insert query with column name mapping', async () => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex
+            .query(User);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.insertItem({ status: 'newStatus' });
+
+
+        assert.equal(
+            (query as any).queryLog.trim(),
+            `insert into "users" ("weirdDatabaseName") values ('newStatus')`
+        );
+
+    });
 
     it('should create multiple insert queries', async () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
@@ -1447,6 +1465,25 @@ describe('TypedKnexQueryBuilder', () => {
         assert.equal(
             (query as any).queryLog.trim(),
             `insert into "users" ("id") values ('newId1'), ('newId2')`
+        );
+
+    });
+
+    it('should create multiple insert queries with column name mapping', async () => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex
+            .query(User);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.insertItems([{ status: 'newStatus1' }, { status: 'newStatus2' }]);
+
+
+        assert.equal(
+            (query as any).queryLog.trim(),
+            `insert into "users" ("weirdDatabaseName") values ('newStatus1'), ('newStatus2')`
         );
 
     });
@@ -1471,6 +1508,25 @@ describe('TypedKnexQueryBuilder', () => {
 
     });
 
+    it('should create update query with column name mapping', async () => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex
+            .query(User);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.updateItem({ status: 'newStatus' });
+
+
+        assert.equal(
+            (query as any).queryLog.trim(),
+            `update "users" set "weirdDatabaseName" = 'newStatus'`
+        );
+
+    });
+
     it('should create update query by id', async () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         (typedKnex as any).onlyLogQuery = true;
@@ -1486,6 +1542,25 @@ describe('TypedKnexQueryBuilder', () => {
         assert.equal(
             (query as any).queryLog.trim(),
             `update "users" set "name" = 'newName' where "id" = 'userId'`
+        );
+
+    });
+
+    it('should create update query by id with column name mapping', async () => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex
+            .query(User);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.updateItemByPrimaryKey('userId', { status: 'newStatus' });
+
+
+        assert.equal(
+            (query as any).queryLog.trim(),
+            `update "users" set "weirdDatabaseName" = 'newStatus' where "id" = 'userId'`
         );
 
     });
@@ -1511,6 +1586,30 @@ describe('TypedKnexQueryBuilder', () => {
         assert.equal(
             (query as any).queryLog.trim(),
             `update "users" set "name" = 'newName1' where "id" = 'userId1';\nupdate "users" set "name" = 'newName2' where "id" = 'userId2';`
+        );
+
+    });
+
+    it('should create multiple update queries by id with column name mapping', async () => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex
+            .query(User);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.updateItemsByPrimaryKey(
+            [
+                { primaryKeyValue: 'userId1', data: { status: 'newStatus1' } },
+                { primaryKeyValue: 'userId2', data: { status: 'newStatus2' } }
+            ]
+        );
+
+
+        assert.equal(
+            (query as any).queryLog.trim(),
+            `update "users" set "weirdDatabaseName" = 'newStatus1' where "id" = 'userId1';\nupdate "users" set "weirdDatabaseName" = 'newStatus2' where "id" = 'userId2';`
         );
 
     });

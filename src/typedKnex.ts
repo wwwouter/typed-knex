@@ -10,6 +10,7 @@ import { NonForeignKeyObjects } from './NonForeignKeyObjects';
 import { NonNullableRecursive } from './NonNullableRecursive';
 import { TransformPropertiesToFunction } from './TransformPropertiesToFunction';
 import { FlattenOption, setToNull, unflatten } from './unflatten';
+import { mapObjectToTableObject } from './mapObjectToTableObject';
 
 
 export class TypedKnex {
@@ -883,6 +884,8 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
             }
         }
 
+        items = items.map(item => mapObjectToTableObject(this.tableClass, item));
+
         while (items.length > 0) {
             const chunk = items.splice(0, 500);
             const query = this.knex.from(this.tableName).insert(chunk);
@@ -902,10 +905,11 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
             item = beforeUpdateTransform(item, this);
         }
 
+        const mappedItem = mapObjectToTableObject(this.tableClass, item);
         if (this.onlyLogQuery) {
-            this.queryLog += this.queryBuilder.update(item).toQuery() + '\n';
+            this.queryLog += this.queryBuilder.update(mappedItem).toQuery() + '\n';
         } else {
-            await this.queryBuilder.update(item);
+            await this.queryBuilder.update(mappedItem);
         }
 
     }
@@ -918,10 +922,12 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
             item = beforeUpdateTransform(item, this);
         }
 
+        const mappedItem = mapObjectToTableObject(this.tableClass, item);
+
         const primaryKeyColumnInfo = getPrimaryKeyColumn(this.tableClass);
 
         const query = this.queryBuilder
-            .update(item)
+            .update(mappedItem)
             .where(primaryKeyColumnInfo.name, primaryKeyValue);
 
         if (this.onlyLogQuery) {
@@ -949,6 +955,8 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
                 if (beforeUpdateTransform) {
                     item.data = beforeUpdateTransform(item.data, this);
                 }
+                item.data = mapObjectToTableObject(this.tableClass, item.data);
+
                 query.update(item.data);
                 sql +=
                     query

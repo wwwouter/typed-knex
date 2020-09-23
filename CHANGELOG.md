@@ -1,5 +1,7 @@
 # Changelog
 
+    - Fixed insert and update queries for tables with column name mappings.
+
 ## 2.14.0
 
 -   Fixed compilation errors for sub-queries using `code` (`whereExists`, `union`, `selectQuery`)
