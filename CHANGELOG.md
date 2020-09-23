@@ -1,5 +1,7 @@
 # Changelog
 
+## 2.15.0
+
     - Fixed insert and update queries for tables with column name mappings.
 
 ## 2.14.0
