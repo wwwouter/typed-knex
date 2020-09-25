@@ -1,5 +1,7 @@
 # Changelog
 
+-   Documentation: registerBeforeInsertTransform and registerBeforeUpdateTransform.
+
 ## 2.15.0
 
     - Fixed insert and update queries for tables with column name mappings.
