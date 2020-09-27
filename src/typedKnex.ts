@@ -275,7 +275,7 @@ type JoinOnVal<Model, JoinedModel> = <PropertyType1>(
 
 interface IJoinOnClause2<Model, JoinedModel> {
     /**
-     * @deprecated since version 2.9, use .on(). Remember that the columns are switched eg .onColumns(i=>i.prop, '=' j=>j.prop) should become .onColumns(j=>j.prop, '=', i=>i.prop)
+     * @deprecated since version 2.9, use .on(). Remember that the columns switched eg .onColumns(i=>i.prop, '=' j=>j.prop) should become .on(j=>j.prop, '=', i=>i.prop)
      */
     onColumns: JoinOnColumns<Model, JoinedModel>;
     on: JoinOn<Model, JoinedModel>;

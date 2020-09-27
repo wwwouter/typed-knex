@@ -35,6 +35,11 @@ Make sure experimentalDecorators and emitDecoratorMetadata are turned on in your
 
 _Tested with Knex.js v0.20.7, TypeScript v3.7.4 and Node.js v14.11.0_
 
+# Breaking changes in next major release
+
+-   `.onColumn()`: use `.on()`. Remember that the columns switched eg `.onColumns(i=>i.prop, '=' j=>j.prop) should become .on(j=>j.prop, '=', i=>i.prop)`.
+-   The use of optional columns (`@Column() public nickName?: string;`). This was used to signal a nullable column. The correct way to do this is `@Column() public nickName: string | null;`.
+
 # Documentation
 
 ## Quick example
@@ -96,6 +101,8 @@ export class User {
     public name: string;
     @Column({ name: "categoryId" })
     public category: UserCategory;
+    @Column()
+    public someNullableValue: string | null;
 }
 ```
 

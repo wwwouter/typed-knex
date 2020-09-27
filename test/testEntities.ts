@@ -56,7 +56,9 @@ export class User {
     public optionalCategory?: UserCategory;
     @Column({ name: 'nullableCategoryId' })
     public nullableCategory: UserCategory | null;
+    @Column()
     public someOptionalValue?: string;
+    @Column()
     public someNullableValue: string | null;
 }
 

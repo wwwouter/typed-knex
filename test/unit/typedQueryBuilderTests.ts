@@ -272,7 +272,7 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(UserSetting)
             .innerJoinTableOnFunction('otherUser', User, join => {
-                join.onColumns(i => i.user2Id, '=', j => j.id);
+                join.on(i => i.id, '=', j => j.user2Id);
             });
 
         const queryString = query.toQuery();
@@ -1119,7 +1119,7 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(UserSetting)
             .leftOuterJoinTableOnFunction('evilTwin', UserSetting, join => {
-                join.onColumns(i => i.id, '=', j => j.id);
+                join.on(i => i.id, '=', j => j.id);
             });
 
         const queryString = query.toQuery();
@@ -1136,7 +1136,7 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(UserSetting)
             .leftOuterJoinTableOnFunction('otherUser', User, join => {
-                join.onColumns(i => i.user2Id, '=', j => j.id);
+                join.on(i => i.id, '=', j => j.user2Id);
             });
 
         const queryString = query.toQuery();
@@ -1154,7 +1154,7 @@ describe('TypedKnexQueryBuilder', () => {
             .query(UserSetting)
             .leftOuterJoinTableOnFunction('otherUser', User, join => {
                 join
-                    .onColumns(i => i.user2Id, '=', j => j.id)
+                    .on(i => i.id, '=', j => j.user2Id)
                     .onNull(i => i.name);
             });
 
@@ -1307,8 +1307,8 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(UserSetting)
             .leftOuterJoinTableOnFunction('evilTwin', UserSetting, join => {
-                join.onColumns(i => i.id, '=', j => j.id);
-                join.onColumns(i => i.key, '=', j => j.key);
+                join.on(i => i.id, '=', j => j.id);
+                join.on(i => i.key, '=', j => j.key);
             });
 
         const queryString = query.toQuery();
@@ -1325,7 +1325,7 @@ describe('TypedKnexQueryBuilder', () => {
         const query = typedKnex
             .query(UserSetting)
             .leftOuterJoinTableOnFunction('evilTwin', UserSetting, join => {
-                join.onColumns(i => i.id, '=', j => j.id);
+                join.on(i => i.id, '=', j => j.id);
             })
             .where(i => i.evilTwin.value, 'value')
             .select(i => i.evilTwin.key);

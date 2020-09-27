@@ -706,7 +706,7 @@ describe('compile time typed-knex', function() {
                 const item = await typedKnex
                 .query(UserSetting)
                 .leftOuterJoinTableOnFunction('otherUser', User, join => {
-                    join.onColumns(i => i.user2Id, '=', j => j.id);
+                    join.on(i => i.id, '=', j => j.user2Id);
                 })
                 .select(i => [i.otherUser.name, i.user2.numericValue])
                 .getFirst();
@@ -742,7 +742,7 @@ describe('compile time typed-knex', function() {
                 const item = await typedKnex
                 .query(UserSetting)
                 .leftOuterJoinTableOnFunction('otherUser', User, join => {
-                    join.onColumns(i => i.user2Id, '=', j => j.id);
+                    join.on(i => i.id, '=', j => j.user2Id);
                 })
                 .select(i => [i.otherUser.name, i.user2.numericValue])
                 .getFirst();
@@ -777,7 +777,7 @@ describe('compile time typed-knex', function() {
                 const item = await typedKnex
                 .query(UserSetting)
                 .leftOuterJoinTableOnFunction('otherUser', User, join => {
-                    join.onColumns(i => i.user2Id, '=', j => j.id);
+                    join.on(i => i.id, '=', j => j.user2Id);
                 })
                 .select(i => [i.otherUser.name, i.user2.numericValue])
                 .getFirst();
@@ -813,7 +813,7 @@ describe('compile time typed-knex', function() {
                 const item = await typedKnex
                 .query(UserSetting)
                 .leftOuterJoinTableOnFunction('otherUser', User, join => {
-                    join.onColumns(i => i.user2Id, '=', j => j.id);
+                    join.on(i => i.id, '=', j => j.user2Id);
                 })
                 .select(i => [i.otherUser.name, i.user2.numericValue])
                 .keepFlat()
