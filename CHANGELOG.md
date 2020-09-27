@@ -1,5 +1,6 @@
 # Changelog
 
+-   Tested with Node.js v14.11.0.
 -   Documentation: registerBeforeInsertTransform and registerBeforeUpdateTransform.
 
 ## 2.15.0
