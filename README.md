@@ -1050,7 +1050,9 @@ await validateTables(knex);
 ## Update version
 
     npm version major|minor|patch
-    npm publish --access public
+    update CHANGELOG.md
+    git commit --amend
+    npm publish --access=public --otp=CODE
     git push
 
 for beta
