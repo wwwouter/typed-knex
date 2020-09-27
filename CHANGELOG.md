@@ -1,5 +1,6 @@
 # Changelog
 
+-   Allow Date columns in `findByPrimaryKey`.
 -   Tested with Node.js v14.11.0.
 -   Documentation: registerBeforeInsertTransform and registerBeforeUpdateTransform.
 

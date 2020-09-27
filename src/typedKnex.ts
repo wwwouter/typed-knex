@@ -11,6 +11,7 @@ import { NonNullableRecursive } from './NonNullableRecursive';
 import { TransformPropertiesToFunction } from './TransformPropertiesToFunction';
 import { FlattenOption, setToNull, unflatten } from './unflatten';
 import { mapObjectToTableObject } from './mapObjectToTableObject';
+import { SelectableColumnTypes } from './SelectableColumnTypes';
 
 
 export class TypedKnex {
@@ -162,19 +163,19 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     getSingle(flattenOption?: FlattenOption): Promise<Row>;
     getMany(flattenOption?: FlattenOption): Promise<Row[]>;
     getCount(): Promise<number>;
-    insertItem(newObject: Partial<RemoveObjectsFrom2<Model>>): Promise<void>;
-    insertItems(items: Partial<RemoveObjectsFrom2<Model>>[]): Promise<void>;
+    insertItem(newObject: Partial<RemoveObjectsFrom<Model>>): Promise<void>;
+    insertItems(items: Partial<RemoveObjectsFrom<Model>>[]): Promise<void>;
     del(): Promise<void>;
     delByPrimaryKey(primaryKeyValue: any): Promise<void>;
-    updateItem(item: Partial<RemoveObjectsFrom2<Model>>): Promise<void>;
+    updateItem(item: Partial<RemoveObjectsFrom<Model>>): Promise<void>;
     updateItemByPrimaryKey(
         primaryKeyValue: any,
-        item: Partial<RemoveObjectsFrom2<Model>>
+        item: Partial<RemoveObjectsFrom<Model>>
     ): Promise<void>;
     updateItemsByPrimaryKey(
         items: {
             primaryKeyValue: any;
-            data: Partial<RemoveObjectsFrom2<Model>>;
+            data: Partial<RemoveObjectsFrom<Model>>;
         }[]
     ): Promise<void>;
     execute(): Promise<void>;
@@ -207,11 +208,10 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     keepFlat(): ITypedQueryBuilder<Model, SelectableModel, any>;
 }
 
-type ReturnNonObjectsNamesOnly<T> = { [K in keyof T]: T[K] extends object ? never : K }[keyof T];
+type ReturnNonObjectsNamesOnly<T> = { [K in keyof T]: T[K] extends SelectableColumnTypes ? K : never }[keyof T];
 
 type RemoveObjectsFrom<T> = { [P in ReturnNonObjectsNamesOnly<T>]: T[P] };
 
-type RemoveObjectsFrom2<T> = { [P in ReturnNonObjectsNamesOnly<T>]: T[P] };
 
 export type ObjectToPrimitive<T> = T extends String
     ? string
@@ -371,9 +371,9 @@ interface ISelectQuery<Model, SelectableModel, Row> {
 type TransformPropsToFunctionsOnlyLevel1<Level1Type> = {
     [Level1Property in keyof RemoveObjectsFrom<
         Level1Type
-    >]: Level1Type[Level1Property] extends object
-    ? never
-    : (() => Pick<Level1Type, Level1Property>)
+    >]: Level1Type[Level1Property] extends SelectableColumnTypes
+    ? (() => Pick<Level1Type, Level1Property>)
+    : never
 };
 
 type TransformPropsToFunctionsReturnPropertyName<Model> = {
@@ -871,11 +871,11 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
         await this.queryBuilder.del().where(primaryKeyColumnInfo.name, value);
     }
 
-    public async insertItem(newObject: Partial<RemoveObjectsFrom2<ModelType>>) {
+    public async insertItem(newObject: Partial<RemoveObjectsFrom<ModelType>>) {
         await this.insertItems([newObject]);
     }
 
-    public async insertItems(items: Partial<RemoveObjectsFrom2<ModelType>>[]) {
+    public async insertItems(items: Partial<RemoveObjectsFrom<ModelType>>[]) {
         items = [...items];
 
         for (let item of items) {
@@ -900,7 +900,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
         }
     }
 
-    public async updateItem(item: Partial<RemoveObjectsFrom2<ModelType>>) {
+    public async updateItem(item: Partial<RemoveObjectsFrom<ModelType>>) {
         if (beforeUpdateTransform) {
             item = beforeUpdateTransform(item, this);
         }
@@ -916,7 +916,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
     public async updateItemByPrimaryKey(
         primaryKeyValue: any,
-        item: Partial<RemoveObjectsFrom2<ModelType>>
+        item: Partial<RemoveObjectsFrom<ModelType>>
     ) {
         if (beforeUpdateTransform) {
             item = beforeUpdateTransform(item, this);
@@ -940,7 +940,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     public async updateItemsByPrimaryKey(
         items: {
             primaryKeyValue: any;
-            data: Partial<RemoveObjectsFrom2<ModelType>>;
+            data: Partial<RemoveObjectsFrom<ModelType>>;
         }[]
     ) {
         const primaryKeyColumnInfo = getPrimaryKeyColumn(this.tableClass);

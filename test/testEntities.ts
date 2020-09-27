@@ -45,11 +45,19 @@ export class User {
     @Column()
     public nickName?: string;
     @Column()
-    public birthDate?: Date;
+    public birthDate: Date;
+    @Column()
+    public deathDate: Date | null;
     @Column()
     public tags?: string[];
     @Column({ name: 'weirdDatabaseName' })
     public status?: string;
+    @Column({ name: 'optionalCategoryId' })
+    public optionalCategory?: UserCategory;
+    @Column({ name: 'nullableCategoryId' })
+    public nullableCategory: UserCategory | null;
+    public someOptionalValue?: string;
+    public someNullableValue: string | null;
 }
 
 @Table('userSettings')

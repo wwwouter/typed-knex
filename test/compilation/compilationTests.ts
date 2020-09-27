@@ -501,6 +501,195 @@ describe('compile time typed-knex', function() {
         done();
     });
 
+    it('should findByPrimaryKey not accept optional objects in select', done => {
+        file = project.createSourceFile(
+            'test/test4.ts',
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+
+                const item = await typedKnex
+                .query(User)
+                .findByPrimaryKey("id", c => [c.optionalCategory]);
+
+                if (item !== undefined) {
+                    console.log(item.optionalCategory);
+                }
+
+            })();
+        `
+        );
+
+        assert.notEqual(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
+
+    it('should findByPrimaryKey not accept nullable objects in select', done => {
+        file = project.createSourceFile(
+            'test/test4.ts',
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+
+                const item = await typedKnex
+                .query(User)
+                .findByPrimaryKey("id", c => [c.nullableCategory]);
+
+                if (item !== undefined) {
+                    console.log(item.nullableCategory);
+                }
+
+            })();
+        `
+        );
+
+        assert.notEqual(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
+
+
+    it('should findByPrimaryKey accept Date objects in select', done => {
+        file = project.createSourceFile(
+            'test/test4.ts',
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+
+                const item = await typedKnex
+                .query(User)
+                .findByPrimaryKey("id", c => [c.birthDate]);
+
+                if (item !== undefined) {
+                    console.log(item.birthDate);
+                }
+
+            })();
+        `
+        );
+
+        assert.equal(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
+
+
+    it('should findByPrimaryKey accept nullable Date objects in select', done => {
+        file = project.createSourceFile(
+            'test/test4.ts',
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+
+                const item = await typedKnex
+                .query(User)
+                .findByPrimaryKey("id", c => [c.deathDate]);
+
+                if (item !== undefined) {
+                    console.log(item.deathDate);
+                }
+
+            })();
+        `
+        );
+
+        assert.equal(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
+
+    it('should findByPrimaryKey accept nullable string objects in select', done => {
+        file = project.createSourceFile(
+            'test/test4.ts',
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+
+                const item = await typedKnex
+                .query(User)
+                .findByPrimaryKey("id", c => [c.someNullableValue]);
+
+                if (item !== undefined) {
+                    console.log(item.someNullableValue);
+                }
+
+            })();
+        `
+        );
+
+        assert.equal(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
+
+
+    it('should findByPrimaryKey accept optional string objects in select', done => {
+        file = project.createSourceFile(
+            'test/test4.ts',
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+
+                const item = await typedKnex
+                .query(User)
+                .findByPrimaryKey("id", c => [c.someOptionalValue]);
+
+                if (item !== undefined) {
+                    console.log(item.someOptionalValue);
+                }
+
+            })();
+        `
+        );
+
+        assert.equal(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
+
     it('should return correct type from leftOuterJoinTableOnFunction', done => {
         file = project.createSourceFile(
             'test/test4.ts',
