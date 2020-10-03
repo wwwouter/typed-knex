@@ -12,6 +12,8 @@ import { TransformPropertiesToFunction } from './TransformPropertiesToFunction';
 import { FlattenOption, setToNull, unflatten } from './unflatten';
 import { mapObjectToTableObject } from './mapObjectToTableObject';
 import { SelectableColumnTypes } from './SelectableColumnTypes';
+import { NestedKeysOf } from './NestedKeysOf';
+import { GetNestedPropertyType } from './PropertyTypes';
 
 
 export class TypedKnex {
@@ -62,6 +64,8 @@ class NotImplementedError extends Error {
 
 export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     columns: { name: string }[];
+
+
 
     where: IWhereWithOperator<Model, SelectableModel, Row>;
     andWhere: IWhereWithOperator<Model, SelectableModel, Row>;
@@ -675,6 +679,17 @@ interface IWhereWithOperator<Model, SelectableModel, Row> {
         operator: Operator,
         value: PropertyType
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+    <ConcatKey extends NestedKeysOf<Model, keyof Model, ''>>(
+        key: ConcatKey,
+        value: GetNestedPropertyType<Model, ConcatKey>
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+    <ConcatKey extends NestedKeysOf<Model, keyof Model, ''>>(
+        key: ConcatKey,
+        operator: Operator,
+        value: GetNestedPropertyType<Model, ConcatKey>
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
 interface IWhereIn<Model, SelectableModel, Row> {
@@ -1281,6 +1296,9 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
 
     public where() {
+        if (typeof arguments[0] === 'string') {
+            return this.callKnexFunctionWithConcatKeyColumn(this.queryBuilder.where.bind(this.queryBuilder), ...arguments);
+        }
         return this.callKnexFunctionWithColumnFunction(this.queryBuilder.where.bind(this.queryBuilder), ...arguments);
     }
 
@@ -1875,8 +1893,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
         const tableToJoinName = getTableMetadata(secondColumnClass).tableName;
         const tableToJoinAlias = secondColumnAlias;
-        const tableToJoinJoinColumnName = `${tableToJoinAlias}.${
-            getPrimaryKeyColumn(secondColumnClass).name
+        const tableToJoinJoinColumnName = `${tableToJoinAlias}.${getPrimaryKeyColumn(secondColumnClass).name
             }`;
 
         if (joinType === 'innerJoin') {
@@ -2088,4 +2105,25 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
         return this;
     }
+
+
+    private callKnexFunctionWithConcatKeyColumn(knexFunction: any, ...args: any[]) {
+        const columnName = this.getColumnName(...args[0].split(','));
+
+        if (args.length === 3) {
+            knexFunction(
+                columnName,
+                args[1],
+                args[2]
+            );
+        } else {
+            knexFunction(
+                columnName,
+                args[1]
+            );
+        }
+
+        return this;
+    }
+
 }
