@@ -832,4 +832,120 @@ describe('compile time typed-knex', function() {
         file.delete();
         done();
     });
+
+    it('should accept string column in orderBy', done => {
+        file = project.createSourceFile(
+            'test/test.ts',
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                const result = await typedKnex
+                    .query(User)
+                    .orderBy(c=>c.id)
+                    .getMany();
+
+                console.log(result.length);
+
+            })();
+        `
+        );
+
+        assert.equal(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
+
+    it('should accept Date column in orderBy', done => {
+        file = project.createSourceFile(
+            'test/test.ts',
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                const result = await typedKnex
+                    .query(User)
+                    .orderBy(c=>c.birthDate)
+                    .getMany();
+
+                console.log(result.length);
+
+            })();
+        `
+        );
+
+        assert.equal(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
+
+    it('should accept nullable Date column in orderBy', done => {
+        file = project.createSourceFile(
+            'test/test.ts',
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                const result = await typedKnex
+                    .query(User)
+                    .orderBy(c=>c.deathDate)
+                    .getMany();
+
+                console.log(result.length);
+
+            })();
+        `
+        );
+
+        assert.equal(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
+
+    it('should not accept foreign key column in orderBy', done => {
+        file = project.createSourceFile(
+            'test/test.ts',
+            `
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                const result = await typedKnex
+                    .query(User)
+                    .orderBy(c=>c.category)
+                    .getMany();
+
+                console.log(result.length);
+
+            })();
+        `
+        );
+
+        assert.notEqual(project.getPreEmitDiagnostics().length, 0);
+
+        file.delete();
+        done();
+    });
 });

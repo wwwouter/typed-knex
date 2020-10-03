@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.17.0
+
+-   Allow `Date` columns in `orderBy`.
+
 ## 2.16.0
 
 -   Documentation: registerBeforeInsertTransform and registerBeforeUpdateTransform.
