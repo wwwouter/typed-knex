@@ -1,5 +1,5 @@
 import { IsNullable } from './IsNullable';
-import { NonForeignKeyObjects } from './NonForeignKeyObjects';
+import { SelectableColumnTypes } from './SelectableColumnTypes';
 
 // Gets the name of the property
 type GetName<T> = T extends { name: infer X } ? X : never;
@@ -18,28 +18,28 @@ export type TransformPropertiesToFunction<Model, PropertyPath extends {
     name: any;
     nullable?: true;
 }[] = []> = {
-        [P in keyof Model]-?:
-        // if it's an object
-        Model[P] extends (object | undefined | null) ?
-        // and if it isn't a foreign key
-        Model[P] extends (NonForeignKeyObjects | undefined) ?
+        [P in keyof Model]-?
+        :
+        // if it is a column
+        Model[P] extends SelectableColumnTypes | Required<SelectableColumnTypes>
+        ?
         // create leaf with this type
         () => RecordFromArray<AddToArray<PropertyPath, {
             name: P;
-        }>, ({} extends {
-            [P2 in P]: Model[P];
-        } ? NonNullable<Model[P]> | null : Model[P])> :
+        }>, (
+                {} extends {
+                    [P2 in P]: Model[P];
+                }
+                ?
+                NonNullable<Model[P]> | null
+                :
+                Model[P])>
+        :
         // if it is a foreign key, transform it's properties
         NonNullable<TransformPropertiesToFunction<Model[P], AddToArray<PropertyPath, {
             name: P;
             nullable: IsNullable<Model[P]>;
-        }>>> :
-        // if it isn't an object, create leaf with this type
-        () => RecordFromArray<AddToArray<PropertyPath, {
-            name: P;
-        }>, ({} extends {
-            [P2 in P]: Model[P];
-        } ? NonNullable<Model[P]> | null : Model[P])>;
+        }>>>
     };
 
 

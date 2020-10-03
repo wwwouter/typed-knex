@@ -1,1 +1,1 @@
-export type SelectableColumnTypes = string | number | boolean | Date | undefined | null;
+export type SelectableColumnTypes = string | number | boolean | Date | undefined | null | any[];

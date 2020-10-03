@@ -1627,6 +1627,7 @@ describe('TypedKnexQueryBuilder', () => {
     //     const item = await typedKnex
     //         .query(User)
     //         .select(i => i.category.name)
+    //         .orderBy(i => i.birthDate)
     //         .getFirst();
 
     //     console.log('item: ', item.category.name);
