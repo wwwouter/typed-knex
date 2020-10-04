@@ -1680,19 +1680,6 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
 
     it('should create query with where on column of own table', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).where(c => c.name, 'user1');
-
-        const queryString = query.toQuery();
-        assert.equal(
-            queryString,
-            'select * from "users" where "users"."name" = \'user1\''
-        );
-
-        done();
-    });
-
-    it('should create query with where on column of own table', done => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex.query(User).where('name', 'user1');
 
         const queryString = query.toQuery();
@@ -1704,12 +1691,11 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         done();
     });
 
-
     it('should create query with Date column', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex.query(User)
-            .select(i => i.birthDate)
-            .where(c => c.birthDate, new Date(1979, 0, 1));
+            .select('birthDate')
+            .where('birthDate', new Date(1979, 0, 1));
 
         const queryString = query.toQuery();
         assert.equal(
@@ -1718,16 +1704,13 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         );
 
         done();
-
-
     });
-
 
     it('should create query with array column', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex.query(User)
-            .select(i => i.tags)
-            .where(c => c.tags, ['tag1']);
+            .select('tags')
+            .where('tags', ['tag1']);
 
         const queryString = query.toQuery();
         assert.equal(
@@ -1741,7 +1724,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
 
     it('should create query with where on column of own table with LIKE', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).where(c => c.name, 'like', '%user%');
+        const query = typedKnex.query(User).where('name', 'like', '%user%');
 
         const queryString = query.toQuery();
         assert.equal(
@@ -1756,9 +1739,9 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         typedKnex
             .query(UserCategory)
-            .select(i => i.phoneNumber)
-            .where(c => c.phoneNumber, 'user1')
-            .select(i => i.backupRegion.code)
+            .select('phoneNumber')
+            .where('phoneNumber', 'user1')
+            .select('backupRegion.code')
             .toQuery();
 
         done();
