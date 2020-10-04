@@ -1,15 +1,36 @@
 import { assert } from 'chai';
-import { runUpgrade } from '../../src/upgrade/upgradeRunner';
+import { Project } from 'ts-morph';
+import { upgradeProjectStringParameters } from '../../src/upgrade/upgradeRunner';
 
-describe('upgradeRunner', function() {
+describe('upgradeProjectStringParameters', function() {
     this.timeout(1000000);
-    it.only('should return select * from "users"', async () => {
+    it('should upgrade where', async () => {
 
 
-        await runUpgrade()
+        const project = new Project({
+            tsConfigFilePath: './upgradeTestProjects/v2-v3-stringParameters/tsconfig.json',
+        });
 
 
-        assert.equal(1, 1)
+        const code = `
+            import { ITypedQueryBuilder } from './typedKnexTypes';
+
+            const a = {} as ITypedQueryBuilder<{}, {}, {}>;
+            a.where(i => i.name, 'this name1');
+        `;
+
+
+        const sourceFile = project.createSourceFile('./upgradeTestProjects/v2-v3-stringParameters/src/test.ts', code);
+
+        assert.equal(project.getPreEmitDiagnostics().length, 0);
+
+        upgradeProjectStringParameters(project);
+
+        assert.equal(sourceFile.getText(), `import { ITypedQueryBuilder } from './typedKnexTypes';
+
+            const a = {} as ITypedQueryBuilder<{}, {}, {}>;
+            a.where('name', 'this name1');
+        `)
 
 
     });

@@ -1,12 +1,3 @@
-interface ITest<T> {
-    name: T;
-}
-
-export const t: ITest<string> = {
-    name: '1'
-};
-
-
 
 interface IWhereWithOperator<Model, SelectableModel, Row> {
     <PropertyType>(
@@ -21,15 +12,6 @@ interface IWhereWithOperator<Model, SelectableModel, Row> {
 }
 
 
-interface ITypedQueryBuilder<Model, SelectableModel, Row> {
+export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     where: IWhereWithOperator<Model, SelectableModel, Row>;
-}
-
-
-const a = {} as ITypedQueryBuilder<{}, {}, {}>;
-
-a.where(i => i.name, 'this name1');
-
-export function doSomething() {
-    a.where(i => i.id, 'this id1');
 }
