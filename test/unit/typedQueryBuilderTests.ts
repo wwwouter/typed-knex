@@ -1668,7 +1668,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .select(['initialValue']);
+            .select('initialValue');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -3281,11 +3281,11 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
     //     const item = await typedKnex
     //         .query(User)
     //         // .select(['category.name', 'id'])
-    //         .select(['id', 'category.name'])
+    //         .select('id', 'category.id', 'birthDate')
     //         .orderBy(i => i.birthDate)
     //         .getFirst();
 
-    //     console.log('item: ', item.category.name);
+    //     console.log('item: ', item.birthDate);
 
     //     // if (item !== undefined) {
     //     //     console.log(item.user2.numericValue);

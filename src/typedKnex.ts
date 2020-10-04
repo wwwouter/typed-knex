@@ -541,11 +541,9 @@ interface ISelectWithFunctionColumns3<Model, SelectableModel, Row> {
         ) => () => R1
     ): ITypedQueryBuilder<Model, SelectableModel, Row & R1>;
 
-    <ConcatKey extends NestedKeysOf<SelectableModel, keyof SelectableModel, ''>>(columnName: ConcatKey): ITypedQueryBuilder<Model, SelectableModel, Row & GetNestedProperty<SelectableModel, ConcatKey>>;
-
 
     <ConcatKey extends NestedKeysOf<SelectableModel, keyof SelectableModel, ''>>
-        (columnNames: ConcatKey[]):
+        (...columnNames: ConcatKey[]):
         ITypedQueryBuilder<Model, SelectableModel, Row & UnionToIntersection<GetNestedProperty<SelectableModel, ConcatKey>>>;
 
 }
@@ -1119,9 +1117,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
         let columnArgumentsList: string[][];
 
         if (typeof arguments[0] === 'string') {
-            columnArgumentsList = [arguments[0].split(',').reverse()];
-        } else if (Array.isArray(arguments[0])) {
-            columnArgumentsList = arguments[0].map(concatKey => concatKey.split(',').reverse());
+            columnArgumentsList = [...arguments].map((concatKey: string) => concatKey.split(',').reverse());
         } else {
             const f = arguments[0];
             columnArgumentsList = this.getArgumentsFromColumnFunction3(f);
