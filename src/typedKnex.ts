@@ -13,7 +13,9 @@ import { FlattenOption, setToNull, unflatten } from './unflatten';
 import { mapObjectToTableObject } from './mapObjectToTableObject';
 import { SelectableColumnTypes } from './SelectableColumnTypes';
 import { NestedKeysOf } from './NestedKeysOf';
-import { GetNestedPropertyType } from './PropertyTypes';
+import { GetNestedProperty, GetNestedPropertyType } from './PropertyTypes';
+
+
 
 
 export class TypedKnex {
@@ -531,11 +533,19 @@ interface ISelectWithFunctionColumns3<Model, SelectableModel, Row> {
         R28 &
         R29
     >;
+
     <R1>(
         selectColumnFunction: (
             c: TransformPropertiesToFunction<SelectableModel>
         ) => () => R1
     ): ITypedQueryBuilder<Model, SelectableModel, Row & R1>;
+
+    <ConcatKey extends NestedKeysOf<SelectableModel, keyof SelectableModel, ''>>(columnName: ConcatKey): ITypedQueryBuilder<Model, SelectableModel, Row & GetNestedProperty<SelectableModel, ConcatKey>>;
+
+
+    <ConcatKey extends NestedKeysOf<SelectableModel, keyof SelectableModel, ''>>(columnName: ConcatKey[]): ITypedQueryBuilder<Model, SelectableModel, Row & GetNestedProperty<SelectableModel, ConcatKey>>;
+
+
 }
 
 interface IFindByPrimaryKey<_Model, SelectableModel, Row> {
@@ -1104,9 +1114,16 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     }
 
     public select() {
-        const f = arguments[0];
+        let columnArgumentsList: string[][];
 
-        const columnArgumentsList = this.getArgumentsFromColumnFunction3(f);
+        if (typeof arguments[0] === 'string') {
+            columnArgumentsList = [arguments[0].split(',').reverse()];
+        } else if (Array.isArray(arguments[0])) {
+            columnArgumentsList = arguments[0].map(concatKey => concatKey.split(',').reverse());
+        } else {
+            const f = arguments[0];
+            columnArgumentsList = this.getArgumentsFromColumnFunction3(f);
+        }
 
         for (const columnArguments of columnArgumentsList) {
             this.queryBuilder.select(
