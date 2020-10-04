@@ -13,6 +13,7 @@ describe('TypedKnexQueryBuilder', () => {
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users"');
 
+
         done();
     });
 
