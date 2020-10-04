@@ -542,7 +542,7 @@ interface ISelectWithFunctionColumns3<Model, SelectableModel, Row> {
     ): ITypedQueryBuilder<Model, SelectableModel, Row & R1>;
 
 
-    <ConcatKey extends NestedKeysOf<Required<SelectableModel>, keyof Required<SelectableModel>, ''>>
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<SelectableModel>, keyof NonNullableRecursive<SelectableModel>, ''>>
         (...columnNames: ConcatKey[]):
         ITypedQueryBuilder<Model, SelectableModel, Row & UnionToIntersection<GetNestedProperty<SelectableModel, ConcatKey>>>;
 
@@ -690,15 +690,15 @@ interface IWhereWithOperator<Model, SelectableModel, Row> {
         value: PropertyType
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
-    <ConcatKey extends NestedKeysOf<Required<Model>, keyof Required<Model>, ''>>(
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
         key: ConcatKey,
-        value: GetNestedPropertyType<Required<Model>, ConcatKey>
+        value: GetNestedPropertyType<Model, ConcatKey>
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
-    <ConcatKey extends NestedKeysOf<Required<Model>, keyof Required<Model>, ''>>(
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
         key: ConcatKey,
         operator: Operator,
-        value: GetNestedPropertyType<Required<Model>, ConcatKey>
+        value: GetNestedPropertyType<Model, ConcatKey>
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
