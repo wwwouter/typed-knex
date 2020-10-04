@@ -431,7 +431,8 @@ interface IDbFunctionWithAlias<Model, SelectableModel, Row> {
 
 
 
-
+type UnionToIntersection<U> =
+    (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never
 
 interface ISelectWithFunctionColumns3<Model, SelectableModel, Row> {
     <
@@ -543,8 +544,9 @@ interface ISelectWithFunctionColumns3<Model, SelectableModel, Row> {
     <ConcatKey extends NestedKeysOf<SelectableModel, keyof SelectableModel, ''>>(columnName: ConcatKey): ITypedQueryBuilder<Model, SelectableModel, Row & GetNestedProperty<SelectableModel, ConcatKey>>;
 
 
-    <ConcatKey extends NestedKeysOf<SelectableModel, keyof SelectableModel, ''>>(columnName: ConcatKey[]): ITypedQueryBuilder<Model, SelectableModel, Row & GetNestedProperty<SelectableModel, ConcatKey>>;
-
+    <ConcatKey extends NestedKeysOf<SelectableModel, keyof SelectableModel, ''>>
+        (columnNames: ConcatKey[]):
+        ITypedQueryBuilder<Model, SelectableModel, Row & UnionToIntersection<GetNestedProperty<SelectableModel, ConcatKey>>>;
 
 }
 

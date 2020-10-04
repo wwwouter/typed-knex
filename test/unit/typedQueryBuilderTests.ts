@@ -3280,7 +3280,8 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
 
     //     const item = await typedKnex
     //         .query(User)
-    //         .select(i => i.category.name)
+    //         // .select(['category.name', 'id'])
+    //         .select(['id', 'category.name'])
     //         .orderBy(i => i.birthDate)
     //         .getFirst();
 
