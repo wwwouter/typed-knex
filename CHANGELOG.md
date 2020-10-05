@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.18.0
+
+-   `findByPrimaryKey` returns `| null` instead of `| void`.
+
 ## 2.17.0
 
 -   Allow `Date` columns in `orderBy`.

@@ -646,7 +646,7 @@ interface IFindByPrimaryKey<_Model, SelectableModel, Row> {
         R28 &
         R28 &
         R29
-        | void
+        | null
     >;
 }
 
