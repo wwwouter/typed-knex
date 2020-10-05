@@ -456,7 +456,7 @@ describe('compile time typed-knex', function() {
                 .query(User)
                 .findByPrimaryKey("id", c => [c.name]);
 
-                if (item !== null) {
+                if (item !== undefined) {
                     console.log(item.name);
                 }
 
@@ -581,7 +581,7 @@ describe('compile time typed-knex', function() {
                 .query(User)
                 .findByPrimaryKey("id", c => [c.birthDate]);
 
-                if (item !== null) {
+                if (item !== undefined) {
                     console.log(item.birthDate);
                 }
 
@@ -613,7 +613,7 @@ describe('compile time typed-knex', function() {
                 .query(User)
                 .findByPrimaryKey("id", c => [c.deathDate]);
 
-                if (item !== null) {
+                if (item !== undefined) {
                     console.log(item.deathDate);
                 }
 
@@ -644,7 +644,7 @@ describe('compile time typed-knex', function() {
                 .query(User)
                 .findByPrimaryKey("id", c => [c.someNullableValue]);
 
-                if (item !== null) {
+                if (item !== undefined) {
                     console.log(item.someNullableValue);
                 }
 
@@ -676,7 +676,7 @@ describe('compile time typed-knex', function() {
                 .query(User)
                 .findByPrimaryKey("id", c => [c.someOptionalValue]);
 
-                if (item !== null) {
+                if (item !== undefined) {
                     console.log(item.someOptionalValue);
                 }
 
