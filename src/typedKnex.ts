@@ -632,7 +632,7 @@ interface IFindByPrimaryKey<_Model, SelectableModel, Row> {
         R28 &
         R28 &
         R29
-        | void
+        | null
     >;
 }
 
@@ -1875,8 +1875,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
         const tableToJoinName = getTableMetadata(secondColumnClass).tableName;
         const tableToJoinAlias = secondColumnAlias;
-        const tableToJoinJoinColumnName = `${tableToJoinAlias}.${
-            getPrimaryKeyColumn(secondColumnClass).name
+        const tableToJoinJoinColumnName = `${tableToJoinAlias}.${getPrimaryKeyColumn(secondColumnClass).name
             }`;
 
         if (joinType === 'innerJoin') {
