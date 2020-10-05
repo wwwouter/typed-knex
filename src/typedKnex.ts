@@ -672,6 +672,11 @@ interface IWhere<Model, SelectableModel, Row> {
         ) => () => PropertyType,
         value: PropertyType
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
+        key: ConcatKey,
+        value: GetNestedPropertyType<Model, ConcatKey>
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
 interface IWhereWithOperator<Model, SelectableModel, Row> {
@@ -1117,7 +1122,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
         let columnArgumentsList: string[][];
 
         if (typeof arguments[0] === 'string') {
-            columnArgumentsList = [...arguments].map((concatKey: string) => concatKey.split(',').reverse());
+            columnArgumentsList = [...arguments].map((concatKey: string) => concatKey.split('.'));
         } else {
             const f = arguments[0];
             columnArgumentsList = this.getArgumentsFromColumnFunction3(f);
@@ -1318,6 +1323,9 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     }
 
     public whereNot() {
+        if (typeof arguments[0] === 'string') {
+            return this.callKnexFunctionWithConcatKeyColumn(this.queryBuilder.whereNot.bind(this.queryBuilder), ...arguments);
+        }
         const columnArguments = this.getArgumentsFromColumnFunction(
             arguments[0]
         );
@@ -2123,7 +2131,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
 
     private callKnexFunctionWithConcatKeyColumn(knexFunction: any, ...args: any[]) {
-        const columnName = this.getColumnName(...args[0].split(','));
+        const columnName = this.getColumnName(...args[0].split('.'));
 
         if (args.length === 3) {
             knexFunction(

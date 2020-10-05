@@ -1751,8 +1751,8 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         typedKnex
             .query(User)
-            .select(i => i.category.phoneNumber)
-            .where(c => c.category.phoneNumber, 'user1');
+            .select('category.phoneNumber')
+            .where('category.phoneNumber', 'user1');
 
         done();
     });
@@ -1761,7 +1761,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
 
     it('should create query with where not on column of own table', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).whereNot(c => c.name, 'user1');
+        const query = typedKnex.query(User).whereNot('name', 'user1');
 
         const queryString = query.toQuery();
         assert.equal(
