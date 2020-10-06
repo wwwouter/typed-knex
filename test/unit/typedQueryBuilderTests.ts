@@ -1774,7 +1774,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
 
     it('should join a table', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).innerJoinColumn(c => c.user);
+        const query = typedKnex.query(UserSetting).innerJoinColumn('user');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -1788,8 +1788,8 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .select(c => [c.user.name])
-            .innerJoinColumn(c => c.user);
+            .select('user.name')
+            .innerJoinColumn('user');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -1803,8 +1803,8 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .where(c => c.user.name, 'user1')
-            .innerJoinColumn(c => c.user);
+            .where('user.name', 'user1')
+            .innerJoinColumn('user');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -1818,8 +1818,8 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .innerJoinColumn(c => c.user)
-            .innerJoinColumn(c => c.user.category);
+            .innerJoinColumn('user')
+            .innerJoinColumn('user.category');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -1833,7 +1833,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .innerJoinColumn(c => c.user.category.region);
+            .innerJoinColumn('user.category.region');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -1847,8 +1847,8 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .select(c => c.user.category.name)
-            .innerJoinColumn(c => c.user.category);
+            .select('user.category.name')
+            .innerJoinColumn('user.category');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -1862,8 +1862,8 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .select(c => [c.user.category.region.code])
-            .innerJoinColumn(c => c.user.category.region);
+            .select('user.category.region.code')
+            .innerJoinColumn('user.category.region');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -1877,8 +1877,8 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .where(c => c.user.category.name, 'user1')
-            .innerJoinColumn(c => c.user.category);
+            .where('user.category.name', 'user1')
+            .innerJoinColumn('user.category');
         const queryString = query.toQuery();
         assert.equal(
             queryString,

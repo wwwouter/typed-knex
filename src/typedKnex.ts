@@ -12,7 +12,7 @@ import { TransformPropertiesToFunction } from './TransformPropertiesToFunction';
 import { FlattenOption, setToNull, unflatten } from './unflatten';
 import { mapObjectToTableObject } from './mapObjectToTableObject';
 import { SelectableColumnTypes } from './SelectableColumnTypes';
-import { NestedKeysOf } from './NestedKeysOf';
+import { NestedForeignKeyKeysOf, NestedKeysOf } from './NestedKeysOf';
 import { GetNestedProperty, GetNestedPropertyType } from './PropertyTypes';
 
 
@@ -662,6 +662,11 @@ interface IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>
             c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
         ) => void,
         setToNullIfNullFunction: (r: Row) => void
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+
+    <ConcatKey extends NestedForeignKeyKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
+        key: ConcatKey,
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
@@ -1889,7 +1894,13 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     }
 
     private joinColumn(joinType: 'innerJoin' | 'leftOuterJoin', f: any) {
-        const columnToJoinArguments = this.getArgumentsFromColumnFunction(f);
+        let columnToJoinArguments: string[];
+
+        if (typeof f === 'string') {
+            columnToJoinArguments = f.split('.');
+        } else {
+            columnToJoinArguments = this.getArgumentsFromColumnFunction(f);
+        }
 
         const columnToJoinName = this.getColumnName(...columnToJoinArguments);
 
