@@ -1892,7 +1892,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .where(c => c.user.category.region.code, 2)
+            .where('user.category.region.code', 2)
             .innerJoinColumn(c => c.user.category.region);
         const queryString = query.toQuery();
         assert.equal(
