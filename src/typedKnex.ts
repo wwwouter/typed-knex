@@ -248,48 +248,56 @@ interface IColumnParameterNoRowTransformation<Model, SelectableModel, Row> {
 }
 
 
-type JoinOnColumns<Model, JoinedModel> = <PropertyType1, PropertyType2>(
-    selectColumn1Function: (
-        c: TransformPropsToFunctionsReturnPropertyType<Model>
-    ) => () => PropertyType1,
-    operator: Operator,
-    selectColumn2Function: (
-        c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
-    ) => () => PropertyType2
-) => IJoinOnClause2<Model, JoinedModel>;
+interface IJoinOnColumns<Model, JoinedModel> {
+
+    <PropertyType1, PropertyType2>(
+        selectColumn1Function: (
+            c: TransformPropsToFunctionsReturnPropertyType<Model>
+        ) => () => PropertyType1,
+        operator: Operator,
+        selectColumn2Function: (
+            c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
+        ) => () => PropertyType2
+    ): IJoinOnClause2<Model, JoinedModel>;
+}
+
+interface IJoinOn<Model, JoinedModel> {
+
+    <PropertyType1, PropertyType2>(
+        selectColumn1Function: (
+            c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
+        ) => () => PropertyType1,
+        operator: Operator,
+        selectColumn2Function: (
+            c: TransformPropsToFunctionsReturnPropertyType<Model>
+        ) => () => PropertyType2
+    ): IJoinOnClause2<Model, JoinedModel>;
+}
+
+interface IJoinOnVal<Model, JoinedModel> {
+
+    <PropertyType1>(
+        selectColumn1Function: (
+            c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
+        ) => () => PropertyType1,
+        operator: Operator,
+        value: any
+    ): IJoinOnClause2<Model, JoinedModel>;
+}
 
 
-
-type JoinOn<Model, JoinedModel> = <PropertyType1, PropertyType2>(
-    selectColumn1Function: (
-        c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
-    ) => () => PropertyType1,
-    operator: Operator,
-    selectColumn2Function: (
-        c: TransformPropsToFunctionsReturnPropertyType<Model>
-    ) => () => PropertyType2
-) => IJoinOnClause2<Model, JoinedModel>;
-
-
-type JoinOnVal<Model, JoinedModel> = <PropertyType1>(
-    selectColumn1Function: (
-        c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
-    ) => () => PropertyType1,
-    operator: Operator,
-    value: any
-) => IJoinOnClause2<Model, JoinedModel>;
 
 interface IJoinOnClause2<Model, JoinedModel> {
     /**
      * @deprecated since version 2.9, use .on(). Remember that the columns switched eg .onColumns(i=>i.prop, '=' j=>j.prop) should become .on(j=>j.prop, '=', i=>i.prop)
      */
-    onColumns: JoinOnColumns<Model, JoinedModel>;
-    on: JoinOn<Model, JoinedModel>;
-    orOn: JoinOn<Model, JoinedModel>;
-    andOn: JoinOn<Model, JoinedModel>;
-    onVal: JoinOnVal<Model, JoinedModel>;
-    andOnVal: JoinOnVal<Model, JoinedModel>;
-    orOnVal: JoinOnVal<Model, JoinedModel>;
+    onColumns: IJoinOnColumns<Model, JoinedModel>;
+    on: IJoinOn<Model, JoinedModel>;
+    orOn: IJoinOn<Model, JoinedModel>;
+    andOn: IJoinOn<Model, JoinedModel>;
+    onVal: IJoinOnVal<Model, JoinedModel>;
+    andOnVal: IJoinOnVal<Model, JoinedModel>;
+    orOnVal: IJoinOnVal<Model, JoinedModel>;
 
     onNull: <X>(
         selectColumn1Function: (
