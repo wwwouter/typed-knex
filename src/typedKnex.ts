@@ -1377,62 +1377,27 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     }
 
     public whereNotIn() {
-        const range = arguments[1];
-        this.queryBuilder.whereNotIn(
-            this.getColumnNameFromFunction(arguments[0]),
-            range
-        );
-        return this;
+        return this.callKnexFunctionWithColumnFunction(this.queryBuilder.whereNotIn.bind(this.queryBuilder), ...arguments);
     }
     public orWhereIn() {
-        const range = arguments[1];
-        this.queryBuilder.orWhereIn(
-            this.getColumnNameFromFunction(arguments[0]),
-            range
-        );
-        return this;
+        return this.callKnexFunctionWithColumnFunction(this.queryBuilder.orWhereIn.bind(this.queryBuilder), ...arguments);
     }
     public orWhereNotIn() {
-        const range = arguments[1];
-        this.queryBuilder.orWhereNotIn(
-            this.getColumnNameFromFunction(arguments[0]),
-            range
-        );
-        return this;
+        return this.callKnexFunctionWithColumnFunction(this.queryBuilder.orWhereNotIn.bind(this.queryBuilder), ...arguments);
     }
 
     public whereBetween() {
-        const value = arguments[1];
-        this.queryBuilder.whereBetween(
-            this.getColumnNameFromFunction(arguments[0]),
-            value
-        );
-        return this;
+        return this.callKnexFunctionWithColumnFunction(this.queryBuilder.whereBetween.bind(this.queryBuilder), ...arguments);
     }
     public whereNotBetween() {
-        const value = arguments[1];
-        this.queryBuilder.whereNotBetween(
-            this.getColumnNameFromFunction(arguments[0]),
-            value
-        );
-        return this;
+        return this.callKnexFunctionWithColumnFunction(this.queryBuilder.whereNotBetween.bind(this.queryBuilder), ...arguments);
     }
 
     public orWhereBetween() {
-        const value = arguments[1];
-        this.queryBuilder.orWhereBetween(
-            this.getColumnNameFromFunction(arguments[0]),
-            value
-        );
-        return this;
+        return this.callKnexFunctionWithColumnFunction(this.queryBuilder.orWhereBetween.bind(this.queryBuilder), ...arguments);
     }
     public orWhereNotBetween() {
-        const value = arguments[1];
-        this.queryBuilder.orWhereNotBetween(
-            this.getColumnNameFromFunction(arguments[0]),
-            value
-        );
-        return this;
+        return this.callKnexFunctionWithColumnFunction(this.queryBuilder.orWhereNotBetween.bind(this.queryBuilder), ...arguments);
     }
 
     public callQueryCallbackFunction(
