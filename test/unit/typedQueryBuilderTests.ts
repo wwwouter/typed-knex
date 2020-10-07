@@ -1982,9 +1982,9 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .where(c => c.name, 'user1')
-            .orWhere(c => c.name, 'user2')
-            .orWhere(c => c.name, 'like', '%user%');
+            .where('name', 'user1')
+            .orWhere('name', 'user2')
+            .orWhere('name', 'like', '%user%');
 
         const queryString = query.toQuery();
         assert.equal(
