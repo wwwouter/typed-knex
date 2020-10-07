@@ -272,6 +272,14 @@ interface IJoinOn<Model, JoinedModel> {
             c: TransformPropsToFunctionsReturnPropertyType<Model>
         ) => () => PropertyType2
     ): IJoinOnClause2<Model, JoinedModel>;
+
+    <ConcatKey1 extends NestedKeysOf<NonNullableRecursive<JoinedModel>, keyof NonNullableRecursive<JoinedModel>, ''>,
+        ConcatKey2 extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
+        key1: ConcatKey1,
+        operator: Operator,
+        key2: ConcatKey2,
+
+    ): IJoinOnClause2<Model, JoinedModel>;
 }
 
 interface IJoinOnVal<Model, JoinedModel> {
@@ -2044,12 +2052,21 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
         );
 
         const onWithJoinedColumnOperatorColumn = (joinedColumn: any, operator: any, modelColumn: any, functionName: string) => {
-            const column1Arguments = this.getArgumentsFromColumnFunction(
-                modelColumn
-            );
-            const column2Arguments = this.getArgumentsFromColumnFunction(
-                joinedColumn
-            );
+            let column1Arguments;
+            let column2Arguments;
+
+            if (typeof modelColumn === 'string') {
+                column1Arguments = modelColumn.split('.');
+                column2Arguments = joinedColumn.split('.');
+            } else {
+                column1Arguments = this.getArgumentsFromColumnFunction(
+                    modelColumn
+                );
+                column2Arguments = this.getArgumentsFromColumnFunction(
+                    joinedColumn
+                );
+            }
+
             const column2ArgumentsWithJoinedTable = [
                 tableToJoinAlias,
                 ...column2Arguments,

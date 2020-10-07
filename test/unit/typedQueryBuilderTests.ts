@@ -1909,7 +1909,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const query = typedKnex
             .query(UserSetting)
             .innerJoinTableOnFunction('otherUser', User, join => {
-                join.on(i => i.id, '=', j => j.user2Id);
+                join.on('id', '=', 'user2Id');
             });
 
         const queryString = query.toQuery();
