@@ -750,6 +750,13 @@ interface IWhereBetween<Model, SelectableModel, Row> {
         ) => () => PropertyType,
         range: [PropertyType, PropertyType]
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>,
+        PropertyType extends GetNestedPropertyType<Model, ConcatKey>>(
+        key: ConcatKey,
+        value: [PropertyType, PropertyType]
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
 }
 
 interface IHaving<Model, SelectableModel, Row> {

@@ -2029,7 +2029,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .whereBetween(c => c.numericValue, [1, 10]);
+            .whereBetween('numericValue', [1, 10]);
 
         const queryString = query.toQuery();
         assert.equal(
