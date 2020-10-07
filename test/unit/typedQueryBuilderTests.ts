@@ -1999,7 +1999,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .whereIn(c => c.name, ['user1', 'user2']);
+            .whereIn('name', ['user1', 'user2']);
 
         const queryString = query.toQuery();
         assert.equal(

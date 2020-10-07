@@ -735,6 +735,12 @@ interface IWhereIn<Model, SelectableModel, Row> {
         ) => () => PropertyType,
         values: PropertyType[]
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
+        key: ConcatKey,
+        value: GetNestedPropertyType<Model, ConcatKey>[]
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
 }
 
 interface IWhereBetween<Model, SelectableModel, Row> {
@@ -1367,13 +1373,9 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     }
 
     public whereIn() {
-        const range = arguments[1];
-        this.queryBuilder.whereIn(
-            this.getColumnNameFromFunction(arguments[0]),
-            range
-        );
-        return this;
+        return this.callKnexFunctionWithColumnFunction(this.queryBuilder.whereIn.bind(this.queryBuilder), ...arguments);
     }
+
     public whereNotIn() {
         const range = arguments[1];
         this.queryBuilder.whereNotIn(
