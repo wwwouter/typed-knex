@@ -1937,54 +1937,12 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .select(c => [c.user.id, c.user.name]);
+            .select('user.id', 'user.name');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
             'select "user"."id" as "user.id", "user"."name" as "user.name" from "userSettings"'
         );
-
-        done();
-    });
-
-    // it('should create query with where not on column of own table', (done) => {
-
-    //     const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-    //     const query = typedKnex
-    //         .query(User)
-    //         .whereNot('name', 'user1');
-    //     const queryString = query.toQuery();
-    //     assert.equal(queryString, 'select * from "users" where not "name" = \'user1\'');
-
-    //     done();
-    // });
-
-    it('should select column from table with to-many relationship', done => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex
-            // .query(User)
-            .query(UserSetting)
-            // .selectColumnWithArrays('category', 'name');
-            // .select(['category2', 'regionId')];
-            .select(c => [c.user.category.regionId]);
-        // .select(['user2s', 'category')];
-        // .select(['name')];
-        const queryString = query.toQuery();
-        assert.equal(
-            queryString,
-            'select "user_category"."regionId" as "user.category.regionId" from "userSettings"'
-        );
-
-        // const i = await query.firstItem();
-        // if (i) {
-        //     // const i1 = i.userSettings;
-        //     const i1 = i.category.name;
-        //     const i2 = i.category.id;
-        //     const i3 = i.id;
-        //     const i4 = i.name;
-        //     i.user.category.regionId
-
-        // }
 
         done();
     });
@@ -2000,12 +1958,6 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
             'select (select other.id from other) as "subQuery" from "users"'
         );
 
-        // const i = await query.firstItem();
-        // console.log(i.name);
-        // console.log(i.subQuery === true);
-        // console.log(i.subQuery === 'true');
-        // console.log(i.subQueryd);
-
         done();
     });
 
@@ -2013,9 +1965,9 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .where(c => c.name, 'user1')
-            .andWhere(c => c.name, 'user2')
-            .andWhere(c => c.name, 'like', '%user%');
+            .where('name', 'user1')
+            .andWhere('name', 'user2')
+            .andWhere('name', 'like', '%user%');
 
         const queryString = query.toQuery();
         assert.equal(

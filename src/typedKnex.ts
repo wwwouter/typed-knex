@@ -2145,6 +2145,9 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     }
 
     private callKnexFunctionWithColumnFunction(knexFunction: any, ...args: any[]) {
+        if (typeof args[0] === 'string') {
+            return this.callKnexFunctionWithConcatKeyColumn(knexFunction, ...args);
+        }
         const columnArguments = this.getArgumentsFromColumnFunction(
             args[0]
         );
