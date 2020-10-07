@@ -779,6 +779,16 @@ interface IWhereCompareTwoColumns<Model, SelectableModel, Row> {
             c: TransformPropsToFunctionsReturnPropertyType<Model2>
         ) => any
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+
+
+    <_PropertyType1, _PropertyType2, Model2>(
+        key1: NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>,
+        operator: Operator,
+        key2: NestedKeysOf<NonNullableRecursive<Model2>, keyof NonNullableRecursive<Model2>, ''>,
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+
 }
 
 interface IWhereExists<Model, SelectableModel, Row> {
@@ -901,10 +911,13 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
     private transaction?: Knex.Transaction;
 
+
+
     constructor(
         private tableClass: new () => ModelType,
         private knex: Knex,
-        queryBuilder?: Knex.QueryBuilder
+        queryBuilder?: Knex.QueryBuilder,
+        private parentTypedQueryBuilder?: any
     ) {
         this.tableName = getTableMetadata(tableClass).tableName;
         this.columns = getColumnProperties(tableClass);
@@ -1271,22 +1284,35 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     }
 
     public whereColumn() {
-        const column1Name = this.getColumnName(
-            ...this.getArgumentsFromColumnFunction(arguments[0])
-        );
+        // This is called from the sub-query
+        // The first column is from the sub-query
+        // The second column is from the parent query
+        let column1Name;
+        let column2Name;
+
+        if (typeof arguments[0] === 'string') {
+            column1Name = this.getColumnName(...arguments[0].split('.'));
+            if (!this.parentTypedQueryBuilder) {
+                throw new Error('Parent query builder is missing, "whereColumn" can only be used in sub-query.');
+            }
+            column2Name = this.parentTypedQueryBuilder.getColumnName(...arguments[2].split('.'));
+        } else {
+            column1Name = this.getColumnName(
+                ...this.getArgumentsFromColumnFunction(arguments[0])
+            );
+
+            if (typeof arguments[2] === 'string') {
+                column2Name = arguments[2];
+            } else if (arguments[2].memories !== undefined) {
+                column2Name = arguments[2].getColumnName; // parent this needed ...
+            } else {
+                column2Name = this.getColumnName(
+                    ...this.getArgumentsFromColumnFunction(arguments[2])
+                );
+            }
+        }
 
         const operator = arguments[1];
-
-        let column2Name;
-        if (typeof arguments[2] === 'string') {
-            column2Name = arguments[2];
-        } else if (arguments[2].memories !== undefined) {
-            column2Name = arguments[2].getColumnName; // parent this needed ...
-        } else {
-            column2Name = this.getColumnName(
-                ...this.getArgumentsFromColumnFunction(arguments[2])
-            );
-        }
 
         this.queryBuilder.whereRaw(`?? ${operator} ??`, [
             column1Name,
@@ -1419,7 +1445,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
             const subQuery = this;
             const { root, memories } = getProxyAndMemories(that);
 
-            const subQB = new TypedQueryBuilder(typeOfSubQuery, that.knex, subQuery);
+            const subQB = new TypedQueryBuilder(typeOfSubQuery, that.knex, subQuery, that);
             subQB.extraJoinedProperties = that.extraJoinedProperties;
             functionToCall(
                 subQB,

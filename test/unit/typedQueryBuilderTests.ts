@@ -485,6 +485,23 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+    it('should create query with where exists with column name mapping', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .whereExists(UserSetting, (subQuery, parentColumn) => {
+                subQuery.whereColumn(c => c.user.notUndefinedStatus, '=', parentColumn.notUndefinedStatus);
+            });
+
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select * from "users" where exists (select * from "userSettings" where "user"."weirdDatabaseName2" = "users"."weirdDatabaseName2")'
+        );
+
+        done();
+    });
+
     it('should create query with or where exists', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
@@ -2059,8 +2076,8 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .whereExists(UserSetting, (subQuery, parentColumn) => {
-                subQuery.whereColumn(c => c.userId, '=', parentColumn.id);
+            .whereExists(UserSetting, (subQuery) => {
+                subQuery.whereColumn('userId', '=', 'id');
             });
 
         const queryString = query.toQuery();
@@ -2072,13 +2089,30 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         done();
     });
 
+    it('should create query with where exists with column name mapping', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+            .whereExists(UserSetting, (subQuery) => {
+                subQuery.whereColumn('user.notUndefinedStatus', '=', 'notUndefinedStatus');
+            });
+
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select * from "users" where exists (select * from "userSettings" where "user"."weirdDatabaseName2" = "users"."weirdDatabaseName2")'
+        );
+
+        done();
+    });
+
     it('should create query with or where exists', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
             .where(c => c.name, 'name')
-            .orWhereExists(UserSetting, (subQuery, parentColumn) => {
-                subQuery.whereColumn(c => c.userId, '=', parentColumn.id);
+            .orWhereExists(UserSetting, (subQuery) => {
+                subQuery.whereColumn('userId', '=', 'id');
             });
 
         const queryString = query.toQuery();
@@ -2094,8 +2128,8 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .whereNotExists(UserSetting, (subQuery, parentColumn) => {
-                subQuery.whereColumn(c => c.userId, '=', parentColumn.id);
+            .whereNotExists(UserSetting, (subQuery) => {
+                subQuery.whereColumn('userId', '=', 'id');
             });
 
         const queryString = query.toQuery();
@@ -2112,8 +2146,8 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const query = typedKnex
             .query(User)
             .where(c => c.name, 'name')
-            .orWhereNotExists(UserSetting, (subQuery, parentColumn) => {
-                subQuery.whereColumn(c => c.userId, '=', parentColumn.id);
+            .orWhereNotExists(UserSetting, (subQuery) => {
+                subQuery.whereColumn('userId', '=', 'id');
             });
 
         const queryString = query.toQuery();

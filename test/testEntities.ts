@@ -52,6 +52,8 @@ export class User {
     public tags?: string[];
     @Column({ name: 'weirdDatabaseName' })
     public status?: string;
+    @Column({ name: 'weirdDatabaseName2' })
+    public notUndefinedStatus: string;
     @Column({ name: 'optionalCategoryId' })
     public optionalCategory?: UserCategory;
     @Column({ name: 'nullableCategoryId' })
