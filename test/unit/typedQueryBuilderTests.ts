@@ -1923,7 +1923,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
 
     it('should select 2 columns at once', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).select(c => [c.id, c.name]);
+        const query = typedKnex.query(User).select('id', 'name');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
