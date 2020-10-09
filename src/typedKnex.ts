@@ -67,8 +67,6 @@ class NotImplementedError extends Error {
 export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     columns: { name: string }[];
 
-
-
     where: IWhereWithOperator<Model, SelectableModel, Row>;
     andWhere: IWhereWithOperator<Model, SelectableModel, Row>;
     orWhere: IWhereWithOperator<Model, SelectableModel, Row>;
@@ -218,7 +216,6 @@ type ReturnNonObjectsNamesOnly<T> = { [K in keyof T]: T[K] extends SelectableCol
 
 type RemoveObjectsFrom<T> = { [P in ReturnNonObjectsNamesOnly<T>]: T[P] };
 
-
 export type ObjectToPrimitive<T> = T extends String
     ? string
     : T extends Number
@@ -250,7 +247,6 @@ interface IColumnParameterNoRowTransformation<Model, SelectableModel, Row> {
         key: ConcatKey,
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
-
 
 // deprecated
 interface IJoinOnColumns<Model, JoinedModel> {
@@ -329,10 +325,8 @@ interface IJoinOnClause2<Model, JoinedModel> {
     onVal: IJoinOnVal<Model, JoinedModel>;
     andOnVal: IJoinOnVal<Model, JoinedModel>;
     orOnVal: IJoinOnVal<Model, JoinedModel>;
-
     onNull: IJoinOnNull<Model, JoinedModel>;
 }
-
 
 interface IInsertSelect {
     <NewPropertyType>(
