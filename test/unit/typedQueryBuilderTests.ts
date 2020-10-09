@@ -2497,7 +2497,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
 
     it('should create query with order by', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).orderBy(c => c.id);
+        const query = typedKnex.query(User).orderBy('id');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -2511,7 +2511,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .select(c => [c.id])
+            .select('id')
             .clearSelect();
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users"');
@@ -2523,7 +2523,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .where(c => c.name, 'user1')
+            .where('name', 'user1')
             .clearWhere();
 
         const queryString = query.toQuery();
@@ -2536,7 +2536,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .orderBy(c => c.id)
+            .orderBy('id')
             .clearOrder();
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users"');
@@ -2548,7 +2548,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .select(c => [c.id])
+            .select('id')
             .distinct();
         const queryString = query.toQuery();
         assert.equal(
@@ -2562,11 +2562,11 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
     it('should clone and adjust only the clone', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
 
-        const query = typedKnex.query(User).select(c => [c.id]);
+        const query = typedKnex.query(User).select('id');
 
         const clonedQuery = query.clone();
 
-        clonedQuery.select(c => [c.name]);
+        clonedQuery.select('name');
 
         assert.equal(
             query.toQuery(),
@@ -2597,8 +2597,8 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .whereIn(c => c.name, ['user1', 'user2'])
-            .orWhereIn(c => c.name, ['user3', 'user4']);
+            .whereIn('name', ['user1', 'user2'])
+            .orWhereIn('name', ['user3', 'user4']);
 
         const queryString = query.toQuery();
         assert.equal(
@@ -2613,8 +2613,8 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .whereNotIn(c => c.name, ['user1', 'user2'])
-            .orWhereNotIn(c => c.name, ['user3', 'user4']);
+            .whereNotIn('name', ['user1', 'user2'])
+            .orWhereNotIn('name', ['user3', 'user4']);
 
         const queryString = query.toQuery();
         assert.equal(

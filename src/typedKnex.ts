@@ -429,6 +429,11 @@ interface IOrderBy<Model, SelectableModel, Row> {
         ) => () => NewRow,
         direction?: 'asc' | 'desc'
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<SelectableModel>, keyof NonNullableRecursive<SelectableModel>, ''>, TName extends keyof any>
+        (columnNames: ConcatKey, direction?: 'asc' | 'desc'):
+        ITypedQueryBuilder<Model, SelectableModel, Row & Record<TName, GetNestedPropertyType<SelectableModel, ConcatKey>>>;
 }
 
 interface IDbFunctionWithAlias<Model, SelectableModel, Row> {
