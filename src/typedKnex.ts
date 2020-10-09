@@ -787,6 +787,12 @@ interface IHaving<Model, SelectableModel, Row> {
         operator: Operator,
         value: PropertyType
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
+        key: ConcatKey,
+        operator: Operator,
+        value: GetNestedPropertyType<Model, ConcatKey>
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
 interface IWhereCompareTwoColumns<Model, SelectableModel, Row> {

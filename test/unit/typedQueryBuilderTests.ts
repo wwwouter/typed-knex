@@ -2195,7 +2195,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .having(c => c.numericValue, '>', 10);
+            .having('numericValue', '>', 10);
 
         const queryString = query.toQuery();
         assert.equal(
