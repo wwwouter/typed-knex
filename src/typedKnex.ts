@@ -442,13 +442,18 @@ interface IDbFunctionWithAlias<Model, SelectableModel, Row> {
         SelectableModel,
         Record<TName, ObjectToPrimitive<NewPropertyType>> & Row
     >;
+
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<SelectableModel>, keyof NonNullableRecursive<SelectableModel>, ''>, TName extends keyof any>
+        (columnNames: ConcatKey, name: TName):
+        ITypedQueryBuilder<Model, SelectableModel, Row & Record<TName, GetNestedPropertyType<SelectableModel, ConcatKey>>>;
+
 }
 
 
 
 
 type UnionToIntersection<U> =
-    (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never
+    (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
 
 interface ISelectWithFunctionColumns3<Model, SelectableModel, Row> {
     <
@@ -1213,7 +1218,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
     public orderBy() {
         this.queryBuilder.orderBy(
-            this.getColumnNameWithoutAliasFromFunction(arguments[0]),
+            this.getColumnNameWithoutAliasFromFunctionOrString(arguments[0]),
             arguments[1]
         );
 
@@ -1920,25 +1925,32 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
         aliasName: string
     ) {
         (this.queryBuilder as any)[knexFunctionName](
-            `${this.getColumnNameWithoutAliasFromFunction(f)} as ${aliasName}`
+            `${this.getColumnNameWithoutAliasFromFunctionOrString(f)} as ${aliasName}`
         );
         return this as any;
     }
 
     private getColumnNameFromFunctionOrString(f: any) {
-        let columParts;
+        let columnParts;
         if (typeof f === 'string') {
-            columParts = f.split('.');
+            columnParts = f.split('.');
         } else {
-            columParts = this.getArgumentsFromColumnFunction(f);
+            columnParts = this.getArgumentsFromColumnFunction(f);
         }
 
-        return this.getColumnName(...columParts);
+        return this.getColumnName(...columnParts);
     }
 
-    private getColumnNameWithoutAliasFromFunction(f: any) {
+    private getColumnNameWithoutAliasFromFunctionOrString(f: any) {
+        let columnParts;
+        if (typeof f === 'string') {
+            columnParts = f.split('.');
+        } else {
+            columnParts = this.getArgumentsFromColumnFunction(f);
+        }
+
         return this.getColumnNameWithoutAlias(
-            ...this.getArgumentsFromColumnFunction(f)
+            ...columnParts
         );
     }
 
