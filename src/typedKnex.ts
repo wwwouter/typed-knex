@@ -245,6 +245,10 @@ interface IColumnParameterNoRowTransformation<Model, SelectableModel, Row> {
             c: TransformPropsToFunctionsReturnPropertyType<Model>
         ) => () => PropertyType1
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
+        key: ConcatKey,
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
 

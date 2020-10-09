@@ -2629,8 +2629,8 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .whereBetween(c => c.numericValue, [1, 10])
-            .orWhereBetween(c => c.numericValue, [100, 1000]);
+            .whereBetween('numericValue', [1, 10])
+            .orWhereBetween('numericValue', [100, 1000]);
 
         const queryString = query.toQuery();
         assert.equal(
@@ -2645,8 +2645,8 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .whereNotBetween(c => c.numericValue, [1, 10])
-            .orWhereNotBetween(c => c.numericValue, [100, 1000]);
+            .whereNotBetween('numericValue', [1, 10])
+            .orWhereNotBetween('numericValue', [100, 1000]);
 
         const queryString = query.toQuery();
         assert.equal(
@@ -2662,9 +2662,9 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const query = typedKnex
             .query(User)
             .whereParentheses(sub =>
-                sub.where(c => c.id, '1').orWhere(c => c.id, '2')
+                sub.where('id', '1').orWhere('id', '2')
             )
-            .orWhere(c => c.name, 'Tester');
+            .orWhere('name', 'Tester');
 
         const queryString = query.toQuery();
         assert.equal(
@@ -2687,7 +2687,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
 
     it('should create query with where null', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).whereNull(c => c.name).orWhereNull(c => c.name);
+        const query = typedKnex.query(User).whereNull('name').orWhereNull('name');
 
         const queryString = query.toQuery();
         assert.equal(
@@ -2700,7 +2700,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
 
     it('should create query with where not null', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).whereNotNull(c => c.name).orWhereNotNull(c => c.name);
+        const query = typedKnex.query(User).whereNotNull('name').orWhereNotNull('name');
 
         const queryString = query.toQuery();
         assert.equal(
