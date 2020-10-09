@@ -122,7 +122,7 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
 
     whereParentheses: IWhereParentheses<Model, SelectableModel, Row>;
 
-    groupBy: IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
+    groupBy: ISelectableColumnKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
 
     having: IHaving<Model, SelectableModel, Row>;
 
@@ -682,6 +682,26 @@ interface IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>
 
 
     <ConcatKey extends NestedForeignKeyKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
+        key: ConcatKey,
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+}
+
+interface ISelectableColumnKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row> {
+    (
+        selectColumnFunction: (
+            c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
+        ) => void
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+    (
+        selectColumnFunction: (
+            c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
+        ) => void,
+        setToNullIfNullFunction: (r: Row) => void
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
         key: ConcatKey,
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
@@ -1538,7 +1558,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
         const operator = arguments[1];
         const value = arguments[2];
         this.queryBuilder.having(
-            this.getColumnNameFromFunction(arguments[0]),
+            this.getColumnNameFromFunctionOrString(arguments[0]),
             operator,
             value
         );
@@ -1548,7 +1568,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     public havingIn() {
         const value = arguments[1];
         this.queryBuilder.havingIn(
-            this.getColumnNameFromFunction(arguments[0]),
+            this.getColumnNameFromFunctionOrString(arguments[0]),
             value
         );
         return this;
@@ -1557,7 +1577,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     public havingNotIn() {
         const value = arguments[1];
         (this.queryBuilder as any).havingNotIn(
-            this.getColumnNameFromFunction(arguments[0]),
+            this.getColumnNameFromFunctionOrString(arguments[0]),
             value
         );
         return this;
@@ -1565,14 +1585,14 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
     public havingNull() {
         (this.queryBuilder as any).havingNull(
-            this.getColumnNameFromFunction(arguments[0])
+            this.getColumnNameFromFunctionOrString(arguments[0])
         );
         return this;
     }
 
     public havingNotNull() {
         (this.queryBuilder as any).havingNotNull(
-            this.getColumnNameFromFunction(arguments[0])
+            this.getColumnNameFromFunctionOrString(arguments[0])
         );
         return this;
     }
@@ -1611,7 +1631,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     public havingBetween() {
         const value = arguments[1];
         (this.queryBuilder as any).havingBetween(
-            this.getColumnNameFromFunction(arguments[0]),
+            this.getColumnNameFromFunctionOrString(arguments[0]),
             value
         );
         return this;
@@ -1620,7 +1640,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     public havingNotBetween() {
         const value = arguments[1];
         (this.queryBuilder as any).havingNotBetween(
-            this.getColumnNameFromFunction(arguments[0]),
+            this.getColumnNameFromFunctionOrString(arguments[0]),
             value
         );
         return this;
@@ -1790,7 +1810,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     }
 
     public groupBy() {
-        this.queryBuilder.groupBy(this.getColumnNameFromFunction(arguments[0]));
+        this.queryBuilder.groupBy(this.getColumnNameFromFunctionOrString(arguments[0]));
         return this;
     }
 
@@ -1899,8 +1919,15 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
         return this as any;
     }
 
-    private getColumnNameFromFunction(f: any) {
-        return this.getColumnName(...this.getArgumentsFromColumnFunction(f));
+    private getColumnNameFromFunctionOrString(f: any) {
+        let columParts;
+        if (typeof f === 'string') {
+            columParts = f.split('.');
+        } else {
+            columParts = this.getArgumentsFromColumnFunction(f);
+        }
+
+        return this.getColumnName(...columParts);
     }
 
     private getColumnNameWithoutAliasFromFunction(f: any) {

@@ -2178,9 +2178,9 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .select(c => c.someValue)
+            .select('someValue')
             .selectRaw('total', Number, 'SUM("numericValue")')
-            .groupBy(c => c.someValue);
+            .groupBy('someValue');
 
         const queryString = query.toQuery();
         assert.equal(
