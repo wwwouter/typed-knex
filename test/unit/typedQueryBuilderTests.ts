@@ -2236,7 +2236,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .havingIn(c => c.name, ['user1', 'user2']);
+            .havingIn('name', ['user1', 'user2']);
 
         const queryString = query.toQuery();
         assert.equal(
