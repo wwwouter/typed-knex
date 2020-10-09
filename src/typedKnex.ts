@@ -356,6 +356,13 @@ interface IInsertSelect {
             c: TransformPropsToFunctionsReturnPropertyType<NewPropertyType>
         ) => any
     ): Promise<void>;
+
+
+    <NewPropertyType, ConcatKey extends NestedKeysOf<NonNullableRecursive<NewPropertyType>, keyof NonNullableRecursive<NewPropertyType>, ''>>
+        (
+        newPropertyClass: new () => NewPropertyType,
+        ...columnNames: ConcatKey[]):
+        Promise<void>;
 }
 
 interface IJoinTableMultipleOnClauses<Model, _SelectableModel, Row> {
@@ -1809,9 +1816,15 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
             this.knex
 
         );
+        let columnArgumentsList;
+        if (typeof arguments[1] === 'string') {
+            const [, ...columnArguments] = arguments;
+            columnArgumentsList = columnArguments.map((concatKey: string) => concatKey.split('.'));
+        } else {
+            const f = arguments[1];
+            columnArgumentsList = this.getArgumentsFromColumnFunction3(f);
+        }
 
-        const f = arguments[1];
-        const columnArgumentsList = typedQueryBuilderForInsert.getArgumentsFromColumnFunction3(f);
         const insertColumns = columnArgumentsList.map(i => typedQueryBuilderForInsert.getColumnName(...i));
 
         // https://github.com/knex/knex/issues/1056

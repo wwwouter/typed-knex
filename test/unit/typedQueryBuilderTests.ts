@@ -2909,10 +2909,10 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserCategory)
-            .select(i => i.id)
+            .select('id')
             .selectQuery('total', Number, User, (subQuery) => {
                 subQuery
-                    .count(i => i.id, 'total')
+                    .count('id', 'total')
                     .whereColumn('categoryId', '=', 'id');
             });
 
@@ -2930,8 +2930,8 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const query = typedKnex
             .query(UserSetting)
             .leftOuterJoinTableOnFunction('evilTwin', UserSetting, join => {
-                join.on(i => i.id, '=', j => j.id);
-                join.on(i => i.key, '=', j => j.key);
+                join.on('id', '=', 'id');
+                join.on('key', '=', 'key');
             });
 
         const queryString = query.toQuery();
@@ -2948,10 +2948,10 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const query = typedKnex
             .query(UserSetting)
             .leftOuterJoinTableOnFunction('evilTwin', UserSetting, join => {
-                join.on(i => i.id, '=', j => j.id);
+                join.on('id', '=', 'id');
             })
-            .where(i => i.evilTwin.value, 'value')
-            .select(i => i.evilTwin.key);
+            .where('evilTwin.value', 'value')
+            .select('evilTwin.key');
 
         const queryString = query.toQuery();
         assert.equal(
@@ -2990,10 +2990,10 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
 
             await query
                 .selectRaw('f', String, '\'fixedValue\'')
-                .select(u => [u.name])
+                .select('name')
                 .distinct()
-                .whereNotNull(u => u.name)
-                .insertSelect(UserSetting, i => [i.id, i.initialValue]);
+                .whereNotNull('name')
+                .insertSelect(UserSetting, 'id', 'initialValue');
         } catch (_e) {
             assert.equal(
                 query.toQuery(),
