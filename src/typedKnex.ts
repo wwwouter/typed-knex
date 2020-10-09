@@ -689,6 +689,10 @@ interface IFindByPrimaryKey<_Model, SelectableModel, Row> {
         R29
         | null
     >;
+
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<SelectableModel>, keyof NonNullableRecursive<SelectableModel>, ''>>
+        (primaryKeyValue: any, ...columnNames: ConcatKey[]):
+        Promise<Row & UnionToIntersection<GetNestedProperty<SelectableModel, ConcatKey>>>;
 }
 
 interface IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row> {
@@ -950,7 +954,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     public columns: { name: string }[];
 
     public onlyLogQuery = false;
-    public queryLog = "";
+    public queryLog = '';
 
     private queryBuilder: Knex.QueryBuilder;
     private tableName: string;
@@ -1412,9 +1416,14 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
         const primaryKeyValue = arguments[0];
 
-        const f = arguments[1];
-
-        const columnArgumentsList = this.getArgumentsFromColumnFunction3(f);
+        let columnArgumentsList;
+        if (typeof arguments[1] === 'string') {
+            const [, ...columnArguments] = arguments;
+            columnArgumentsList = columnArguments.map((concatKey: string) => concatKey.split('.'));
+        } else {
+            const f = arguments[1];
+            columnArgumentsList = this.getArgumentsFromColumnFunction3(f);
+        }
 
         for (const columnArguments of columnArgumentsList) {
             this.queryBuilder.select(
@@ -1426,7 +1435,11 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
         this.queryBuilder.where(primaryKeyColumnInfo.name, primaryKeyValue);
 
-        return await this.queryBuilder.first();
+        if (this.onlyLogQuery) {
+            this.queryLog += this.queryBuilder.toQuery() + '\n';
+        } else {
+            return this.queryBuilder.first();
+        }
     }
 
 

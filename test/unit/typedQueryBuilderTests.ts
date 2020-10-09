@@ -3234,7 +3234,26 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
             (query as any).queryLog.trim(),
             `update "users" set "weirdDatabaseName" = 'newStatus1' where "id" = 'userId1';\nupdate "users" set "weirdDatabaseName" = 'newStatus2' where "id" = 'userId2';`
         );
+    });
 
+
+
+    it('should create findByPrimaryKey query', async () => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex
+            .query(User);
+
+        (query as any).onlyLogQuery = true;
+
+        const a = await query.findByPrimaryKey('1', 'id', 'name');
+        console.log(a.id)
+
+        assert.equal(
+            (query as any).queryLog.trim(),
+            `select "users"."id" as "id", "users"."name" as "name" from "users" where "id" = '1'`
+        );
     });
 
 });
