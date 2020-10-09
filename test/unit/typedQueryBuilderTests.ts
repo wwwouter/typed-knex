@@ -3237,30 +3237,4 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
 
     });
 
-
-
-
-    // it('should stay commented out', async done => {
-    //     const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-
-    //     // const item = await typedKnex
-    //     //     .query(UserSetting)
-    //     //     .insertItem({ id: '1', key:  });
-
-    //     const item = await typedKnex
-    //         .query(User)
-    //         // .select(['category.name', 'id'])
-    //         .select('id', 'category.id', 'birthDate')
-    //         .orderBy(i => i.birthDate)
-    //         .getFirst();
-
-    //     console.log('item: ', item.birthDate);
-
-    //     // if (item !== undefined) {
-    //     //     console.log(item.user2.numericValue);
-    //     //     console.log(item.otherUser.name);
-    //     // }
-
-    //     done();
-    // });
 });
