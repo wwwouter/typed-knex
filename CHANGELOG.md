@@ -1,5 +1,7 @@
 # Changelog
 
+-   Dropped support for Node 8 (Knex.js v0.21.0)
+
 ## 2.18.0
 
 -   `findByPrimaryKey` returns `| undefined` instead of `| void`.
