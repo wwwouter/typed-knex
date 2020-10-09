@@ -2,7 +2,7 @@
 
 ## 2.18.0
 
--   `findByPrimaryKey` returns `| null` instead of `| void`.
+-   `findByPrimaryKey` returns `| undefined` instead of `| void`.
 
 ## 2.17.0
 

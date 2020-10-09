@@ -3247,8 +3247,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
 
         (query as any).onlyLogQuery = true;
 
-        const a = await query.findByPrimaryKey('1', 'id', 'name');
-        console.log(a.id)
+        await query.findByPrimaryKey('1', 'id', 'name');
 
         assert.equal(
             (query as any).queryLog.trim(),

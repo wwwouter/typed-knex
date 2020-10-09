@@ -687,12 +687,12 @@ interface IFindByPrimaryKey<_Model, SelectableModel, Row> {
         R28 &
         R28 &
         R29
-        | null
+        | undefined
     >;
 
     <ConcatKey extends NestedKeysOf<NonNullableRecursive<SelectableModel>, keyof NonNullableRecursive<SelectableModel>, ''>>
         (primaryKeyValue: any, ...columnNames: ConcatKey[]):
-        Promise<Row & UnionToIntersection<GetNestedProperty<SelectableModel, ConcatKey>>>;
+        Promise<Row & UnionToIntersection<GetNestedProperty<SelectableModel, ConcatKey>> | undefined>;
 }
 
 interface IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row> {
