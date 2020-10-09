@@ -2266,8 +2266,8 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .havingExists(UserSetting, (subQuery, parentColumn) => {
-                subQuery.whereColumn(c => c.userId, '=', parentColumn.id);
+            .havingExists(UserSetting, (subQuery) => {
+                subQuery.whereColumn('userId', '=', 'id');
             });
 
         const queryString = query.toQuery();
@@ -2283,8 +2283,8 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .havingNotExists(UserSetting, (subQuery, parentColumn) => {
-                subQuery.whereColumn(c => c.userId, '=', parentColumn.id);
+            .havingNotExists(UserSetting, (subQuery) => {
+                subQuery.whereColumn('userId', '=', 'id');
             });
 
         const queryString = query.toQuery();
@@ -2315,7 +2315,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .havingBetween(c => c.numericValue, [1, 10]);
+            .havingBetween('numericValue', [1, 10]);
 
         const queryString = query.toQuery();
         assert.equal(
@@ -2330,7 +2330,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .havingNotBetween(c => c.numericValue, [1, 10]);
+            .havingNotBetween('numericValue', [1, 10]);
 
         const queryString = query.toQuery();
         assert.equal(
@@ -2345,9 +2345,9 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .select(c => [c.id])
+            .select('id')
             .union(User, subQuery => {
-                subQuery.select(c => [c.id]).where(c => c.numericValue, 12);
+                subQuery.select('id').where('numericValue', 12);
             });
 
         const queryString = query.toQuery();
@@ -2363,9 +2363,9 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .select(c => [c.id])
+            .select('id')
             .unionAll(User, subQuery => {
-                subQuery.select(c => [c.id]).where(c => c.numericValue, 12);
+                subQuery.select('id').where('numericValue', 12);
             });
 
         const queryString = query.toQuery();
@@ -2381,7 +2381,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .min(c => c.numericValue, 'minNumericValue');
+            .min('numericValue', 'minNumericValue');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
