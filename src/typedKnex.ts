@@ -126,8 +126,8 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
 
     having: IHaving<Model, SelectableModel, Row>;
 
-    havingNull: IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
-    havingNotNull: IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
+    havingNull: ISelectableColumnKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
+    havingNotNull: ISelectableColumnKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
 
     havingIn: IWhereIn<Model, SelectableModel, Row>;
     havingNotIn: IWhereIn<Model, SelectableModel, Row>;

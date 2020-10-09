@@ -2208,7 +2208,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
 
     it('should create query with having null', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).havingNull(c => c.numericValue);
+        const query = typedKnex.query(User).havingNull('numericValue');
 
         const queryString = query.toQuery();
         assert.equal(
