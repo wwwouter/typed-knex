@@ -295,7 +295,27 @@ interface IJoinOnVal<Model, JoinedModel> {
         operator: Operator,
         value: any
     ): IJoinOnClause2<Model, JoinedModel>;
+
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<JoinedModel>, keyof NonNullableRecursive<JoinedModel>, ''>>(
+        key: ConcatKey,
+        operator: Operator,
+        value: any
+    ): IJoinOnClause2<Model, JoinedModel>;
 }
+
+interface IJoinOnNull<Model, JoinedModel> {
+
+    <X>(
+        selectColumn1Function: (
+            c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
+        ) => () => X
+    ): IJoinOnClause2<Model, JoinedModel>;
+
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<JoinedModel>, keyof NonNullableRecursive<JoinedModel>, ''>>(
+        key: ConcatKey,
+    ): IJoinOnClause2<Model, JoinedModel>;
+}
+
 
 
 
@@ -311,12 +331,11 @@ interface IJoinOnClause2<Model, JoinedModel> {
     andOnVal: IJoinOnVal<Model, JoinedModel>;
     orOnVal: IJoinOnVal<Model, JoinedModel>;
 
-    onNull: <X>(
-        selectColumn1Function: (
-            c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
-        ) => () => X
-    ) => IJoinOnClause2<Model, JoinedModel>;
+    onNull: IJoinOnNull<Model, JoinedModel>;
 }
+
+
+
 
 interface IWhereCompareTwoColumns<Model, SelectableModel, Row> {
     <PropertyType1, _PropertyType2, Model2>(
@@ -1384,6 +1403,11 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     }
 
     public getArgumentsFromColumnFunction(f: any) {
+
+        if (typeof f === 'string') {
+            return f.split('.');
+        }
+
         const { root, memories } = getProxyAndMemories();
 
         f(root);
@@ -1504,7 +1528,9 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
         const subQueryBuilder = new TypedQueryBuilder(
             typeOfSubQuery,
-            this.knex
+            this.knex,
+            undefined,
+            this
         );
         functionToCall(subQueryBuilder, root, memories);
 

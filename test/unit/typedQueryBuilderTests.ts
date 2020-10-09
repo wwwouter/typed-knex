@@ -2715,7 +2715,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
-            .leftOuterJoinColumn(i => i.user);
+            .leftOuterJoinColumn('user');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -2727,7 +2727,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
 
     it('should return camelCase correctly', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).select(c => c.initialValue);
+        const query = typedKnex.query(UserSetting).select('initialValue');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -2742,7 +2742,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const query = typedKnex
             .query(UserSetting)
             .leftOuterJoinTableOnFunction('evilTwin', UserSetting, join => {
-                join.on(i => i.id, '=', j => j.id);
+                join.on('id', '=', 'id');
             });
 
         const queryString = query.toQuery();
@@ -2759,7 +2759,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const query = typedKnex
             .query(UserSetting)
             .leftOuterJoinTableOnFunction('otherUser', User, join => {
-                join.on(i => i.id, '=', j => j.user2Id);
+                join.on('id', '=', 'user2Id');
             });
 
         const queryString = query.toQuery();
@@ -2777,8 +2777,8 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
             .query(UserSetting)
             .leftOuterJoinTableOnFunction('otherUser', User, join => {
                 join
-                    .on(i => i.id, '=', j => j.user2Id)
-                    .onNull(i => i.name);
+                    .on('id', '=', 'user2Id')
+                    .onNull('name');
             });
 
         const queryString = query.toQuery();
@@ -2796,9 +2796,9 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
             .query(UserSetting)
             .leftOuterJoinTableOnFunction('otherUser', User, join => {
                 join
-                    .on(j => j.id, '=', i => i.user2Id)
-                    .andOn(j => j.name, '=', i => i.user2Id)
-                    .orOn(j => j.someValue, '=', i => i.user2Id);
+                    .on('id', '=', 'user2Id')
+                    .andOn('name', '=', 'user2Id')
+                    .orOn('someValue', '=', 'user2Id');
             });
 
         const queryString = query.toQuery();
@@ -2817,9 +2817,9 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
             .query(UserSetting)
             .leftOuterJoinTableOnFunction('otherUser', User, join => {
                 join
-                    .onVal(i => i.name, '=', '1')
-                    .andOnVal(i => i.name, '=', '2')
-                    .orOnVal(i => i.name, '=', '3');
+                    .onVal('name', '=', '1')
+                    .andOnVal('name', '=', '2')
+                    .orOnVal('name', '=', '3');
             });
 
         const queryString = query.toQuery();
@@ -2910,10 +2910,10 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const query = typedKnex
             .query(UserCategory)
             .select(i => i.id)
-            .selectQuery('total', Number, User, (subQuery, parentColumn) => {
+            .selectQuery('total', Number, User, (subQuery) => {
                 subQuery
                     .count(i => i.id, 'total')
-                    .whereColumn(c => c.categoryId, '=', parentColumn.id);
+                    .whereColumn('categoryId', '=', 'id');
             });
 
         const queryString = query.toQuery();
@@ -3022,8 +3022,8 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .whereExists(UserSetting, (subQuery, parentColumn) => {
-                subQuery.whereColumn(c => c.userId, '=', parentColumn.id);
+            .whereExists(UserSetting, (subQuery) => {
+                subQuery.whereColumn('userId', '=', 'id');
             });
 
         const queryString = query.toQuery();
