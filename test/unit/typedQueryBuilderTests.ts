@@ -2394,7 +2394,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .count(c => c.numericValue, 'countNumericValue');
+            .count('numericValue', 'countNumericValue');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -2407,7 +2407,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .countDistinct(c => c.numericValue, 'countDistinctNumericValue');
+            .countDistinct('numericValue', 'countDistinctNumericValue');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -2420,7 +2420,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .max(c => c.numericValue, 'maxNumericValue');
+            .max('numericValue', 'maxNumericValue');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -2433,8 +2433,8 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .max(c => c.numericValue, 'maxNumericValue')
-            .max(c => c.someValue, 'maxSomeValue');
+            .max('numericValue', 'maxNumericValue')
+            .max('someValue', 'maxSomeValue');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -2447,7 +2447,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .sum(c => c.numericValue, 'sumNumericValue');
+            .sum('numericValue', 'sumNumericValue');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -2460,7 +2460,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .sumDistinct(c => c.numericValue, 'sumDistinctNumericValue');
+            .sumDistinct('numericValue', 'sumDistinctNumericValue');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -2473,7 +2473,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .avg(c => c.numericValue, 'avgNumericValue');
+            .avg('numericValue', 'avgNumericValue');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -2486,7 +2486,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(User)
-            .avgDistinct(c => c.numericValue, 'avgDistinctNumericValue');
+            .avgDistinct('numericValue', 'avgDistinctNumericValue');
         const queryString = query.toQuery();
         assert.equal(
             queryString,
