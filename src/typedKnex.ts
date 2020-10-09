@@ -252,6 +252,7 @@ interface IColumnParameterNoRowTransformation<Model, SelectableModel, Row> {
 }
 
 
+// deprecated
 interface IJoinOnColumns<Model, JoinedModel> {
 
     <PropertyType1, PropertyType2>(
@@ -317,8 +318,6 @@ interface IJoinOnNull<Model, JoinedModel> {
 }
 
 
-
-
 interface IJoinOnClause2<Model, JoinedModel> {
     /**
      * @deprecated since version 2.9, use .on(). Remember that the columns switched eg .onColumns(i=>i.prop, '=' j=>j.prop) should become .on(j=>j.prop, '=', i=>i.prop)
@@ -334,20 +333,6 @@ interface IJoinOnClause2<Model, JoinedModel> {
     onNull: IJoinOnNull<Model, JoinedModel>;
 }
 
-
-
-
-interface IWhereCompareTwoColumns<Model, SelectableModel, Row> {
-    <PropertyType1, _PropertyType2, Model2>(
-        selectColumn1Function: (
-            c: TransformPropsToFunctionsReturnPropertyType<Model>
-        ) => () => PropertyType1,
-        operator: Operator,
-        selectColumn2Function: (
-            c: TransformPropsToFunctionsReturnPropertyType<Model2>
-        ) => any
-    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
-}
 
 interface IInsertSelect {
     <NewPropertyType>(
