@@ -40,7 +40,9 @@ function getDiagnostics(code: string) {
     return allDiagnostics;
 }
 
-describe('compile time typed-knex', function() {
+
+
+describe('compile time typed-knex string column parameters', function() {
     this.timeout(1000000);
 
 
@@ -64,7 +66,7 @@ describe('compile time typed-knex', function() {
             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
             const result = await typedKnex
                 .query(User)
-                .select(c=>[c.id])
+                .select('id')
                 .getFirst();
 
             console.log(result.id);
@@ -91,7 +93,7 @@ describe('compile time typed-knex', function() {
             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
             const result = await typedKnex
                 .query(User)
-                .select(c=>[c.id])
+                .select('id')
                 .getFirst();
 
             console.log(result.name);
@@ -116,7 +118,7 @@ describe('compile time typed-knex', function() {
                 const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
                 const result = await typedKnex
                     .query(User)
-                    .select(c=>[c.id])
+                    .select('id')
                     .getFirst();
 
                 console.log(result.id);
@@ -141,7 +143,7 @@ describe('compile time typed-knex', function() {
                 const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
                 const result = await typedKnex
                     .query(User)
-                    .select(c=>[c.id])
+                    .select('id')
                     .getFirst();
 
                 console.log(result.name);
@@ -270,9 +272,9 @@ describe('compile time typed-knex', function() {
 
                 const query = typedKnex
                 .query(User)
-                .whereExists(UserSetting, (subQuery, parentColumn) => {
+                .whereExists(UserSetting, (subQuery) => {
 
-                    subQuery.whereColumns(['user', 'id'], '=', parentColumn('someValue'));
+                    subQuery.whereColumns('user.id', '=', 'someValue');
                 });
 
 
@@ -294,9 +296,9 @@ describe('compile time typed-knex', function() {
 
                 const query = typedKnex
                 .query(User)
-                .whereExists(UserSetting, (subQuery, parentColumn) => {
+                .whereExists(UserSetting, (subQuery) => {
 
-                    subQuery.whereColumns(['user', 'id'], '=', parentColumn('unknown'));
+                    subQuery.whereColumns('user.id', '=', 'unknown');
                 });
 
 
@@ -319,7 +321,7 @@ describe('compile time typed-knex', function() {
                 const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
                 const result = await typedKnex
                     .query(User)
-                    .min(c => c.numericValue, 'minNumericValue')
+                    .min('numericValue', 'minNumericValue')
                     .getFirst();
 
                 console.log(result.minNumericValue);
@@ -343,7 +345,7 @@ describe('compile time typed-knex', function() {
                 const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
                 const result = await typedKnex
                     .query(User)
-                    .min(c => c('numericValue'), 'minNumericValue')
+                    .min('numericValue', 'minNumericValue')
                     .getFirst();
 
                 console.log(result.id);
@@ -367,7 +369,7 @@ describe('compile time typed-knex', function() {
                 const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
                 const result = await typedKnex
                     .query(User)
-                    .select(c=>[c.id])
+                    .select('id')
                     .clearSelect()
                     .getFirst();
 
@@ -395,7 +397,7 @@ describe('compile time typed-knex', function() {
 
     //             const item = await typedKnex
     //             .query(User)
-    //             .findByColumn(c => c.numericValue, 1, c => [c.name]);
+    //             .findByColumn('numericValue', 1, 'name');
 
     //             if (item !== undefined) {
     //                 console.log(item.name);
@@ -423,7 +425,7 @@ describe('compile time typed-knex', function() {
 
                 const item = await typedKnex
                 .query(User)
-                .findByPrimaryKey("id", c => [c.name]);
+                .findByPrimaryKey("id", 'name');
 
                 if (item !== undefined) {
                     console.log(item.name);
@@ -449,7 +451,7 @@ describe('compile time typed-knex', function() {
 
                 const item = await typedKnex
                 .query(User)
-                .findByPrimaryKey("id", c => [c.category]);
+                .findByPrimaryKey("id", 'category');
 
                 if (item !== undefined) {
                     console.log(item.category);
@@ -475,7 +477,7 @@ describe('compile time typed-knex', function() {
 
                 const item = await typedKnex
                 .query(User)
-                .findByPrimaryKey("id", c => [c.optionalCategory]);
+                .findByPrimaryKey("id", 'optionalCategory');
 
                 if (item !== undefined) {
                     console.log(item.optionalCategory);
@@ -501,7 +503,7 @@ describe('compile time typed-knex', function() {
 
                 const item = await typedKnex
                 .query(User)
-                .findByPrimaryKey("id", c => [c.nullableCategory]);
+                .findByPrimaryKey("id", 'nullableCategory');
 
                 if (item !== undefined) {
                     console.log(item.nullableCategory);
@@ -528,7 +530,7 @@ describe('compile time typed-knex', function() {
 
                 const item = await typedKnex
                 .query(User)
-                .findByPrimaryKey("id", c => [c.birthDate]);
+                .findByPrimaryKey("id", 'birthDate');
 
                 if (item !== undefined) {
                     console.log(item.birthDate);
@@ -555,7 +557,7 @@ describe('compile time typed-knex', function() {
 
                 const item = await typedKnex
                 .query(User)
-                .findByPrimaryKey("id", c => [c.deathDate]);
+                .findByPrimaryKey("id", 'deathDate');
 
                 if (item !== undefined) {
                     console.log(item.deathDate);
@@ -581,7 +583,7 @@ describe('compile time typed-knex', function() {
 
                 const item = await typedKnex
                 .query(User)
-                .findByPrimaryKey("id", c => [c.someNullableValue]);
+                .findByPrimaryKey("id", 'someNullableValue');
 
                 if (item !== undefined) {
                     console.log(item.someNullableValue);
@@ -608,7 +610,7 @@ describe('compile time typed-knex', function() {
 
                 const item = await typedKnex
                 .query(User)
-                .findByPrimaryKey("id", c => [c.someOptionalValue]);
+                .findByPrimaryKey("id", 'someOptionalValue');
 
                 if (item !== undefined) {
                     console.log(item.someOptionalValue);
@@ -635,9 +637,9 @@ describe('compile time typed-knex', function() {
                 const item = await typedKnex
                 .query(UserSetting)
                 .leftOuterJoinTableOnFunction('otherUser', User, join => {
-                    join.on(i => i.id, '=', j => j.user2Id);
+                    join.on('id', '=', 'user2Id');
                 })
-                .select(i => [i.otherUser.name, i.user2.numericValue])
+                .select('otherUser.name', 'user2.numericValue')
                 .getFirst();
 
                 if (item !== undefined) {
@@ -666,9 +668,9 @@ describe('compile time typed-knex', function() {
                 const item = await typedKnex
                 .query(UserSetting)
                 .leftOuterJoinTableOnFunction('otherUser', User, join => {
-                    join.on(i => i.id, '=', j => j.user2Id);
+                    join.on('id', '=', 'user2Id');
                 })
-                .select(i => [i.otherUser.name, i.user2.numericValue])
+                .select('otherUser.name', 'user2.numericValue')
                 .getFirst();
 
                 if (item !== undefined) {
@@ -696,9 +698,9 @@ describe('compile time typed-knex', function() {
                 const item = await typedKnex
                 .query(UserSetting)
                 .leftOuterJoinTableOnFunction('otherUser', User, join => {
-                    join.on(i => i.id, '=', j => j.user2Id);
+                    join.on('id', '=', 'user2Id');
                 })
-                .select(i => [i.otherUser.name, i.user2.numericValue])
+                .select('otherUser.name', 'user2.numericValue')
                 .getFirst();
 
                 if (item !== undefined) {
@@ -727,9 +729,9 @@ describe('compile time typed-knex', function() {
                 const item = await typedKnex
                 .query(UserSetting)
                 .leftOuterJoinTableOnFunction('otherUser', User, join => {
-                    join.on(i => i.id, '=', j => j.user2Id);
+                    join.on('id', '=', 'user2Id');
                 })
-                .select(i => [i.otherUser.name, i.user2.numericValue])
+                .select('otherUser.name', 'user2.numericValue')
                 .keepFlat()
                 .getSingle();
 
