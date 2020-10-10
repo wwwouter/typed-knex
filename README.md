@@ -1057,4 +1057,5 @@ await validateTables(knex);
 
 for beta
 
-    npm publish --access public --tag beta
+    update version to x.x.x-beta.x
+    npm publish --access public --tag beta --otp=CODE
