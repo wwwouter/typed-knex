@@ -70,7 +70,7 @@ describe('compile time typed-knex', function() {
             console.log(result.id);
 
         })();
-    `)
+    `);
 
 
         assert.equal(allDiagnostics.length, 0);
@@ -97,7 +97,7 @@ describe('compile time typed-knex', function() {
             console.log(result.name);
 
         })();
-    `)
+    `);
 
         assert.notEqual(allDiagnostics.length, 0);
 
@@ -122,349 +122,266 @@ describe('compile time typed-knex', function() {
                 console.log(result.id);
 
             })();
-            `)
+            `);
 
         assert.equal(allDiagnostics.length, 0);
 
         done();
     });
 
-    // it('should error on calling property not used in select method', done => {
-    //     file = project.createSourceFile(
-    //         'test/test.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User } from './testEntities';
+    it('should error on calling property not used in select method', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
 
 
-    //         (async () => {
+            (async () => {
 
-    //             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-    //             const result = await typedKnex
-    //                 .query(User)
-    //                 .select(c=>[c.id])
-    //                 .getFirst();
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                const result = await typedKnex
+                    .query(User)
+                    .select(c=>[c.id])
+                    .getFirst();
 
-    //             console.log(result.name);
+                console.log(result.name);
 
-    //         })();
-    //     `
-    //     );
+            })();
+            `);
 
-    //     assert.notEqual(project.getPreEmitDiagnostics().length, 0);
+        assert.notEqual(allDiagnostics.length, 0);
 
-    //     file.delete();
-    //     done();
-    // });
+        done();
+    });
 
-    // it('should allow to call whereIn with type of property', done => {
-    //     file = project.createSourceFile(
-    //         'test/test.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User } from './testEntities';
+    it('should allow to call whereIn with type of property', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
 
 
-    //         (async () => {
+            (async () => {
 
-    //             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-    //             const query = typedKnex
-    //             .query(User)
-    //             .whereIn('name', ['user1', 'user2']);
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                const query = typedKnex
+                .query(User)
+                .whereIn('name', ['user1', 'user2']);
 
 
-    //         })();
-    //     `
-    //     );
+            })();
+            `);
 
-    //     assert.notEqual(project.getPreEmitDiagnostics().length, 0);
+        assert.notEqual(allDiagnostics.length, 0);
 
-    //     file.delete();
-    //     done();
-    // });
+        done();
+    });
 
-    // it('should error on calling whereIn with different type', done => {
-    //     file = project.createSourceFile(
-    //         'test/test.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User } from './testEntities';
+    it('should error on calling whereIn with different type', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
 
 
-    //         (async () => {
+            (async () => {
 
-    //             const query = typedKnex
-    //             .query(User)
-    //             .whereIn('name', [1]);
+                const query = typedKnex
+                .query(User)
+                .whereIn('name', [1]);
 
-    //         })();
-    //     `
-    //     );
+            })();
+        `);
+        assert.notEqual(allDiagnostics.length, 0);
 
-    //     assert.notEqual(project.getPreEmitDiagnostics().length, 0);
+        done();
+    });
 
-    //     file.delete();
-    //     done();
-    // });
+    it('should allow to call whereBetween with type of property', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
 
-    // it('should allow to call whereBetween with type of property', done => {
-    //     file = project.createSourceFile(
-    //         'test/test.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User } from './testEntities';
 
+            (async () => {
 
-    //         (async () => {
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                const query = typedKnex
+                .query(User)
+                .whereBetween('numericValue', [1,10]);
 
-    //             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-    //             const query = typedKnex
-    //             .query(User)
-    //             .whereBetween('numericValue', [1,10]);
 
+            })();
+        `);
+        assert.notEqual(allDiagnostics.length, 0);
 
-    //         })();
-    //     `
-    //     );
+        done();
+    });
 
-    //     assert.notEqual(project.getPreEmitDiagnostics().length, 0);
+    it('should error on calling whereBetween with different type', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
 
-    //     file.delete();
-    //     done();
-    // });
 
-    // it('should error on calling whereBetween with different type', done => {
-    //     file = project.createSourceFile(
-    //         'test/test.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User } from './testEntities';
+            (async () => {
 
+                const query = typedKnex
+                .query(User)
+                .whereBetween('numericValue', ['','']);
 
-    //         (async () => {
+            })();
+        `);
+        assert.notEqual(allDiagnostics.length, 0);
 
-    //             const query = typedKnex
-    //             .query(User)
-    //             .whereBetween('numericValue', ['','']);
+        done();
+    });
 
-    //         })();
-    //     `
-    //     );
+    it('should error on calling whereBetween with array of more than 2', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
 
-    //     assert.notEqual(project.getPreEmitDiagnostics().length, 0);
 
-    //     file.delete();
-    //     done();
-    // });
+            (async () => {
 
-    // it('should error on calling whereBetween with array of more than 2', done => {
-    //     file = project.createSourceFile(
-    //         'test/test.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User } from './testEntities';
+                const query = typedKnex
+                .query(User)
+                .whereBetween('numericValue', [1,2,3]);
 
+            })();
+        `);
+        assert.notEqual(allDiagnostics.length, 0);
 
-    //         (async () => {
+        done();
+    });
 
-    //             const query = typedKnex
-    //             .query(User)
-    //             .whereBetween('numericValue', [1,2,3]);
+    it('should allow property of parent query in where exists', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User, UserSetting } from './testEntities';
 
-    //         })();
-    //     `
-    //     );
 
-    //     assert.notEqual(project.getPreEmitDiagnostics().length, 0);
+            (async () => {
 
-    //     file.delete();
-    //     done();
-    // });
+                const query = typedKnex
+                .query(User)
+                .whereExists(UserSetting, (subQuery, parentColumn) => {
 
-    // it('should allow property of parent query in where exists', done => {
-    //     file = project.createSourceFile(
-    //         'test/test.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User, UserSetting } from './testEntities';
+                    subQuery.whereColumns(['user', 'id'], '=', parentColumn('someValue'));
+                });
 
 
-    //         (async () => {
+            })();
+        `);
+        assert.notEqual(allDiagnostics.length, 0);
 
-    //             const query = typedKnex
-    //             .query(User)
-    //             .whereExists(UserSetting, (subQuery, parentColumn) => {
+        done();
+    });
 
-    //                 subQuery.whereColumns(['user', 'id'], '=', parentColumn('someValue'));
-    //             });
+    it('should not allow unknown property of parent query in where exists', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User, UserSetting } from './testEntities';
 
 
-    //         })();
-    //     `
-    //     );
+            (async () => {
 
-    //     assert.notEqual(project.getPreEmitDiagnostics().length, 0);
+                const query = typedKnex
+                .query(User)
+                .whereExists(UserSetting, (subQuery, parentColumn) => {
 
-    //     file.delete();
-    //     done();
-    // });
+                    subQuery.whereColumns(['user', 'id'], '=', parentColumn('unknown'));
+                });
 
-    // it('should not allow unknown property of parent query in where exists', done => {
-    //     file = project.createSourceFile(
-    //         'test/test.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User, UserSetting } from './testEntities';
 
+            })();
+        `);
+        assert.notEqual(allDiagnostics.length, 0);
 
-    //         (async () => {
+        done();
+    });
 
-    //             const query = typedKnex
-    //             .query(User)
-    //             .whereExists(UserSetting, (subQuery, parentColumn) => {
+    it('should return type with properties from the min method', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
 
-    //                 subQuery.whereColumns(['user', 'id'], '=', parentColumn('unknown'));
-    //             });
 
+            (async () => {
 
-    //         })();
-    //     `
-    //     );
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                const result = await typedKnex
+                    .query(User)
+                    .min(c => c.numericValue, 'minNumericValue')
+                    .getFirst();
 
-    //     assert.notEqual(project.getPreEmitDiagnostics().length, 0);
+                console.log(result.minNumericValue);
 
-    //     file.delete();
-    //     done();
-    // });
+            })();
+        `);
+        assert.equal(allDiagnostics.length, 0);
 
-    // it('should return type with properties from the min method', done => {
-    //     file = project.createSourceFile(
-    //         'test/test1.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User } from './testEntities';
+        done();
+    });
 
+    it('should error on calling property not used in min method', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
 
-    //         (async () => {
 
-    //             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-    //             const result = await typedKnex
-    //                 .query(User)
-    //                 .min(c => c.numericValue, 'minNumericValue')
-    //                 .getFirst();
+            (async () => {
 
-    //             console.log(result.minNumericValue);
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                const result = await typedKnex
+                    .query(User)
+                    .min(c => c('numericValue'), 'minNumericValue')
+                    .getFirst();
 
-    //         })();
-    //     `
-    //     );
+                console.log(result.id);
 
-    //     assert.equal(project.getPreEmitDiagnostics().length, 0);
-    //     file.delete();
+            })();
+        `);
+        assert.notEqual(allDiagnostics.length, 0);
 
-    //     done();
-    // });
+        done();
+    });
 
-    // it('should error on calling property not used in min method', done => {
-    //     file = project.createSourceFile(
-    //         'test/test2.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User } from './testEntities';
+    it('should return all Model properties after clearSelect', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
 
 
-    //         (async () => {
+            (async () => {
 
-    //             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-    //             const result = await typedKnex
-    //                 .query(User)
-    //                 .min(c => c('numericValue'), 'minNumericValue')
-    //                 .getFirst();
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                const result = await typedKnex
+                    .query(User)
+                    .select(c=>[c.id])
+                    .clearSelect()
+                    .getFirst();
 
-    //             console.log(result.id);
+                    console.log(result.id);
+                    console.log(result.name);
 
-    //         })();
-    //     `
-    //     );
+            })();
+        `);
+        assert.equal(allDiagnostics.length, 0);
 
-    //     assert.notEqual(project.getPreEmitDiagnostics().length, 0);
-    //     file.delete();
+        done();
+    });
 
-    //     done();
-    // });
-
-    // it('should return all Model properties after clearSelect', done => {
-    //     file = project.createSourceFile(
-    //         'test/test3.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User } from './testEntities';
-
-
-    //         (async () => {
-
-    //             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-    //             const result = await typedKnex
-    //                 .query(User)
-    //                 .select(c=>[c.id])
-    //                 .clearSelect()
-    //                 .getFirst();
-
-    //                 console.log(result.id);
-    //                 console.log(result.name);
-
-    //         })();
-    //     `
-    //     );
-
-    //     assert.equal(project.getPreEmitDiagnostics().length, 0);
-
-    //     file.delete();
-    //     done();
-    // });
-
-    // // it('should return correct type from findByColumn', done => {
-    // //     file = project.createSourceFile(
-    // //         'test/test4.ts',
-    // //         `
-    // //         import * as knex from 'knex';
-    // //         import { TypedKnex } from '../src/typedKnex';
-    // //         import { User } from './testEntities';
-
-    // //         (async () => {
-
-    // //             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-
-    // //             const item = await typedKnex
-    // //             .query(User)
-    // //             .findByColumn(c => c.numericValue, 1, c => [c.name]);
-
-    // //             if (item !== undefined) {
-    // //                 console.log(item.name);
-    // //             }
-
-    // //         })();
-    // //     `
-    // //     );
-
-    // //     assert.equal(project.getPreEmitDiagnostics().length, 0);
-
-    // //     file.delete();
-    // //     done();
-    // // });
-
-    // it('should return correct type from findByPrimaryKey', done => {
+    // it('should return correct type from findByColumn', done => {
     //     file = project.createSourceFile(
     //         'test/test4.ts',
     //         `
@@ -472,14 +389,13 @@ describe('compile time typed-knex', function() {
     //         import { TypedKnex } from '../src/typedKnex';
     //         import { User } from './testEntities';
 
-
     //         (async () => {
 
     //             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
 
     //             const item = await typedKnex
     //             .query(User)
-    //             .findByPrimaryKey("id", c => [c.name]);
+    //             .findByColumn(c => c.numericValue, 1, c => [c.name]);
 
     //             if (item !== undefined) {
     //                 console.log(item.name);
@@ -489,488 +405,438 @@ describe('compile time typed-knex', function() {
     //     `
     //     );
 
-    //     assert.equal(project.getPreEmitDiagnostics().length, 0);
+    //     assert.equal(allDiagnostics.length, 0);
 
-    //     file.delete();
     //     done();
     // });
 
-    // it('should findByPrimaryKey not accept objects in select', done => {
-    //     file = project.createSourceFile(
-    //         'test/test4.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User } from './testEntities';
+    it('should return correct type from findByPrimaryKey', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
 
 
-    //         (async () => {
+            (async () => {
 
-    //             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
 
-    //             const item = await typedKnex
-    //             .query(User)
-    //             .findByPrimaryKey("id", c => [c.category]);
+                const item = await typedKnex
+                .query(User)
+                .findByPrimaryKey("id", c => [c.name]);
 
-    //             if (item !== undefined) {
-    //                 console.log(item.category);
-    //             }
+                if (item !== undefined) {
+                    console.log(item.name);
+                }
 
-    //         })();
-    //     `
-    //     );
+            })();
+        `);
+        assert.equal(allDiagnostics.length, 0);
 
-    //     assert.notEqual(project.getPreEmitDiagnostics().length, 0);
+        done();
+    });
 
-    //     file.delete();
-    //     done();
-    // });
+    it('should findByPrimaryKey not accept objects in select', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
 
-    // it('should findByPrimaryKey not accept optional objects in select', done => {
-    //     file = project.createSourceFile(
-    //         'test/test4.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User } from './testEntities';
 
+            (async () => {
 
-    //         (async () => {
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
 
-    //             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                const item = await typedKnex
+                .query(User)
+                .findByPrimaryKey("id", c => [c.category]);
 
-    //             const item = await typedKnex
-    //             .query(User)
-    //             .findByPrimaryKey("id", c => [c.optionalCategory]);
+                if (item !== undefined) {
+                    console.log(item.category);
+                }
 
-    //             if (item !== undefined) {
-    //                 console.log(item.optionalCategory);
-    //             }
+            })();
+        `);
+        assert.notEqual(allDiagnostics.length, 0);
 
-    //         })();
-    //     `
-    //     );
+        done();
+    });
 
-    //     assert.notEqual(project.getPreEmitDiagnostics().length, 0);
+    it('should findByPrimaryKey not accept optional objects in select', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
 
-    //     file.delete();
-    //     done();
-    // });
 
-    // it('should findByPrimaryKey not accept nullable objects in select', done => {
-    //     file = project.createSourceFile(
-    //         'test/test4.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User } from './testEntities';
+            (async () => {
 
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
 
-    //         (async () => {
+                const item = await typedKnex
+                .query(User)
+                .findByPrimaryKey("id", c => [c.optionalCategory]);
 
-    //             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                if (item !== undefined) {
+                    console.log(item.optionalCategory);
+                }
 
-    //             const item = await typedKnex
-    //             .query(User)
-    //             .findByPrimaryKey("id", c => [c.nullableCategory]);
+            })();
+        `);
+        assert.notEqual(allDiagnostics.length, 0);
 
-    //             if (item !== undefined) {
-    //                 console.log(item.nullableCategory);
-    //             }
+        done();
+    });
 
-    //         })();
-    //     `
-    //     );
+    it('should findByPrimaryKey not accept nullable objects in select', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
 
-    //     assert.notEqual(project.getPreEmitDiagnostics().length, 0);
 
-    //     file.delete();
-    //     done();
-    // });
+            (async () => {
 
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
 
-    // it('should findByPrimaryKey accept Date objects in select', done => {
-    //     file = project.createSourceFile(
-    //         'test/test4.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User } from './testEntities';
+                const item = await typedKnex
+                .query(User)
+                .findByPrimaryKey("id", c => [c.nullableCategory]);
 
+                if (item !== undefined) {
+                    console.log(item.nullableCategory);
+                }
 
-    //         (async () => {
+            })();
+        `);
+        assert.notEqual(allDiagnostics.length, 0);
 
-    //             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        done();
+    });
 
-    //             const item = await typedKnex
-    //             .query(User)
-    //             .findByPrimaryKey("id", c => [c.birthDate]);
 
-    //             if (item !== undefined) {
-    //                 console.log(item.birthDate);
-    //             }
+    it('should findByPrimaryKey accept Date objects in select', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
 
-    //         })();
-    //     `
-    //     );
 
-    //     assert.equal(project.getPreEmitDiagnostics().length, 0);
+            (async () => {
 
-    //     file.delete();
-    //     done();
-    // });
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
 
+                const item = await typedKnex
+                .query(User)
+                .findByPrimaryKey("id", c => [c.birthDate]);
 
-    // it('should findByPrimaryKey accept nullable Date objects in select', done => {
-    //     file = project.createSourceFile(
-    //         'test/test4.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User } from './testEntities';
+                if (item !== undefined) {
+                    console.log(item.birthDate);
+                }
 
+            })();
+        `);
+        assert.equal(allDiagnostics.length, 0);
 
-    //         (async () => {
+        done();
+    });
 
-    //             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
 
-    //             const item = await typedKnex
-    //             .query(User)
-    //             .findByPrimaryKey("id", c => [c.deathDate]);
+    it('should findByPrimaryKey accept nullable Date objects in select', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
 
-    //             if (item !== undefined) {
-    //                 console.log(item.deathDate);
-    //             }
 
-    //         })();
-    //     `
-    //     );
+            (async () => {
 
-    //     assert.equal(project.getPreEmitDiagnostics().length, 0);
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
 
-    //     file.delete();
-    //     done();
-    // });
+                const item = await typedKnex
+                .query(User)
+                .findByPrimaryKey("id", c => [c.deathDate]);
 
-    // it('should findByPrimaryKey accept nullable string objects in select', done => {
-    //     file = project.createSourceFile(
-    //         'test/test4.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User } from './testEntities';
+                if (item !== undefined) {
+                    console.log(item.deathDate);
+                }
 
+            })();
+        `);
+        assert.equal(allDiagnostics.length, 0);
 
-    //         (async () => {
+        done();
+    });
 
-    //             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it('should findByPrimaryKey accept nullable string objects in select', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
 
-    //             const item = await typedKnex
-    //             .query(User)
-    //             .findByPrimaryKey("id", c => [c.someNullableValue]);
 
-    //             if (item !== undefined) {
-    //                 console.log(item.someNullableValue);
-    //             }
+            (async () => {
 
-    //         })();
-    //     `
-    //     );
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
 
-    //     assert.equal(project.getPreEmitDiagnostics().length, 0);
+                const item = await typedKnex
+                .query(User)
+                .findByPrimaryKey("id", c => [c.someNullableValue]);
 
-    //     file.delete();
-    //     done();
-    // });
+                if (item !== undefined) {
+                    console.log(item.someNullableValue);
+                }
 
+            })();
+        `);
+        assert.equal(allDiagnostics.length, 0);
 
-    // it('should findByPrimaryKey accept optional string objects in select', done => {
-    //     file = project.createSourceFile(
-    //         'test/test4.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User } from './testEntities';
+        done();
+    });
 
 
-    //         (async () => {
+    it('should findByPrimaryKey accept optional string objects in select', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
 
-    //             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
 
-    //             const item = await typedKnex
-    //             .query(User)
-    //             .findByPrimaryKey("id", c => [c.someOptionalValue]);
+            (async () => {
 
-    //             if (item !== undefined) {
-    //                 console.log(item.someOptionalValue);
-    //             }
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
 
-    //         })();
-    //     `
-    //     );
+                const item = await typedKnex
+                .query(User)
+                .findByPrimaryKey("id", c => [c.someOptionalValue]);
 
-    //     assert.equal(project.getPreEmitDiagnostics().length, 0);
+                if (item !== undefined) {
+                    console.log(item.someOptionalValue);
+                }
 
-    //     file.delete();
-    //     done();
-    // });
+            })();
+        `);
+        assert.equal(allDiagnostics.length, 0);
 
-    // it('should return correct type from leftOuterJoinTableOnFunction', done => {
-    //     file = project.createSourceFile(
-    //         'test/test4.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User, UserSetting } from './testEntities';
+        done();
+    });
 
+    it('should return correct type from leftOuterJoinTableOnFunction', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User, UserSetting } from './testEntities';
 
-    //         (async () => {
 
-    //             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+            (async () => {
 
-    //             const item = await typedKnex
-    //             .query(UserSetting)
-    //             .leftOuterJoinTableOnFunction('otherUser', User, join => {
-    //                 join.on(i => i.id, '=', j => j.user2Id);
-    //             })
-    //             .select(i => [i.otherUser.name, i.user2.numericValue])
-    //             .getFirst();
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
 
-    //             if (item !== undefined) {
-    //                 console.log(item.user2.numericValue);
-    //                 console.log(item.otherUser.name);
-    //             }
+                const item = await typedKnex
+                .query(UserSetting)
+                .leftOuterJoinTableOnFunction('otherUser', User, join => {
+                    join.on(i => i.id, '=', j => j.user2Id);
+                })
+                .select(i => [i.otherUser.name, i.user2.numericValue])
+                .getFirst();
 
-    //         })();
-    //     `
-    //     );
+                if (item !== undefined) {
+                    console.log(item.user2.numericValue);
+                    console.log(item.otherUser.name);
+                }
 
-    //     assert.equal(project.getPreEmitDiagnostics().length, 0);
+            })();
+        `);
+        assert.equal(allDiagnostics.length, 0);
 
-    //     file.delete();
-    //     done();
-    // });
+        done();
+    });
 
-    // it('should not return type from leftOuterJoinTableOnFunction with not selected from joined table', done => {
-    //     file = project.createSourceFile(
-    //         'test/test4.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User, UserSetting } from './testEntities';
+    it('should not return type from leftOuterJoinTableOnFunction with not selected from joined table', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User, UserSetting } from './testEntities';
 
 
-    //         (async () => {
+            (async () => {
 
-    //             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
 
-    //             const item = await typedKnex
-    //             .query(UserSetting)
-    //             .leftOuterJoinTableOnFunction('otherUser', User, join => {
-    //                 join.on(i => i.id, '=', j => j.user2Id);
-    //             })
-    //             .select(i => [i.otherUser.name, i.user2.numericValue])
-    //             .getFirst();
+                const item = await typedKnex
+                .query(UserSetting)
+                .leftOuterJoinTableOnFunction('otherUser', User, join => {
+                    join.on(i => i.id, '=', j => j.user2Id);
+                })
+                .select(i => [i.otherUser.name, i.user2.numericValue])
+                .getFirst();
 
-    //             if (item !== undefined) {
-    //                 console.log(item.otherUser.id);
-    //             }
+                if (item !== undefined) {
+                    console.log(item.otherUser.id);
+                }
 
-    //         })();
-    //     `
-    //     );
+            })();
+        `);
+        assert.notEqual(allDiagnostics.length, 0);
 
-    //     assert.notEqual(project.getPreEmitDiagnostics().length, 0);
+        done();
+    });
 
-    //     file.delete();
-    //     done();
-    // });
+    it('should not return type from leftOuterJoinTableOnFunction with not selected from main table', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User, UserSetting } from './testEntities';
 
-    // it('should not return type from leftOuterJoinTableOnFunction with not selected from main table', done => {
-    //     file = project.createSourceFile(
-    //         'test/test4.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User, UserSetting } from './testEntities';
 
+            (async () => {
 
-    //         (async () => {
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
 
-    //             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                const item = await typedKnex
+                .query(UserSetting)
+                .leftOuterJoinTableOnFunction('otherUser', User, join => {
+                    join.on(i => i.id, '=', j => j.user2Id);
+                })
+                .select(i => [i.otherUser.name, i.user2.numericValue])
+                .getFirst();
 
-    //             const item = await typedKnex
-    //             .query(UserSetting)
-    //             .leftOuterJoinTableOnFunction('otherUser', User, join => {
-    //                 join.on(i => i.id, '=', j => j.user2Id);
-    //             })
-    //             .select(i => [i.otherUser.name, i.user2.numericValue])
-    //             .getFirst();
+                if (item !== undefined) {
+                    console.log(item.id);
+                }
 
-    //             if (item !== undefined) {
-    //                 console.log(item.id);
-    //             }
+            })();
+        `);
+        assert.notEqual(allDiagnostics.length, 0);
 
-    //         })();
-    //     `
-    //     );
+        done();
+    });
 
-    //     assert.notEqual(project.getPreEmitDiagnostics().length, 0);
 
-    //     file.delete();
-    //     done();
-    // });
+    it('should  return any when keepFlat() is used', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User, UserSetting } from './testEntities';
 
 
-    // it('should  return any when keepFlat() is used', done => {
-    //     file = project.createSourceFile(
-    //         'test/test4.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User, UserSetting } from './testEntities';
+            (async () => {
 
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
 
-    //         (async () => {
+                const item = await typedKnex
+                .query(UserSetting)
+                .leftOuterJoinTableOnFunction('otherUser', User, join => {
+                    join.on(i => i.id, '=', j => j.user2Id);
+                })
+                .select(i => [i.otherUser.name, i.user2.numericValue])
+                .keepFlat()
+                .getSingle();
 
-    //             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
 
-    //             const item = await typedKnex
-    //             .query(UserSetting)
-    //             .leftOuterJoinTableOnFunction('otherUser', User, join => {
-    //                 join.on(i => i.id, '=', j => j.user2Id);
-    //             })
-    //             .select(i => [i.otherUser.name, i.user2.numericValue])
-    //             .keepFlat()
-    //             .getSingle();
+                console.log(item.doesNotExist);
 
 
-    //             console.log(item.doesNotExist);
+            })();
+        `);
+        assert.equal(allDiagnostics.length, 0);
 
+        done();
+    });
 
-    //         })();
-    //     `
-    //     );
+    it('should accept string column in orderBy', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
 
-    //     assert.equal(project.getPreEmitDiagnostics().length, 0);
 
-    //     file.delete();
-    //     done();
-    // });
+            (async () => {
 
-    // it('should accept string column in orderBy', done => {
-    //     file = project.createSourceFile(
-    //         'test/test.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User } from './testEntities';
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                const result = await typedKnex
+                    .query(User)
+                    .orderBy(c=>c.id)
+                    .getMany();
 
+                console.log(result.length);
 
-    //         (async () => {
+            })();
+        `);
+        assert.equal(allDiagnostics.length, 0);
 
-    //             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-    //             const result = await typedKnex
-    //                 .query(User)
-    //                 .orderBy(c=>c.id)
-    //                 .getMany();
+        done();
+    });
 
-    //             console.log(result.length);
+    it('should accept Date column in orderBy', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
 
-    //         })();
-    //     `
-    //     );
 
-    //     assert.equal(project.getPreEmitDiagnostics().length, 0);
+            (async () => {
 
-    //     file.delete();
-    //     done();
-    // });
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                const result = await typedKnex
+                    .query(User)
+                    .orderBy(c=>c.birthDate)
+                    .getMany();
 
-    // it('should accept Date column in orderBy', done => {
-    //     file = project.createSourceFile(
-    //         'test/test.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User } from './testEntities';
+                console.log(result.length);
 
+            })();
+        `);
+        assert.equal(allDiagnostics.length, 0);
 
-    //         (async () => {
+        done();
+    });
 
-    //             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-    //             const result = await typedKnex
-    //                 .query(User)
-    //                 .orderBy(c=>c.birthDate)
-    //                 .getMany();
+    it('should accept nullable Date column in orderBy', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
 
-    //             console.log(result.length);
 
-    //         })();
-    //     `
-    //     );
+            (async () => {
 
-    //     assert.equal(project.getPreEmitDiagnostics().length, 0);
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                const result = await typedKnex
+                    .query(User)
+                    .orderBy(c=>c.deathDate)
+                    .getMany();
 
-    //     file.delete();
-    //     done();
-    // });
+                console.log(result.length);
 
-    // it('should accept nullable Date column in orderBy', done => {
-    //     file = project.createSourceFile(
-    //         'test/test.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User } from './testEntities';
+            })();
+        `);
+        assert.equal(allDiagnostics.length, 0);
 
+        done();
+    });
 
-    //         (async () => {
+    it('should not accept foreign key column in orderBy', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
 
-    //             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-    //             const result = await typedKnex
-    //                 .query(User)
-    //                 .orderBy(c=>c.deathDate)
-    //                 .getMany();
 
-    //             console.log(result.length);
+            (async () => {
 
-    //         })();
-    //     `
-    //     );
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+                const result = await typedKnex
+                    .query(User)
+                    .orderBy(c=>c.category)
+                    .getMany();
 
-    //     assert.equal(project.getPreEmitDiagnostics().length, 0);
+                console.log(result.length);
 
-    //     file.delete();
-    //     done();
-    // });
+            })();
+        `);
+        assert.notEqual(allDiagnostics.length, 0);
 
-    // it('should not accept foreign key column in orderBy', done => {
-    //     file = project.createSourceFile(
-    //         'test/test.ts',
-    //         `
-    //         import * as knex from 'knex';
-    //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User } from './testEntities';
-
-
-    //         (async () => {
-
-    //             const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-    //             const result = await typedKnex
-    //                 .query(User)
-    //                 .orderBy(c=>c.category)
-    //                 .getMany();
-
-    //             console.log(result.length);
-
-    //         })();
-    //     `
-    //     );
-
-    //     assert.notEqual(project.getPreEmitDiagnostics().length, 0);
-
-    //     file.delete();
-    //     done();
-    // });
+        done();
+    });
 });
