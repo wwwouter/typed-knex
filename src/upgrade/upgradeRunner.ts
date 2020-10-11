@@ -1,4 +1,5 @@
 import { ArrowFunction, CallExpression, Project, PropertyAccessExpression, SyntaxKind } from "ts-morph";
+import * as path from 'path';
 
 function changeFirstArgumentFromFunctionToString(callExpression: CallExpression) {
     const args = callExpression.getArguments();
@@ -18,10 +19,22 @@ function changeFirstArgumentFromFunctionToString(callExpression: CallExpression)
     }
 }
 
+function printProgress(progress: number) {
+    // process.stdout.clearLine();
+    process.stdout.cursorTo(0);
+    process.stdout.write((progress * 100).toFixed(0) + '%');
+}
+
+
 export function upgradeProjectStringParameters(project: Project) {
     const sourceFiles = project.getSourceFiles();
 
+    let fileCounter = 0;
+
     for (const sourceFile of sourceFiles) {
+
+        printProgress(fileCounter / sourceFiles.length);
+        // console.log('sourceFile: ', sourceFile.getFilePath());
         sourceFile.forEachDescendant(node => {
             if (node.getKind() === SyntaxKind.PropertyAccessExpression) {
                 const typeString = node.getType().getText();
@@ -33,18 +46,32 @@ export function upgradeProjectStringParameters(project: Project) {
                 }
             }
         });
+
+        fileCounter++;
     }
 }
 
-export async function runUpgrade() {
+export async function runUpgrade(actions: string[], configFilename?: string) {
+    let tsConfigFilePath;
+    if (!configFilename) {
+        tsConfigFilePath = 'tsconfig.json';
 
+    } else {
+        tsConfigFilePath = configFilename;
+    }
+
+    const tsConfigFileFullPath = path.resolve(tsConfigFilePath);
+
+    console.log(`Loading "${tsConfigFileFullPath}"`);
 
     const project = new Project({
-        tsConfigFilePath: `../ZXY-Cloud/tsconfig.backend.json`,
+        tsConfigFilePath: tsConfigFileFullPath,
     });
 
-    upgradeProjectStringParameters(project);
-
+    if (actions.includes('string-parameters')) {
+        console.log('Running "string-parameters"');
+        upgradeProjectStringParameters(project);
+    }
 
     await project.save();
 }

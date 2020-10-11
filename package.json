@@ -5,7 +5,8 @@
     "dependencies": {
         "flat": "5.0.0",
         "reflect-metadata": "0.1.13",
-        "ts-morph": "8.1.1"
+        "ts-morph": "8.1.1",
+        "yargs": "16.0.3"
     },
     "main": "./dist/src/index.js",
     "typings": "dist/src/index",
@@ -18,6 +19,9 @@
         "mocha:integration": "npm run build && mocha --bail \"build/test/integration/**/*Tests.js\"",
         "mocha:all": "npm run build && mocha \"build/test/**/*Tests.js\"",
         "upgrade-packages": "rm -f package-lock.json && ncu --removeRange -u -x @types/node"
+    },
+    "bin": {
+        "typed-knex": "./dist/src/cli.js"
     },
     "repository": {
         "type": "git",
@@ -41,13 +45,14 @@
         "@types/flat": "0.0.28",
         "@types/mocha": "5.2.7",
         "@types/sqlite3": "3.1.6",
+        "@types/yargs": "15.0.8",
         "@wwwouter/tslint-contrib": "1.0.0",
         "chai": "4.2.0",
         "chai-as-promised": "7.1.1",
         "knex": "0.20.7",
         "mocha": "7.0.0",
-        "sqlite3": "4.1.1",
         "npm-check-updates": "4.0.1",
+        "sqlite3": "4.1.1",
         "tslint": "5.20.1",
         "tslint-microsoft-contrib": "6.2.0",
         "typescript": "4.1.0-beta"
