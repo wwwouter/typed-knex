@@ -7,3 +7,4 @@ export {
 } from './typedKnex';
 export { validateEntities, validateTables } from './validateEntities';
 export { FlattenOption } from './unflatten';
+export { ICustomDatabaseType } from './ICustomDatabaseType';
