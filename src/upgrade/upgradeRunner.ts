@@ -54,9 +54,19 @@ export function upgradeProjectStringParameters(project: Project) {
             if (node.getKind() === SyntaxKind.PropertyAccessExpression) {
                 const typeString = node.getType().getText();
                 if (
+                    typeString.includes('IColumnParameterNoRowTransformation') ||
+                    typeString.includes('IJoinOnVal<') ||
+                    typeString.includes('IJoinOnNull<') ||
+                    typeString.includes('IOrderBy<') ||
+                    typeString.includes('IDbFunctionWithAlias<') ||
+                    typeString.includes('IKeyFunctionAsParametersReturnQueryBuider<') ||
+                    typeString.includes('ISelectableColumnKeyFunctionAsParametersReturnQueryBuider<') ||
+                    typeString.includes('IWhere<') ||
+                    typeString.includes('IWhereIn<') ||
+                    typeString.includes('IWhereBetween<') ||
+                    typeString.includes('IHaving<') ||
                     typeString.includes('ISelectWithFunctionColumns3<') ||
-                    typeString.includes('IWhereWithOperator<') ||
-                    typeString.includes('IColumnParameterNoRowTransformation')) {
+                    typeString.includes('IWhereWithOperator<')) {
                     const callExpression = node.getParentIfKind(SyntaxKind.CallExpression);
                     if (callExpression) {
                         changeFirstArgumentFromFunctionToString(callExpression);
