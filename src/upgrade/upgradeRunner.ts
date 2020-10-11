@@ -62,7 +62,7 @@ export function upgradeProjectStringParameters(project: Project) {
             if (node.getKind() === SyntaxKind.PropertyAccessExpression) {
                 const typeString = node.getType().getText();
                 if (
-                    typeString.includes('IJoinOn') ||
+                    typeString.includes('IJoinOn<') ||
                     typeString.includes('IWhereCompareTwoColumns') ||
                     typeString.includes('IFindByPrimaryKey') ||
                     typeString.includes('IInsertSelect') ||
@@ -90,6 +90,39 @@ export function upgradeProjectStringParameters(project: Project) {
         fileCounter++;
     }
 }
+export function upgradeProjectJoinOnColumnsToOn(project: Project) {
+    const sourceFiles = project.getSourceFiles();
+
+    let fileCounter = 0;
+
+    for (const sourceFile of sourceFiles) {
+
+        printProgress(fileCounter / sourceFiles.length);
+        sourceFile.forEachDescendant(node => {
+            if (node.getKind() === SyntaxKind.PropertyAccessExpression) {
+                const typeString = node.getType().getText();
+                if (typeString.includes('IJoinOnColumns<')) {
+                    const callExpression = node.getParentIfKind(SyntaxKind.CallExpression);
+                    if (callExpression) {
+                        callExpression.getFirstChild()!.getChildren()[2].replaceWithText('on');
+                        const args = callExpression.getArguments();
+
+                        if (args.length === 3) {
+                            const arg0Text = args[0].getText();
+                            const arg2Text = args[2].getText();
+                            callExpression.removeArgument(0);
+                            callExpression.insertArgument(0, arg2Text);
+                            callExpression.removeArgument(2);
+                            callExpression.insertArgument(2, arg0Text);
+                        }
+                    }
+                }
+            }
+        });
+
+        fileCounter++;
+    }
+}
 
 export async function runUpgrade(actions: string[], configFilename?: string) {
     let tsConfigFilePath;
@@ -108,9 +141,22 @@ export async function runUpgrade(actions: string[], configFilename?: string) {
         tsConfigFilePath: tsConfigFileFullPath,
     });
 
+    let remainingActions = [...actions];
+
     if (actions.includes('string-parameters')) {
         console.log('Running "string-parameters"');
         upgradeProjectStringParameters(project);
+        remainingActions = remainingActions.filter(action => action !== 'string-parameters');
+
+    }
+    if (actions.includes('join-on-columns-to-on')) {
+        console.log('Running "join-on-columns-to-on"');
+        upgradeProjectJoinOnColumnsToOn(project);
+        remainingActions = remainingActions.filter(action => action !== 'join-on-columns-to-on');
+    }
+
+    if (remainingActions.length > 0) {
+        console.log(`Unknown actions: ${remainingActions.join()}`)
     }
 
     await project.save();

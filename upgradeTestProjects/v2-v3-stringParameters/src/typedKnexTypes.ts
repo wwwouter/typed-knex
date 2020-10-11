@@ -121,7 +121,21 @@ interface ISelectWithFunctionColumns3<Model, SelectableModel, Row> {
 
 
 }
+
 interface IJoinOn<_Model, _JoinedModel> {
+
+    <PropertyType1, PropertyType2>(
+        selectColumn1Function: (
+            c: any
+        ) => () => PropertyType1,
+        operator: string,
+        selectColumn2Function: (
+            c: any
+        ) => () => PropertyType2
+    ): any;
+}
+
+interface IJoinOnColumns<_Model, _JoinedModel> {
 
     <PropertyType1, PropertyType2>(
         selectColumn1Function: (
@@ -136,11 +150,13 @@ interface IJoinOn<_Model, _JoinedModel> {
 
 }
 
-
 export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     where: IWhereWithOperator<Model, SelectableModel, Row>;
 
     select: ISelectWithFunctionColumns3<Model, SelectableModel, Row>;
 
     joinOn: IJoinOn<Model, SelectableModel>;
+
+    onColumns: IJoinOnColumns<Model, SelectableModel>;
+
 }
