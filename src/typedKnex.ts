@@ -6,17 +6,14 @@ import {
     getPrimaryKeyColumn,
     getTableMetadata
 } from './decorators';
+import { mapObjectToTableObject } from './mapObjectToTableObject';
+import { NestedForeignKeyKeysOf, NestedKeysOf } from './NestedKeysOf';
 import { NonForeignKeyObjects } from './NonForeignKeyObjects';
 import { NonNullableRecursive } from './NonNullableRecursive';
+import { GetNestedProperty, GetNestedPropertyType } from './PropertyTypes';
+import { SelectableColumnTypes } from './SelectableColumnTypes';
 import { TransformPropertiesToFunction } from './TransformPropertiesToFunction';
 import { FlattenOption, setToNull, unflatten } from './unflatten';
-import { mapObjectToTableObject } from './mapObjectToTableObject';
-import { SelectableColumnTypes } from './SelectableColumnTypes';
-import { NestedForeignKeyKeysOf, NestedKeysOf } from './NestedKeysOf';
-import { GetNestedProperty, GetNestedPropertyType } from './PropertyTypes';
-
-
-
 
 export class TypedKnex {
     constructor(private knex: Knex) { }
@@ -244,7 +241,7 @@ interface IColumnParameterNoRowTransformation<Model, SelectableModel, Row> {
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
     <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
-        key: ConcatKey,
+        key: ConcatKey
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
@@ -278,7 +275,7 @@ interface IJoinOn<Model, JoinedModel> {
         ConcatKey2 extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
         key1: ConcatKey1,
         operator: Operator,
-        key2: ConcatKey2,
+        key2: ConcatKey2
 
     ): IJoinOnClause2<Model, JoinedModel>;
 }
@@ -309,7 +306,7 @@ interface IJoinOnNull<Model, JoinedModel> {
     ): IJoinOnClause2<Model, JoinedModel>;
 
     <ConcatKey extends NestedKeysOf<NonNullableRecursive<JoinedModel>, keyof NonNullableRecursive<JoinedModel>, ''>>(
-        key: ConcatKey,
+        key: ConcatKey
     ): IJoinOnClause2<Model, JoinedModel>;
 }
 
@@ -689,6 +686,7 @@ interface IFindByPrimaryKey<_Model, SelectableModel, Row> {
         Promise<Row & UnionToIntersection<GetNestedProperty<SelectableModel, ConcatKey>> | undefined>;
 }
 
+
 interface IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row> {
     (
         selectColumnFunction: (
@@ -705,7 +703,7 @@ interface IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>
 
 
     <ConcatKey extends NestedForeignKeyKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
-        key: ConcatKey,
+        key: ConcatKey
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
@@ -725,7 +723,7 @@ interface ISelectableColumnKeyFunctionAsParametersReturnQueryBuider<Model, Selec
 
 
     <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
-        key: ConcatKey,
+        key: ConcatKey
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
@@ -834,7 +832,7 @@ interface IWhereCompareTwoColumns<Model, SelectableModel, Row> {
     <_PropertyType1, _PropertyType2, Model2>(
         key1: NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>,
         operator: Operator,
-        key2: NestedKeysOf<NonNullableRecursive<Model2>, keyof NonNullableRecursive<Model2>, ''>,
+        key2: NestedKeysOf<NonNullableRecursive<Model2>, keyof NonNullableRecursive<Model2>, ''>
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
 

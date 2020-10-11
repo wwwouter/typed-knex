@@ -543,6 +543,32 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
+    it('should findByPrimaryKey accept unknown objects in select', done => {
+        const allDiagnostics = getDiagnostics(`
+            import * as knex from 'knex';
+            import { TypedKnex } from '../src/typedKnex';
+            import { User } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+
+                const item = await typedKnex
+                .query(User)
+                .findByPrimaryKey("id", 'extraData');
+
+                if (item !== undefined) {
+                    console.log(item.extraData);
+                }
+
+            })();
+        `);
+        assert.equal(allDiagnostics.length, 0);
+
+        done();
+    });
+
 
     it('should findByPrimaryKey accept nullable Date objects in select', done => {
         const allDiagnostics = getDiagnostics(`

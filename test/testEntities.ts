@@ -1,4 +1,5 @@
 import { Column, Table } from '../src/decorators';
+import { ICustomDatabaseType } from '../src/ICustomDatabaseType';
 
 @Table('regions')
 export class Region {
@@ -24,6 +25,11 @@ export class UserCategory {
     public phoneNumber?: string;
     @Column({ name: 'backupRegionId' })
     public backupRegion?: Region;
+}
+
+// tslint:disable-next-line: no-empty-interfaces
+class IExtraData extends ICustomDatabaseType {
+
 }
 
 @Table('users')
@@ -62,6 +68,8 @@ export class User {
     public someOptionalValue?: string;
     @Column()
     public someNullableValue: string | null;
+    @Column()
+    public extraData!: IExtraData;
 }
 
 @Table('userSettings')
