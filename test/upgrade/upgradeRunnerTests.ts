@@ -17,6 +17,7 @@ describe('upgradeProjectStringParameters', function() {
 
             const a = {} as ITypedQueryBuilder<{}, {}, {}>;
             a.where(i => i.name, 'this name1');
+            a.where(i => i.other.id, 'id1');
         `;
 
 
@@ -30,6 +31,7 @@ describe('upgradeProjectStringParameters', function() {
 
             const a = {} as ITypedQueryBuilder<{}, {}, {}>;
             a.where('name', 'this name1');
+            a.where('other.id', 'id1');
         `)
 
 

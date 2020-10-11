@@ -1,5 +1,5 @@
-import { ArrowFunction, CallExpression, Project, PropertyAccessExpression, SyntaxKind } from "ts-morph";
 import * as path from 'path';
+import { ArrowFunction, CallExpression, Project, PropertyAccessExpression, SyntaxKind } from "ts-morph";
 
 function changeFirstArgumentFromFunctionToString(callExpression: CallExpression) {
     const args = callExpression.getArguments();
@@ -10,7 +10,10 @@ function changeFirstArgumentFromFunctionToString(callExpression: CallExpression)
 
             if (firstArgument.getBody().getKind() === SyntaxKind.PropertyAccessExpression) {
                 const body = firstArgument.getBody() as PropertyAccessExpression;
-                const name = body.getName();
+
+                const indexOfFirstPeriod = body.getText().indexOf('.');
+
+                const name = body.getText().substring(indexOfFirstPeriod + 1);
 
                 callExpression.removeArgument(0);
                 callExpression.insertArgument(0, `'${name}'`);
@@ -20,7 +23,6 @@ function changeFirstArgumentFromFunctionToString(callExpression: CallExpression)
 }
 
 function printProgress(progress: number) {
-    // process.stdout.clearLine();
     process.stdout.cursorTo(0);
     process.stdout.write((progress * 100).toFixed(0) + '%');
 }
@@ -34,7 +36,6 @@ export function upgradeProjectStringParameters(project: Project) {
     for (const sourceFile of sourceFiles) {
 
         printProgress(fileCounter / sourceFiles.length);
-        // console.log('sourceFile: ', sourceFile.getFilePath());
         sourceFile.forEachDescendant(node => {
             if (node.getKind() === SyntaxKind.PropertyAccessExpression) {
                 const typeString = node.getType().getText();
