@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import { Project } from 'ts-morph';
 import { upgradeProjectStringParameters } from '../../src/upgrade/upgradeRunner';
 
-describe('upgradeProjectStringParameters', function() {
+describe.only('upgradeProjectStringParameters', function() {
     this.timeout(1000000);
     it('should upgrade where', async () => {
 

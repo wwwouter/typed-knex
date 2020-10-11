@@ -5,19 +5,31 @@ function changeFirstArgumentFromFunctionToString(callExpression: CallExpression)
     const args = callExpression.getArguments();
 
     if (args.length > 0) {
-        if (args[0].getKind() === SyntaxKind.ArrowFunction) {
-            const firstArgument = args[0] as ArrowFunction;
 
-            if (firstArgument.getBody().getKind() === SyntaxKind.PropertyAccessExpression) {
-                const body = firstArgument.getBody() as PropertyAccessExpression;
+        // let argumentToReplace: ArrowFunction | undefined;
+        let argumentToReplaceIndex: number | undefined;
+        if (args[0].getKind() === SyntaxKind.ArrowFunction) {
+            // argumentToReplace = args[0] as ArrowFunction;
+            argumentToReplaceIndex = 0;
+        } else if (args[1]?.getKind() === SyntaxKind.ArrowFunction) {
+            // argumentToReplace = args[1] as ArrowFunction;
+            argumentToReplaceIndex = 1;
+        }
+
+        if (argumentToReplaceIndex !== undefined) {
+            const argumentToReplace = args[argumentToReplaceIndex] as ArrowFunction;
+            // const firstArgument = args[0] as ArrowFunction;
+
+            if (argumentToReplace.getBody().getKind() === SyntaxKind.PropertyAccessExpression) {
+                const body = argumentToReplace.getBody() as PropertyAccessExpression;
                 const indexOfFirstPeriod = body.getText().indexOf('.');
 
                 const name = body.getText().substring(indexOfFirstPeriod + 1);
 
                 callExpression.removeArgument(0);
                 callExpression.insertArgument(0, `'${name}'`);
-            } else if (firstArgument.getBody().getKind() === SyntaxKind.ArrayLiteralExpression) {
-                const body = firstArgument.getBody() as ArrayLiteralExpression;
+            } else if (argumentToReplace.getBody().getKind() === SyntaxKind.ArrayLiteralExpression) {
+                const body = argumentToReplace.getBody() as ArrayLiteralExpression;
                 const parameters: string[] = [];
 
                 const propertyAccessExpressions = body.getChildren()[1].getChildrenOfKind(SyntaxKind.PropertyAccessExpression);
@@ -54,6 +66,8 @@ export function upgradeProjectStringParameters(project: Project) {
             if (node.getKind() === SyntaxKind.PropertyAccessExpression) {
                 const typeString = node.getType().getText();
                 if (
+                    typeString.includes('IFindByPrimaryKey') ||
+                    typeString.includes('IInsertSelect') ||
                     typeString.includes('IColumnParameterNoRowTransformation') ||
                     typeString.includes('IJoinOnVal<') ||
                     typeString.includes('IJoinOnNull<') ||
