@@ -39,7 +39,10 @@ export function upgradeProjectStringParameters(project: Project) {
         sourceFile.forEachDescendant(node => {
             if (node.getKind() === SyntaxKind.PropertyAccessExpression) {
                 const typeString = node.getType().getText();
-                if (typeString.includes('IWhereWithOperator<') || typeString.includes('IColumnParameterNoRowTransformation')) {
+                if (
+                    typeString.includes('ISelectWithFunctionColumns3<') ||
+                    typeString.includes('IWhereWithOperator<') ||
+                    typeString.includes('IColumnParameterNoRowTransformation')) {
                     const callExpression = node.getParentIfKind(SyntaxKind.CallExpression);
                     if (callExpression) {
                         changeFirstArgumentFromFunctionToString(callExpression);
