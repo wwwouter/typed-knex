@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { ArrowFunction, CallExpression, Project, PropertyAccessExpression, SyntaxKind } from "ts-morph";
+import { ArrayLiteralExpression, ArrowFunction, CallExpression, Project, PropertyAccessExpression, SyntaxKind } from "ts-morph";
 
 function changeFirstArgumentFromFunctionToString(callExpression: CallExpression) {
     const args = callExpression.getArguments();
@@ -10,13 +10,27 @@ function changeFirstArgumentFromFunctionToString(callExpression: CallExpression)
 
             if (firstArgument.getBody().getKind() === SyntaxKind.PropertyAccessExpression) {
                 const body = firstArgument.getBody() as PropertyAccessExpression;
-
                 const indexOfFirstPeriod = body.getText().indexOf('.');
 
                 const name = body.getText().substring(indexOfFirstPeriod + 1);
 
                 callExpression.removeArgument(0);
                 callExpression.insertArgument(0, `'${name}'`);
+            } else if (firstArgument.getBody().getKind() === SyntaxKind.ArrayLiteralExpression) {
+                const body = firstArgument.getBody() as ArrayLiteralExpression;
+                const parameters: string[] = [];
+
+                const propertyAccessExpressions = body.getChildren()[1].getChildrenOfKind(SyntaxKind.PropertyAccessExpression);
+                for (const propertyAccessExpression of propertyAccessExpressions) {
+                    const indexOfFirstPeriod = propertyAccessExpression.getText().indexOf('.');
+
+                    const name = propertyAccessExpression.getText().substring(indexOfFirstPeriod + 1);
+
+                    parameters.push(`'${name}'`);
+                }
+
+                callExpression.removeArgument(0);
+                callExpression.insertArgument(0, parameters.join());
             }
         }
     }

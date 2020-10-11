@@ -37,7 +37,7 @@ describe('upgradeProjectStringParameters', function() {
 
     });
 
-    it.only('should upgrade select single column', async () => {
+    it('should upgrade select single column', async () => {
 
 
         const project = new Project({
@@ -94,8 +94,7 @@ describe('upgradeProjectStringParameters', function() {
         assert.equal(sourceFile.getText(), `import { ITypedQueryBuilder } from './typedKnexTypes';
 
             const a = {} as ITypedQueryBuilder<{}, {}, {}>;
-            a.select('name', 'other.id');
-
+            a.select('name','other.id');
         `)
 
 
