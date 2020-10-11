@@ -118,6 +118,22 @@ interface ISelectWithFunctionColumns3<Model, SelectableModel, Row> {
         R28 &
         R29
     >;
+
+
+}
+interface IJoinOn<_Model, _JoinedModel> {
+
+    <PropertyType1, PropertyType2>(
+        selectColumn1Function: (
+            c: any
+        ) => () => PropertyType1,
+        operator: string,
+        selectColumn2Function: (
+            c: any
+        ) => () => PropertyType2
+    ): any;
+
+
 }
 
 
@@ -125,13 +141,6 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     where: IWhereWithOperator<Model, SelectableModel, Row>;
 
     select: ISelectWithFunctionColumns3<Model, SelectableModel, Row>;
+
+    joinOn: IJoinOn<Model, SelectableModel>;
 }
-
-
-// const a = {} as ITypedQueryBuilder<{}, {}, {}>;
-// a.select(i => i.name);
-
-
-// // const a = {} as ITypedQueryBuilder<{}, {}, {}>;
-// a.select(i => [i.name, i.asdfsaf.asdf]);
-

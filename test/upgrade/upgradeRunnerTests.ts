@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import { Project } from 'ts-morph';
 import { upgradeProjectStringParameters } from '../../src/upgrade/upgradeRunner';
 
-describe.only('upgradeProjectStringParameters', function() {
+describe('upgradeProjectStringParameters', function() {
     this.timeout(1000000);
     it('should upgrade where', async () => {
 
@@ -95,6 +95,37 @@ describe.only('upgradeProjectStringParameters', function() {
 
             const a = {} as ITypedQueryBuilder<{}, {}, {}>;
             a.select('name','other.id');
+        `)
+
+
+    });
+
+    it('should upgrade both column parameters', async () => {
+
+
+        const project = new Project({
+            tsConfigFilePath: './upgradeTestProjects/v2-v3-stringParameters/tsconfig.json',
+        });
+
+
+        const code = `
+            import { ITypedQueryBuilder } from './typedKnexTypes';
+
+            const a = {} as ITypedQueryBuilder<{}, {}, {}>;
+            a.joinOn(i => i.name, 'op', i => i.other.id);
+        `;
+
+
+        const sourceFile = project.createSourceFile('./upgradeTestProjects/v2-v3-stringParameters/src/test.ts', code);
+
+        assert.equal(project.getPreEmitDiagnostics().length, 0);
+
+        upgradeProjectStringParameters(project);
+
+        assert.equal(sourceFile.getText(), `import { ITypedQueryBuilder } from './typedKnexTypes';
+
+            const a = {} as ITypedQueryBuilder<{}, {}, {}>;
+            a.joinOn('name', 'op', 'other.id');
         `)
 
 

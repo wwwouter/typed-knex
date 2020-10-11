@@ -4,47 +4,43 @@ import { ArrayLiteralExpression, ArrowFunction, CallExpression, Project, Propert
 function changeFirstArgumentFromFunctionToString(callExpression: CallExpression) {
     const args = callExpression.getArguments();
 
-    if (args.length > 0) {
+    if (args[0]?.getKind() === SyntaxKind.ArrowFunction) {
+        changeArgumentFromFunctionToString(args[0] as ArrowFunction, callExpression, 0);
+    }
 
-        // let argumentToReplace: ArrowFunction | undefined;
-        let argumentToReplaceIndex: number | undefined;
-        if (args[0].getKind() === SyntaxKind.ArrowFunction) {
-            // argumentToReplace = args[0] as ArrowFunction;
-            argumentToReplaceIndex = 0;
-        } else if (args[1]?.getKind() === SyntaxKind.ArrowFunction) {
-            // argumentToReplace = args[1] as ArrowFunction;
-            argumentToReplaceIndex = 1;
+    if (args[1]?.getKind() === SyntaxKind.ArrowFunction) {
+        changeArgumentFromFunctionToString(args[1] as ArrowFunction, callExpression, 1);
+    }
+
+    if (args[2]?.getKind() === SyntaxKind.ArrowFunction) {
+        changeArgumentFromFunctionToString(args[2] as ArrowFunction, callExpression, 2);
+    }
+}
+
+function changeArgumentFromFunctionToString(argumentToReplace: ArrowFunction, callExpression: CallExpression, argumentIndex: number) {
+    if (argumentToReplace.getBody().getKind() === SyntaxKind.PropertyAccessExpression) {
+        const body = argumentToReplace.getBody() as PropertyAccessExpression;
+        const indexOfFirstPeriod = body.getText().indexOf('.');
+
+        const name = body.getText().substring(indexOfFirstPeriod + 1);
+
+        callExpression.removeArgument(argumentIndex);
+        callExpression.insertArgument(argumentIndex, `'${name}'`);
+    } else if (argumentToReplace.getBody().getKind() === SyntaxKind.ArrayLiteralExpression) {
+        const body = argumentToReplace.getBody() as ArrayLiteralExpression;
+        const parameters: string[] = [];
+
+        const propertyAccessExpressions = body.getChildren()[1].getChildrenOfKind(SyntaxKind.PropertyAccessExpression);
+        for (const propertyAccessExpression of propertyAccessExpressions) {
+            const indexOfFirstPeriod = propertyAccessExpression.getText().indexOf('.');
+
+            const name = propertyAccessExpression.getText().substring(indexOfFirstPeriod + 1);
+
+            parameters.push(`'${name}'`);
         }
 
-        if (argumentToReplaceIndex !== undefined) {
-            const argumentToReplace = args[argumentToReplaceIndex] as ArrowFunction;
-            // const firstArgument = args[0] as ArrowFunction;
-
-            if (argumentToReplace.getBody().getKind() === SyntaxKind.PropertyAccessExpression) {
-                const body = argumentToReplace.getBody() as PropertyAccessExpression;
-                const indexOfFirstPeriod = body.getText().indexOf('.');
-
-                const name = body.getText().substring(indexOfFirstPeriod + 1);
-
-                callExpression.removeArgument(0);
-                callExpression.insertArgument(0, `'${name}'`);
-            } else if (argumentToReplace.getBody().getKind() === SyntaxKind.ArrayLiteralExpression) {
-                const body = argumentToReplace.getBody() as ArrayLiteralExpression;
-                const parameters: string[] = [];
-
-                const propertyAccessExpressions = body.getChildren()[1].getChildrenOfKind(SyntaxKind.PropertyAccessExpression);
-                for (const propertyAccessExpression of propertyAccessExpressions) {
-                    const indexOfFirstPeriod = propertyAccessExpression.getText().indexOf('.');
-
-                    const name = propertyAccessExpression.getText().substring(indexOfFirstPeriod + 1);
-
-                    parameters.push(`'${name}'`);
-                }
-
-                callExpression.removeArgument(0);
-                callExpression.insertArgument(0, parameters.join());
-            }
-        }
+        callExpression.removeArgument(argumentIndex);
+        callExpression.insertArgument(argumentIndex, parameters.join());
     }
 }
 
@@ -66,6 +62,8 @@ export function upgradeProjectStringParameters(project: Project) {
             if (node.getKind() === SyntaxKind.PropertyAccessExpression) {
                 const typeString = node.getType().getText();
                 if (
+                    typeString.includes('IJoinOn') ||
+                    typeString.includes('IWhereCompareTwoColumns') ||
                     typeString.includes('IFindByPrimaryKey') ||
                     typeString.includes('IInsertSelect') ||
                     typeString.includes('IColumnParameterNoRowTransformation') ||
