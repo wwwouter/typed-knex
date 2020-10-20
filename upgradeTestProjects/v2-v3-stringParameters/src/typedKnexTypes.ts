@@ -163,6 +163,17 @@ interface IWhereCompareTwoColumns<_Model, _SelectableModel, _Row> {
 
 }
 
+interface IWhereExists<Model, SelectableModel, Row> {
+    <SubQueryModel>(
+        subQueryModel: new () => SubQueryModel,
+        code: (
+            subQuery: ITypedQueryBuilder<SubQueryModel, SubQueryModel, {}>,
+            parent: any
+        ) => void
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+}
+
+
 export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     where: IWhereWithOperator<Model, SelectableModel, Row>;
 
@@ -174,5 +185,7 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
 
 
     whereColumn: IWhereCompareTwoColumns<Model, SelectableModel, Row>;
+
+    whereExists: IWhereExists<Model, SelectableModel, Row>;
 
 }

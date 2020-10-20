@@ -164,4 +164,31 @@ describe('upgradeProjectStringParameters', function() {
 
 
     });
+
+    it('should upgrade whereExists', async () => {
+        const project = new Project({
+            tsConfigFilePath: './upgradeTestProjects/v2-v3-stringParameters/tsconfig.json',
+        });
+
+        const code = `
+            import { ITypedQueryBuilder } from './typedKnexTypes';
+
+            class TableClass {}
+            const a = {} as ITypedQueryBuilder<{}, {}, {}>;
+            a.whereExists(TableClass, (subQuery, _parent) => subQuery.select(i => i.id));
+        `;
+
+        const sourceFile = project.createSourceFile('./upgradeTestProjects/v2-v3-stringParameters/src/test.ts', code);
+
+        assert.equal(project.getPreEmitDiagnostics().length, 0);
+
+        upgradeProjectStringParameters(project);
+
+        assert.equal(sourceFile.getText(), `import { ITypedQueryBuilder } from './typedKnexTypes';
+
+            class TableClass {}
+            const a = {} as ITypedQueryBuilder<{}, {}, {}>;
+            a.whereExists(TableClass, (subQuery) => subQuery.select('id'));
+        `)
+    });
 });

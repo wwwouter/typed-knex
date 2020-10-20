@@ -58,6 +58,15 @@ function changeIWhereCompareTwoColumns(callExpression: CallExpression) {
     changeArgumentFromObjectToString(args[2] as PropertyAccessExpression, callExpression, 2)
 }
 
+
+function changeIWhereExists(callExpression: CallExpression) {
+    const args = callExpression.getArguments();
+    const subqueryFunction = args[1] as ArrowFunction;
+    const parameters = subqueryFunction.getParameters();
+    parameters[1].remove();
+}
+
+
 function printProgress(progress: number) {
     process.stdout.cursorTo(0);
     process.stdout.write((progress * 100).toFixed(0) + '%');
@@ -100,6 +109,11 @@ export function upgradeProjectStringParameters(project: Project) {
                     const callExpression = node.getParentIfKind(SyntaxKind.CallExpression);
                     if (callExpression) {
                         changeIWhereCompareTwoColumns(callExpression);
+                    }
+                } else if (typeString.startsWith('IWhereExists<')) {
+                    const callExpression = node.getParentIfKind(SyntaxKind.CallExpression);
+                    if (callExpression) {
+                        changeIWhereExists(callExpression);
                     }
                 }
             }
