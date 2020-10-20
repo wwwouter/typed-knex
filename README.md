@@ -37,8 +37,8 @@ _Tested with Knex.js v0.21.6, TypeScript v4.1.0 and Node.js v14.11.0_
 
 # Breaking changes in next major release
 
--   `.onColumn()`: use `.on()`. Remember that the columns switched eg `.onColumns(i=>i.prop1, '=' j=>j.prop2) should become .on("prop2", '=', "prop1")`.
--   The use of optional columns (`@Column() public nickName?: string;`). This was used to signal a nullable column. The correct way to do this is `@Column() public nickName: string | null;`.
+-   `.onColumn()` will be deprecated. Use `.on()`. Remember that the columns switched eg `.onColumns(i=>i.prop1, '=' j=>j.prop2) should become .on("prop2", '=', "prop1")`.
+-   The use of optional columns (`@Column() public nickName?: string;`) will be deprecated. This was used to signal a nullable column. The correct way to do this is `@Column() public nickName: string | null;`.
 
 # Documentation
 
