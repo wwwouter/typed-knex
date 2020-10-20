@@ -37,14 +37,14 @@ _Tested with Knex.js v0.21.6, TypeScript v4.1.0 and Node.js v14.11.0_
 
 # Breaking changes in next major release
 
--   `.onColumn()`: use `.on()`. Remember that the columns switched eg `.onColumns(i=>i.prop, '=' j=>j.prop) should become .on(j=>j.prop, '=', i=>i.prop)`.
+-   `.onColumn()`: use `.on()`. Remember that the columns switched eg `.onColumns(i=>i.prop1, '=' j=>j.prop2) should become .on("prop2", '=', "prop1")`.
 -   The use of optional columns (`@Column() public nickName?: string;`). This was used to signal a nullable column. The correct way to do this is `@Column() public nickName: string | null;`.
 
 # Documentation
 
 ## Quick example
 
-To reference a column, use an arrow function. Like this `.select(i=>i.name)` or this `.where(i=>i.name, "Hejlsberg")`
+To reference a column, use the name. Like this `.select('name')` or this `.where('name', "Hejlsberg")`
 
 ```ts
 import * as Knex from "knex";
@@ -60,9 +60,9 @@ async function example() {
 
     const query = typedKnex
         .query(User)
-        .innerJoin((i) => i.category)
-        .where((i) => i.name, "Hejlsberg")
-        .select((i) => [i.id, i.category.name]);
+        .innerJoin("category")
+        .where("name", "Hejlsberg")
+        .select("id", "category.name");
 
     const oneUser = await query.getSingle();
 
@@ -243,13 +243,13 @@ Hook that is run before doing an insert. Execute this function as soon as possib
 
 ```
 registerBeforeInsertTransform((item: any, typedQueryBuilder: ITypedQueryBuilder<{}, {}, {}>) => {
-    if (typedQueryBuilder.columns.find(i => i.name === 'created_at') && !item.hasOwnProperty('created_at')) {
+    if (typedQueryBuilder.columns.find("name" === 'created_at') && !item.hasOwnProperty('created_at')) {
         item.created_at = new Date();
     }
-    if (typedQueryBuilder.columns.find(i => i.name === 'updated_at') && !item.hasOwnProperty('updated_at')) {
+    if (typedQueryBuilder.columns.find("name" === 'updated_at') && !item.hasOwnProperty('updated_at')) {
         item.updated_at = new Date();
     }
-    if (typedQueryBuilder.columns.find(i => i.name === 'id') && !item.hasOwnProperty('id')) {
+    if (typedQueryBuilder.columns.find("name" === 'id') && !item.hasOwnProperty('id')) {
         item.id = guid();
     }
     return item;
@@ -262,7 +262,7 @@ Hook that is run before doing an update. Execute this function as soon as possib
 
 ```
 registerBeforeUpdateTransform((item: any, typedQueryBuilder: ITypedQueryBuilder<{}, {}, {}>) => {
-    if (typedQueryBuilder.columns.find(i => i.name === 'updated_at') && !item.hasOwnProperty('updated_at')) {
+    if (typedQueryBuilder.columns.find("name" === 'updated_at') && !item.hasOwnProperty('updated_at')) {
         item.updated_at = new Date();
     }
     return item;
@@ -282,11 +282,11 @@ const query = typedKnex.query(User);
 https://knexjs.org/#Builder-select
 
 ```ts
-typedKnex.query(User).select((i) => i.id);
+typedKnex.query(User).select("id");
 ```
 
 ```ts
-typedKnex.query(User).select((i) => [i.id, i.name]);
+typedKnex.query(User).select("id","name");
 ```
 
 ### where
@@ -294,13 +294,13 @@ typedKnex.query(User).select((i) => [i.id, i.name]);
 https://knexjs.org/#Builder-where
 
 ```ts
-typedKnex.query(User).where((i) => i.name, "name");
+typedKnex.query(User).where("name", "name");
 ```
 
 Or with operator
 
 ```ts
-typedKnex.query(User).where((c) => c.name, "like", "%user%");
+typedKnex.query(User).where("name", "like", "%user%");
 
 // select * from "users" where "users"."name" like '%user%'
 ```
@@ -310,15 +310,15 @@ typedKnex.query(User).where((c) => c.name, "like", "%user%");
 ```ts
 typedKnex
     .query(User)
-    .where((i) => i.name, "name")
-    .andWhere((i) => i.name, "name");
+    .where("name", "name")
+    .andWhere("name", "name");
 ```
 
 ```ts
 typedKnex
     .query(User)
-    .where((i) => i.name, "name")
-    .andWhere((i) => i.name, "like", "%na%");
+    .where("name", "name")
+    .andWhere("name", "like", "%na%");
 ```
 
 ### orWhere
@@ -326,15 +326,15 @@ typedKnex
 ```ts
 typedKnex
     .query(User)
-    .where((i) => i.name, "name")
-    .orWhere((i) => i.name, "name");
+    .where("name", "name")
+    .orWhere("name", "name");
 ```
 
 ```ts
 typedKnex
     .query(User)
-    .where((i) => i.name, "name")
-    .orWhere((i) => i.name, "like", "%na%");
+    .where("name", "name")
+    .orWhere("name", "like", "%na%");
 ```
 
 ### whereNot
@@ -342,7 +342,7 @@ typedKnex
 https://knexjs.org/#Builder-whereNot
 
 ```ts
-typedKnex.query(User).whereNot((i) => i.name, "name");
+typedKnex.query(User).whereNot("name", "name");
 ```
 
 ### whereColumn
@@ -350,15 +350,15 @@ typedKnex.query(User).whereNot((i) => i.name, "name");
 To use in subqueries
 
 ```ts
-typedKnex.query(User).whereNotExists(UserSetting, (subQuery, parentColumn) => {
-    subQuery.whereColumn((i) => i.userId, "=", parentColumn.id);
+typedKnex.query(User).whereNotExists(UserSetting, (subQuery) => {
+    subQuery.whereColumn("userId", "=", "id");
 });
 ```
 
 ### whereNull
 
 ```ts
-typedKnex.query(User).whereNull((i) => i.name);
+typedKnex.query(User).whereNull("name");
 ```
 
 ### orWhereNull
@@ -366,14 +366,14 @@ typedKnex.query(User).whereNull((i) => i.name);
 ```ts
 typedKnex
     .query(User)
-    .whereNull((i) => i.name)
-    .orWhereNull((i) => i.name);
+    .whereNull("name")
+    .orWhereNull("name");
 ```
 
 ### whereNotNull
 
 ```ts
-typedKnex.query(User).whereNotNull((i) => i.name);
+typedKnex.query(User).whereNotNull("name");
 ```
 
 ### orWhereNotNull
@@ -381,14 +381,14 @@ typedKnex.query(User).whereNotNull((i) => i.name);
 ```ts
 typedKnex
     .query(User)
-    .whereNotNull((i) => i.name)
-    .orWhereNotNull((i) => i.name);
+    .whereNotNull("name")
+    .orWhereNotNull("name");
 ```
 
 ### orderBy
 
 ```ts
-typedKnex.query(User).orderBy((i) => i.id);
+typedKnex.query(User).orderBy("id");
 ```
 
 ### orderByRaw
@@ -402,7 +402,7 @@ await typedKnex.query(User).orderByRaw("SUM(??) DESC", "users.year");
 ### innerJoinColumn
 
 ```ts
-typedKnex.query(User).innerJoinColumn((i) => i.category);
+typedKnex.query(User).innerJoinColumn("category");
 ```
 
 ### innerJoinTableOnFunction
@@ -410,31 +410,31 @@ typedKnex.query(User).innerJoinColumn((i) => i.category);
 ```ts
 typedKnex.query(User).innerJoinTableOnFunction("evilTwin", User, (join) => {
     join.on(
-        (j) => j.id,
+        "id",
         "=",
-        (i) => i.id
+        "id"
     )
         .andOn(
-            (j) => j.name,
+            "name",
             "=",
-            (i) => i.id
+            "id"
         )
         .orOn(
-            (j) => j.someValue,
+            "someValue",
             "=",
-            (i) => i.id
+            "id"
         )
-        .onVal((j) => j.name, "=", "1")
-        .andOnVal((j) => j.name, "=", "2")
-        .orOnVal((j) => j.name, "=", "3")
-        .onNull((j) => j.name);
+        .onVal("name", "=", "1")
+        .andOnVal("name", "=", "2")
+        .orOnVal("name", "=", "3")
+        .onNull("name");
 });
 ```
 
 ### leftOuterJoinColumn
 
 ```ts
-typedKnex.query(User).leftOuterJoinColumn((i) => i.category);
+typedKnex.query(User).leftOuterJoinColumn("category");
 ```
 
 ### leftOuterJoinTableOnFunction
@@ -442,24 +442,24 @@ typedKnex.query(User).leftOuterJoinColumn((i) => i.category);
 ```ts
 typedKnex.query(User).leftOuterJoinTableOnFunction("evilTwin", User, (join) => {
     join.on(
-        (j) => j.id,
+        "id",
         "=",
-        (i) => i.id
+        "id"
     )
         .andOn(
-            (j) => j.name,
+            "name",
             "=",
-            (i) => i.id
+            "id"
         )
         .orOn(
-            (j) => j.someValue,
+            "someValue",
             "=",
-            (i) => i.id
+            "id"
         )
-        .onVal((j) => j.name, "=", "1")
-        .andOnVal((j) => j.name, "=", "2")
-        .orOnVal((j) => j.name, "=", "3")
-        .onNull((j) => j.name);
+        .onVal("name", "=", "1")
+        .andOnVal("name", "=", "2")
+        .orOnVal("name", "=", "3")
+        .onNull("name");
 });
 ```
 
@@ -474,9 +474,9 @@ typedKnex.query(User).selectRaw("otherId", Number, "select other.id from other")
 ```ts
 typedKnex
     .query(UserCategory)
-    .select((i) => i.id)
-    .selectQuery("total", Number, User, (subQuery, parentColumn) => {
-        subQuery.count((i) => i.id, "total").whereColumn((c) => c.categoryId, "=", parentColumn.id);
+    .select("id")
+    .selectQuery("total", Number, User, (subQuery) => {
+        subQuery.count("id", "total").whereColumn("categoryId", "=", "id");
     });
 ```
 
@@ -487,19 +487,19 @@ select "userCategories"."id" as "id", (select count("users"."id") as "total" fro
 ### findByPrimaryKey
 
 ```ts
-const user = await typedKnex.query(User).findByPrimaryKey("id", (i) => [i.id, i.name]);
+const user = await typedKnex.query(User).findByPrimaryKey("id", "d","name");
 ```
 
 ### whereIn
 
 ```ts
-typedKnex.query(User).whereIn((i) => i.name, ["user1", "user2"]);
+typedKnex.query(User).whereIn("name", ["user1", "user2"]);
 ```
 
 ### whereNotIn
 
 ```ts
-typedKnex.query(User).whereNotIn((i) => i.name, ["user1", "user2"]);
+typedKnex.query(User).whereNotIn("name", ["user1", "user2"]);
 ```
 
 ### orWhereIn
@@ -507,8 +507,8 @@ typedKnex.query(User).whereNotIn((i) => i.name, ["user1", "user2"]);
 ```ts
 typedKnex
     .query(User)
-    .whereIn((i) => i.name, ["user1", "user2"])
-    .orWhereIn((i) => i.name, ["user3", "user4"]);
+    .whereIn("name", ["user1", "user2"])
+    .orWhereIn("name", ["user3", "user4"]);
 ```
 
 ### orWhereNotIn
@@ -516,20 +516,20 @@ typedKnex
 ```ts
 typedKnex
     .query(User)
-    .whereIn((i) => i.name, ["user1", "user2"])
-    .orWhereNotIn((i) => i.name, ["user3", "user4"]);
+    .whereIn("name", ["user1", "user2"])
+    .orWhereNotIn("name", ["user3", "user4"]);
 ```
 
 ### whereBetween
 
 ```ts
-typedKnex.query(UserCategory).whereBetween((i) => i.year, [1, 2037]);
+typedKnex.query(UserCategory).whereBetween("year", [1, 2037]);
 ```
 
 ### whereNotBetween
 
 ```ts
-typedKnex.query(User).whereNotBetween((i) => i.year, [1, 2037]);
+typedKnex.query(User).whereNotBetween("year", [1, 2037]);
 ```
 
 ### orWhereBetween
@@ -537,8 +537,8 @@ typedKnex.query(User).whereNotBetween((i) => i.year, [1, 2037]);
 ```ts
 typedKnex
     .query(User)
-    .whereBetween((c) => c.year, [1, 10])
-    .orWhereBetween((c) => c.year, [100, 1000]);
+    .whereBetween("year", [1, 10])
+    .orWhereBetween("year", [100, 1000]);
 ```
 
 ### orWhereNotBetween
@@ -546,39 +546,39 @@ typedKnex
 ```ts
 typedKnex
     .query(User)
-    .whereBetween((c) => c.year, [1, 10])
-    .orWhereNotBetween((c) => c.year, [100, 1000]);
+    .whereBetween("year", [1, 10])
+    .orWhereNotBetween("year", [100, 1000]);
 ```
 
 ### whereExists
 
 ```ts
-typedKnex.query(User).whereExists(UserSetting, (subQuery, parentColumn) => {
-    subQuery.whereColumn((c) => c.userId, "=", parentColumn.id);
+typedKnex.query(User).whereExists(UserSetting, (subQuery) => {
+    subQuery.whereColumn("userId", "=", "id");
 });
 ```
 
 ### orWhereExists
 
 ```ts
-typedKnex.query(User).orWhereExists(UserSetting, (subQuery, parentColumn) => {
-    subQuery.whereColumn((c) => c.userId, "=", parentColumn.id);
+typedKnex.query(User).orWhereExists(UserSetting, (subQuery) => {
+    subQuery.whereColumn("userId", "=", "id");
 });
 ```
 
 ### whereNotExists
 
 ```ts
-typedKnex.query(User).whereNotExists(UserSetting, (subQuery, parentColumn) => {
-    subQuery.whereColumn((c) => c.userId, "=", parentColumn.id);
+typedKnex.query(User).whereNotExists(UserSetting, (subQuery) => {
+    subQuery.whereColumn("userId", "=", "id");
 });
 ```
 
 ### orWhereNotExists
 
 ```ts
-typedKnex.query(User).orWhereNotExists(UserSetting, (subQuery, parentColumn) => {
-    subQuery.whereColumn((c) => c.userId, "=", parentColumn.id);
+typedKnex.query(User).orWhereNotExists(UserSetting, (subQuery) => {
+    subQuery.whereColumn("userId", "=", "id");
 });
 ```
 
@@ -587,8 +587,8 @@ typedKnex.query(User).orWhereNotExists(UserSetting, (subQuery, parentColumn) => 
 ```ts
 typedKnex
     .query(User)
-    .whereParentheses((sub) => sub.where((c) => c.id, "1").orWhere((c) => c.id, "2"))
-    .orWhere((c) => c.name, "Tester");
+    .whereParentheses((sub) => sub.where("id", "1").orWhere("id", "2"))
+    .orWhere("name", "Tester");
 
 const queryString = query.toQuery();
 console.log(queryString);
@@ -605,74 +605,74 @@ select * from "users" where ("users"."id" = '1' or "users"."id" = '2') or "users
 ```ts
 typedKnex
     .query(User)
-    .select((c) => c.someValue)
+    .select("someValue")
     .selectRaw("total", Number, 'SUM("numericValue")')
-    .groupBy((c) => c.someValue);
+    .groupBy("someValue");
 ```
 
 ### having
 
 ```ts
-typedKnex.query(User).having((c) => c.numericValue, ">", 10);
+typedKnex.query(User).having("numericValue", ">", 10);
 ```
 
 ### havingNull
 
 ```ts
-typedKnex.query(User).havingNull((c) => c.numericValue);
+typedKnex.query(User).havingNull("numericValue");
 ```
 
 ### havingNotNull
 
 ```ts
-typedKnex.query(User).havingNotNull((c) => c.numericValue);
+typedKnex.query(User).havingNotNull("numericValue");
 ```
 
 ### havingIn
 
 ```ts
-typedKnex.query(User).havingIn((c) => c.name, ["user1", "user2"]);
+typedKnex.query(User).havingIn("name", ["user1", "user2"]);
 ```
 
 ### havingNotIn
 
 ```ts
-typedKnex.query(User).havingNotIn((c) => c.name, ["user1", "user2"]);
+typedKnex.query(User).havingNotIn("name", ["user1", "user2"]);
 ```
 
 ### havingExists
 
 ```ts
-typedKnex.query(User).havingExists(UserSetting, (subQuery, parentColumn) => {
-    subQuery.whereColumn((c) => c.userId, "=", parentColumn.id);
+typedKnex.query(User).havingExists(UserSetting, (subQuery) => {
+    subQuery.whereColumn("userId", "=", "id");
 });
 ```
 
 ### havingNotExists
 
 ```ts
-typedKnex.query(User).havingNotExists(UserSetting, (subQuery, parentColumn) => {
-    subQuery.whereColumn((c) => c.userId, "=", parentColumn.id);
+typedKnex.query(User).havingNotExists(UserSetting, (subQuery) => {
+    subQuery.whereColumn("userId", "=", "id");
 });
 ```
 
 ### havingBetween
 
 ```ts
-typedKnex.query(User).havingBetween((c) => c.numericValue, [1, 10]);
+typedKnex.query(User).havingBetween("numericValue", [1, 10]);
 ```
 
 ### havingNotBetween
 
 ```ts
-typedKnex.query(User).havingNotBetween((c) => c.numericValue, [1, 10]);
+typedKnex.query(User).havingNotBetween("numericValue", [1, 10]);
 ```
 
 ### union
 
 ```ts
 typedKnex.query(User).union(User, (subQuery) => {
-    subQuery.select((c) => [c.id]).where((c) => c.numericValue, 12);
+    subQuery.select("id").where("numericValue", 12);
 });
 ```
 
@@ -681,58 +681,58 @@ typedKnex.query(User).union(User, (subQuery) => {
 ```ts
 typedKnex
     .query(User)
-    .select((c) => [c.id])
+    .select("id")
     .unionAll(User, (subQuery) => {
-        subQuery.select((c) => [c.id]).where((c) => c.numericValue, 12);
+        subQuery.select("id").where("numericValue", 12);
     });
 ```
 
 ### min
 
 ```ts
-typedKnex.query(User).min((c) => c.numericValue, "minNumericValue");
+typedKnex.query(User).min("numericValue", "minNumericValue");
 ```
 
 ### count
 
 ```ts
-typedKnex.query(User).count((c) => c.numericValue, "countNumericValue");
+typedKnex.query(User).count("numericValue", "countNumericValue");
 ```
 
 ### countDistinct
 
 ```ts
-typedKnex.query(User).countDistinct((c) => c.numericValue, "countDistinctNumericValue");
+typedKnex.query(User).countDistinct("numericValue", "countDistinctNumericValue");
 ```
 
 ### max
 
 ```ts
-typedKnex.query(User).max((c) => c.numericValue, "maxNumericValue");
+typedKnex.query(User).max("numericValue", "maxNumericValue");
 ```
 
 ### sum
 
 ```ts
-typedKnex.query(User).sum((c) => c.numericValue, "sumNumericValue");
+typedKnex.query(User).sum("numericValue", "sumNumericValue");
 ```
 
 ### sumDistinct
 
 ```ts
-typedKnex.query(User).sumDistinct((c) => c.numericValue, "sumDistinctNumericValue");
+typedKnex.query(User).sumDistinct("numericValue", "sumDistinctNumericValue");
 ```
 
 ### avg
 
 ```ts
-typedKnex.query(User).avg((c) => c.numericValue, "avgNumericValue");
+typedKnex.query(User).avg("numericValue", "avgNumericValue");
 ```
 
 ### avgDistinct
 
 ```ts
-typedKnex.query(User).avgDistinct((c) => c.numericValue, "avgDistinctNumericValue");
+typedKnex.query(User).avgDistinct("numericValue", "avgDistinctNumericValue");
 ```
 
 ### clearSelect
@@ -740,9 +740,9 @@ typedKnex.query(User).avgDistinct((c) => c.numericValue, "avgDistinctNumericValu
 ```ts
 typedKnex
     .query(User)
-    .select((i) => i.id)
+    .select("id")
     .clearSelect()
-    .select((i = i.name));
+    .select("name");
 ```
 
 ### clearWhere
@@ -750,9 +750,9 @@ typedKnex
 ```ts
 typedKnex
     .query(User)
-    .where((i) => i.id, "name")
+    .where("id", "name")
     .clearWhere()
-    .where((i = i.name), "name");
+    .where(("name", "name");
 ```
 
 ### clearOrder
@@ -760,9 +760,9 @@ typedKnex
 ```ts
 typedKnex
     .query(User)
-    .orderBy((i) => i.id)
+    .orderBy("id")
     .clearOrder()
-    .orderBy((i = i.name));
+    .orderBy(("name");
 ```
 
 ### limit
@@ -784,7 +784,7 @@ Use `useKnexQueryBuilder` to get to the underlying Knex.js query builder.
 ```ts
 const query = typedKnex.query(User)
     .useKnexQueryBuilder(queryBuilder => queryBuilder.where('somethingelse', 'value')
-    .select(i=>i.name);
+    .select("name");
 );
 ```
 
@@ -795,18 +795,18 @@ Use `keepFlat` to prevent unflattening of the result.
 ```ts
 const item = await typedKnex
     .query(User)
-    .where(i => i.name, 'name')
-    .innerJoinColumn(i => i.category);
-    .select(i=>[i.name, i.category.name)
+    .where("name", 'name')
+    .innerJoinColumn("category");
+    .select("name", "category.name")
     .getFirst();
 
 // returns { name: 'user name', category: { name: 'category name' }}
 
 const item = await typedKnex
     .query(User)
-    .where(i => i.name, 'name')
-    .innerJoinColumn(i => i.category);
-    .select(i=>[i.name, i.category.name)
+    .where("name", 'name')
+    .innerJoinColumn("category");
+    .select("name", "category.name")
     .keepFlat()
     .getFirst();
 
@@ -833,7 +833,7 @@ console.log(query.toQuery()); // select * from "users"
 ```ts
 const user = await typedKnex
     .query(User)
-    .where((i) => i.name, "name")
+    .where("name", "name")
     .getFirstOrNull();
 ```
 
@@ -849,7 +849,7 @@ const user = await typedKnex
 ```ts
 const user = await typedKnex
     .query(User)
-    .where((i) => i.name, "name")
+    .where("name", "name")
     .getFirst();
 ```
 
@@ -865,7 +865,7 @@ const user = await typedKnex
 ```ts
 const user = await typedKnex
     .query(User)
-    .where((i) => i.name, "name")
+    .where("name", "name")
     .getSingleOrNull();
 ```
 
@@ -881,7 +881,7 @@ const user = await typedKnex
 ```ts
 const user = await typedKnex
     .query(User)
-    .where((i) => i.name, "name")
+    .where("name", "name")
     .getSingle();
 ```
 
@@ -890,7 +890,7 @@ const user = await typedKnex
 ```ts
 const users = await typedKnex
     .query(User)
-    .whereNotNull((i) => i.name)
+    .whereNotNull("name")
     .getMany();
 ```
 
@@ -917,10 +917,10 @@ typedKnex.query(User);
 ```ts
 await typedKnex.query(User);
     .selectRaw('f', String, '\'fixedValue\'')
-    .select(u => [u.name])
+    .select("name")
     .distinct()
-    .whereNotNull(u => u.name)
-    .insertSelect(UserSetting, i => [i.id, i.initialValue]);
+    .whereNotNull("name")
+    .insertSelect(UserSetting, "id", "initialValue");
 
 // insert into "userSettings" ("userSettings"."id","userSettings"."initialValue") select distinct ('fixedValue') as "f", "users"."name" as "name" from "users" where "users"."name" is not null
 ```
