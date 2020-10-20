@@ -234,6 +234,9 @@ export type AddPropertyWithType<
     > = Original & Record<NewKey, NewKeyType>;
 
 interface IColumnParameterNoRowTransformation<Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <PropertyType1>(
         selectColumn1Function: (
             c: TransformPropsToFunctionsReturnPropertyType<Model>
@@ -261,6 +264,9 @@ interface IJoinOnColumns<Model, JoinedModel> {
 
 interface IJoinOn<Model, JoinedModel> {
 
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <PropertyType1, PropertyType2>(
         selectColumn1Function: (
             c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
@@ -282,6 +288,9 @@ interface IJoinOn<Model, JoinedModel> {
 
 interface IJoinOnVal<Model, JoinedModel> {
 
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <PropertyType1>(
         selectColumn1Function: (
             c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
@@ -299,6 +308,9 @@ interface IJoinOnVal<Model, JoinedModel> {
 
 interface IJoinOnNull<Model, JoinedModel> {
 
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <X>(
         selectColumn1Function: (
             c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
@@ -313,7 +325,8 @@ interface IJoinOnNull<Model, JoinedModel> {
 
 interface IJoinOnClause2<Model, JoinedModel> {
     /**
-     * @deprecated since version 2.9, use .on(). Remember that the columns switched eg .onColumns(i=>i.prop, '=' j=>j.prop) should become .on(j=>j.prop, '=', i=>i.prop)
+     * @deprecated since version 2.9, use .on(). Remember that the columns switched eg .onColumns(i=>i.prop, '=' j=>j.prop) should become .on(j=>j.prop, '=', i=>i.prop).
+     * Use `npx typed-knex -u join-on-columns-to-on` to upgrade.
      */
     onColumns: IJoinOnColumns<Model, JoinedModel>;
     on: IJoinOn<Model, JoinedModel>;
@@ -326,6 +339,9 @@ interface IJoinOnClause2<Model, JoinedModel> {
 }
 
 interface IInsertSelect {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <NewPropertyType>(
         newPropertyClass: new () => NewPropertyType,
         selectColumn1Function: (
@@ -429,6 +445,9 @@ type TransformPropsToFunctionsReturnPropertyType<Model> = {
 
 
 interface IOrderBy<Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <NewRow>(
         selectColumnFunction: (
             c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
@@ -443,6 +462,9 @@ interface IOrderBy<Model, SelectableModel, Row> {
 }
 
 interface IDbFunctionWithAlias<Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <NewPropertyType, TName extends keyof any>(
         selectColumnFunction: (
             c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
@@ -467,6 +489,9 @@ type UnionToIntersection<U> =
     (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
 
 interface ISelectWithFunctionColumns3<Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <
         R1,
         R2,
@@ -567,6 +592,9 @@ interface ISelectWithFunctionColumns3<Model, SelectableModel, Row> {
         R29
     >;
 
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <R1>(
         selectColumnFunction: (
             c: TransformPropertiesToFunction<SelectableModel>
@@ -581,6 +609,9 @@ interface ISelectWithFunctionColumns3<Model, SelectableModel, Row> {
 }
 
 interface IFindByPrimaryKey<_Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <
         R1,
         R2,
@@ -688,12 +719,18 @@ interface IFindByPrimaryKey<_Model, SelectableModel, Row> {
 
 
 interface IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     (
         selectColumnFunction: (
             c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
         ) => void
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     (
         selectColumnFunction: (
             c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
@@ -708,12 +745,18 @@ interface IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>
 }
 
 interface ISelectableColumnKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     (
         selectColumnFunction: (
             c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
         ) => void
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     (
         selectColumnFunction: (
             c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
@@ -728,6 +771,9 @@ interface ISelectableColumnKeyFunctionAsParametersReturnQueryBuider<Model, Selec
 }
 
 interface IWhere<Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <PropertyType>(
         selectColumnFunction: (
             c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<SelectableModel>>
@@ -742,6 +788,9 @@ interface IWhere<Model, SelectableModel, Row> {
 }
 
 interface IWhereWithOperator<Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <PropertyType>(
         selectColumnFunction: (
             c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<SelectableModel>>
@@ -749,6 +798,9 @@ interface IWhereWithOperator<Model, SelectableModel, Row> {
         value: PropertyType
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <PropertyType>(
         selectColumnFunction: (
             c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<SelectableModel>>
@@ -770,6 +822,9 @@ interface IWhereWithOperator<Model, SelectableModel, Row> {
 }
 
 interface IWhereIn<Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <PropertyType>(
         selectColumnFunction: (
             c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<SelectableModel>>
@@ -785,6 +840,9 @@ interface IWhereIn<Model, SelectableModel, Row> {
 }
 
 interface IWhereBetween<Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <PropertyType>(
         selectColumnFunction: (
             c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<SelectableModel>>
@@ -801,6 +859,9 @@ interface IWhereBetween<Model, SelectableModel, Row> {
 }
 
 interface IHaving<Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <PropertyType>(
         selectColumnFunction: (
             c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<SelectableModel>>
@@ -817,6 +878,9 @@ interface IHaving<Model, SelectableModel, Row> {
 }
 
 interface IWhereCompareTwoColumns<Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <PropertyType1, _PropertyType2, Model2>(
         selectColumn1Function: (
             c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>

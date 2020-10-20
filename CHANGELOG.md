@@ -1,6 +1,7 @@
 # Changelog
 
 -   Dropped support for Node 8 (Knex.js v0.21.0)
+-   Updated all functions to use strings as parameters and deprecated the use of lambas. Use `npx typed-knex -u string-parameters` to upgrade.
 
 ## 2.18.0
 
@@ -51,7 +52,7 @@
 ## 2.9.0
 
 -   Updated on clauses for joins:
-    -   Deprecated `.onColumns`.
+    -   Deprecated `.onColumns`. Use `npx typed-knex -u join-on-columns-to-on` to upgrade.
     -   Added `.on`, `andOn`, `orOn`, `onVal`, `andOnVal`, `orOnVal`.
 
 ## 2.8.1
