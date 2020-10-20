@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { ArrayLiteralExpression, ArrowFunction, CallExpression, Project, PropertyAccessExpression, SyntaxKind } from "ts-morph";
 
-function changeFirstArgumentFromFunctionToString(callExpression: CallExpression) {
+function changeArgumentsFromFunctionToString(callExpression: CallExpression) {
     const args = callExpression.getArguments();
 
     if (args[0]?.getKind() === SyntaxKind.ArrowFunction) {
@@ -44,6 +44,20 @@ function changeArgumentFromFunctionToString(argumentToReplace: ArrowFunction, ca
     }
 }
 
+function changeArgumentFromObjectToString(argumentToReplace: PropertyAccessExpression, callExpression: CallExpression, argumentIndex: number) {
+    const indexOfFirstPeriod = argumentToReplace.getText().indexOf('.');
+    const name = argumentToReplace.getText().substring(indexOfFirstPeriod + 1);
+    callExpression.removeArgument(argumentIndex);
+    callExpression.insertArgument(argumentIndex, `'${name}'`);
+}
+
+
+function changeIWhereCompareTwoColumns(callExpression: CallExpression) {
+    const args = callExpression.getArguments();
+    changeArgumentFromFunctionToString(args[0] as ArrowFunction, callExpression, 0);
+    changeArgumentFromObjectToString(args[2] as PropertyAccessExpression, callExpression, 2)
+}
+
 function printProgress(progress: number) {
     process.stdout.cursorTo(0);
     process.stdout.write((progress * 100).toFixed(0) + '%');
@@ -63,7 +77,6 @@ export function upgradeProjectStringParameters(project: Project) {
                 const typeString = node.getType().getText();
                 if (
                     typeString.includes('IJoinOn<') ||
-                    typeString.includes('IWhereCompareTwoColumns') ||
                     typeString.includes('IFindByPrimaryKey') ||
                     typeString.includes('IInsertSelect') ||
                     typeString.includes('IColumnParameterNoRowTransformation') ||
@@ -81,7 +94,12 @@ export function upgradeProjectStringParameters(project: Project) {
                     typeString.includes('IWhereWithOperator<')) {
                     const callExpression = node.getParentIfKind(SyntaxKind.CallExpression);
                     if (callExpression) {
-                        changeFirstArgumentFromFunctionToString(callExpression);
+                        changeArgumentsFromFunctionToString(callExpression);
+                    }
+                } else if (typeString.startsWith('IWhereCompareTwoColumns<')) {
+                    const callExpression = node.getParentIfKind(SyntaxKind.CallExpression);
+                    if (callExpression) {
+                        changeIWhereCompareTwoColumns(callExpression);
                     }
                 }
             }

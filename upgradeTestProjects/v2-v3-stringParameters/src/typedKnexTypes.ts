@@ -150,6 +150,19 @@ interface IJoinOnColumns<_Model, _JoinedModel> {
 
 }
 
+interface IWhereCompareTwoColumns<_Model, _SelectableModel, _Row> {
+
+    <PropertyType1>(
+        selectColumn1Function: (
+            c: any
+        ) => () => PropertyType1,
+        operator: string,
+        parentSelection: any
+    ): any;
+
+
+}
+
 export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     where: IWhereWithOperator<Model, SelectableModel, Row>;
 
@@ -158,5 +171,8 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     joinOn: IJoinOn<Model, SelectableModel>;
 
     onColumns: IJoinOnColumns<Model, SelectableModel>;
+
+
+    whereColumn: IWhereCompareTwoColumns<Model, SelectableModel, Row>;
 
 }

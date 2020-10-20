@@ -130,4 +130,38 @@ describe('upgradeProjectStringParameters', function() {
 
 
     });
+
+
+    it('should upgrade whereColumn', async () => {
+
+
+        const project = new Project({
+            tsConfigFilePath: './upgradeTestProjects/v2-v3-stringParameters/tsconfig.json',
+        });
+
+
+        const code = `
+            import { ITypedQueryBuilder } from './typedKnexTypes';
+
+            const a = {} as ITypedQueryBuilder<{}, {}, {}>;
+            const parent = {id:1};
+            a.whereColumn(i => i.name, '=', parent.id);
+        `;
+
+
+        const sourceFile = project.createSourceFile('./upgradeTestProjects/v2-v3-stringParameters/src/test.ts', code);
+
+        assert.equal(project.getPreEmitDiagnostics().length, 0);
+
+        upgradeProjectStringParameters(project);
+
+        assert.equal(sourceFile.getText(), `import { ITypedQueryBuilder } from './typedKnexTypes';
+
+            const a = {} as ITypedQueryBuilder<{}, {}, {}>;
+            const parent = {id:1};
+            a.whereColumn('name', '=', 'id');
+        `)
+
+
+    });
 });
