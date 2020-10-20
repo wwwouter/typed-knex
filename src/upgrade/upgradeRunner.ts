@@ -60,7 +60,6 @@ function changeIWhereCompareTwoColumns(callExpression: CallExpression) {
     }
 }
 
-
 function changeIWhereExists(callExpression: CallExpression) {
     const args = callExpression.getArguments();
     const subqueryFunction = args[1] as ArrowFunction;
@@ -70,12 +69,15 @@ function changeIWhereExists(callExpression: CallExpression) {
     }
 }
 
-
 function printProgress(progress: number) {
-    process.stdout.cursorTo(0);
-    process.stdout.write((progress * 100).toFixed(0) + '%');
+    const percentage = (progress * 100).toFixed(0) + '%';
+    if (process.stdout && process.stdout.cursorTo) {
+        process.stdout.cursorTo(0);
+        process.stdout.write(percentage);
+    } else {
+        console.log(percentage)
+    }
 }
-
 
 export function upgradeProjectStringParameters(project: Project) {
     const sourceFiles = project.getSourceFiles();
