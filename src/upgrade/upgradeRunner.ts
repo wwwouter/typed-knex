@@ -125,6 +125,7 @@ export function upgradeProjectStringParameters(project: Project) {
 
         fileCounter++;
     }
+    printProgress(1);
 }
 export function upgradeProjectJoinOnColumnsToOn(project: Project) {
     const sourceFiles = project.getSourceFiles();
