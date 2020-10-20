@@ -54,8 +54,10 @@ function changeArgumentFromObjectToString(argumentToReplace: PropertyAccessExpre
 
 function changeIWhereCompareTwoColumns(callExpression: CallExpression) {
     const args = callExpression.getArguments();
-    changeArgumentFromFunctionToString(args[0] as ArrowFunction, callExpression, 0);
-    changeArgumentFromObjectToString(args[2] as PropertyAccessExpression, callExpression, 2)
+    if (args[0].getKind() === SyntaxKind.ArrowFunction && args[2].getKind() === SyntaxKind.PropertyAccessExpression) {
+        changeArgumentFromFunctionToString(args[0] as ArrowFunction, callExpression, 0);
+        changeArgumentFromObjectToString(args[2] as PropertyAccessExpression, callExpression, 2);
+    }
 }
 
 
@@ -63,7 +65,9 @@ function changeIWhereExists(callExpression: CallExpression) {
     const args = callExpression.getArguments();
     const subqueryFunction = args[1] as ArrowFunction;
     const parameters = subqueryFunction.getParameters();
-    parameters[1].remove();
+    if (parameters.length === 2) {
+        parameters[1].remove();
+    }
 }
 
 
