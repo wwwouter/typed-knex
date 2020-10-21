@@ -6,13 +6,14 @@ import {
     getPrimaryKeyColumn,
     getTableMetadata
 } from './decorators';
+import { mapObjectToTableObject } from './mapObjectToTableObject';
+import { NestedForeignKeyKeysOf, NestedKeysOf } from './NestedKeysOf';
 import { NonForeignKeyObjects } from './NonForeignKeyObjects';
 import { NonNullableRecursive } from './NonNullableRecursive';
+import { GetNestedProperty, GetNestedPropertyType } from './PropertyTypes';
+import { SelectableColumnTypes } from './SelectableColumnTypes';
 import { TransformPropertiesToFunction } from './TransformPropertiesToFunction';
 import { FlattenOption, setToNull, unflatten } from './unflatten';
-import { mapObjectToTableObject } from './mapObjectToTableObject';
-import { SelectableColumnTypes } from './SelectableColumnTypes';
-
 
 export class TypedKnex {
     constructor(private knex: Knex) { }
@@ -116,12 +117,12 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
 
     whereParentheses: IWhereParentheses<Model, SelectableModel, Row>;
 
-    groupBy: IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
+    groupBy: ISelectableColumnKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
 
     having: IHaving<Model, SelectableModel, Row>;
 
-    havingNull: IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
-    havingNotNull: IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
+    havingNull: ISelectableColumnKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
+    havingNotNull: ISelectableColumnKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
 
     havingIn: IWhereIn<Model, SelectableModel, Row>;
     havingNotIn: IWhereIn<Model, SelectableModel, Row>;
@@ -212,7 +213,6 @@ type ReturnNonObjectsNamesOnly<T> = { [K in keyof T]: T[K] extends SelectableCol
 
 type RemoveObjectsFrom<T> = { [P in ReturnNonObjectsNamesOnly<T>]: T[P] };
 
-
 export type ObjectToPrimitive<T> = T extends String
     ? string
     : T extends Number
@@ -234,83 +234,127 @@ export type AddPropertyWithType<
     > = Original & Record<NewKey, NewKeyType>;
 
 interface IColumnParameterNoRowTransformation<Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <PropertyType1>(
         selectColumn1Function: (
             c: TransformPropsToFunctionsReturnPropertyType<Model>
         ) => () => PropertyType1
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
+        key: ConcatKey
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
+// deprecated
+interface IJoinOnColumns<Model, JoinedModel> {
 
-type JoinOnColumns<Model, JoinedModel> = <PropertyType1, PropertyType2>(
-    selectColumn1Function: (
-        c: TransformPropsToFunctionsReturnPropertyType<Model>
-    ) => () => PropertyType1,
-    operator: Operator,
-    selectColumn2Function: (
-        c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
-    ) => () => PropertyType2
-) => IJoinOnClause2<Model, JoinedModel>;
-
-
-
-type JoinOn<Model, JoinedModel> = <PropertyType1, PropertyType2>(
-    selectColumn1Function: (
-        c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
-    ) => () => PropertyType1,
-    operator: Operator,
-    selectColumn2Function: (
-        c: TransformPropsToFunctionsReturnPropertyType<Model>
-    ) => () => PropertyType2
-) => IJoinOnClause2<Model, JoinedModel>;
-
-
-type JoinOnVal<Model, JoinedModel> = <PropertyType1>(
-    selectColumn1Function: (
-        c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
-    ) => () => PropertyType1,
-    operator: Operator,
-    value: any
-) => IJoinOnClause2<Model, JoinedModel>;
-
-interface IJoinOnClause2<Model, JoinedModel> {
-    /**
-     * @deprecated since version 2.9, use .on(). Remember that the columns switched eg .onColumns(i=>i.prop, '=' j=>j.prop) should become .on(j=>j.prop, '=', i=>i.prop)
-     */
-    onColumns: JoinOnColumns<Model, JoinedModel>;
-    on: JoinOn<Model, JoinedModel>;
-    orOn: JoinOn<Model, JoinedModel>;
-    andOn: JoinOn<Model, JoinedModel>;
-    onVal: JoinOnVal<Model, JoinedModel>;
-    andOnVal: JoinOnVal<Model, JoinedModel>;
-    orOnVal: JoinOnVal<Model, JoinedModel>;
-
-    onNull: <X>(
-        selectColumn1Function: (
-            c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
-        ) => () => X
-    ) => IJoinOnClause2<Model, JoinedModel>;
-}
-
-interface IWhereCompareTwoColumns<Model, SelectableModel, Row> {
-    <PropertyType1, _PropertyType2, Model2>(
+    <PropertyType1, PropertyType2>(
         selectColumn1Function: (
             c: TransformPropsToFunctionsReturnPropertyType<Model>
         ) => () => PropertyType1,
         operator: Operator,
         selectColumn2Function: (
-            c: TransformPropsToFunctionsReturnPropertyType<Model2>
-        ) => any
-    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+            c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
+        ) => () => PropertyType2
+    ): IJoinOnClause2<Model, JoinedModel>;
+}
+
+interface IJoinOn<Model, JoinedModel> {
+
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
+    <PropertyType1, PropertyType2>(
+        selectColumn1Function: (
+            c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
+        ) => () => PropertyType1,
+        operator: Operator,
+        selectColumn2Function: (
+            c: TransformPropsToFunctionsReturnPropertyType<Model>
+        ) => () => PropertyType2
+    ): IJoinOnClause2<Model, JoinedModel>;
+
+    <ConcatKey1 extends NestedKeysOf<NonNullableRecursive<JoinedModel>, keyof NonNullableRecursive<JoinedModel>, ''>,
+        ConcatKey2 extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
+        key1: ConcatKey1,
+        operator: Operator,
+        key2: ConcatKey2
+
+    ): IJoinOnClause2<Model, JoinedModel>;
+}
+
+interface IJoinOnVal<Model, JoinedModel> {
+
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
+    <PropertyType1>(
+        selectColumn1Function: (
+            c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
+        ) => () => PropertyType1,
+        operator: Operator,
+        value: any
+    ): IJoinOnClause2<Model, JoinedModel>;
+
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<JoinedModel>, keyof NonNullableRecursive<JoinedModel>, ''>>(
+        key: ConcatKey,
+        operator: Operator,
+        value: any
+    ): IJoinOnClause2<Model, JoinedModel>;
+}
+
+interface IJoinOnNull<Model, JoinedModel> {
+
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
+    <X>(
+        selectColumn1Function: (
+            c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
+        ) => () => X
+    ): IJoinOnClause2<Model, JoinedModel>;
+
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<JoinedModel>, keyof NonNullableRecursive<JoinedModel>, ''>>(
+        key: ConcatKey
+    ): IJoinOnClause2<Model, JoinedModel>;
+}
+
+
+interface IJoinOnClause2<Model, JoinedModel> {
+    /**
+     * @deprecated since version 2.9, use .on(). Remember that the columns switched eg .onColumns(i=>i.prop, '=' j=>j.prop) should become .on(j=>j.prop, '=', i=>i.prop).
+     * Use `npx typed-knex -u join-on-columns-to-on` to upgrade.
+     */
+    onColumns: IJoinOnColumns<Model, JoinedModel>;
+    on: IJoinOn<Model, JoinedModel>;
+    orOn: IJoinOn<Model, JoinedModel>;
+    andOn: IJoinOn<Model, JoinedModel>;
+    onVal: IJoinOnVal<Model, JoinedModel>;
+    andOnVal: IJoinOnVal<Model, JoinedModel>;
+    orOnVal: IJoinOnVal<Model, JoinedModel>;
+    onNull: IJoinOnNull<Model, JoinedModel>;
 }
 
 interface IInsertSelect {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <NewPropertyType>(
         newPropertyClass: new () => NewPropertyType,
         selectColumn1Function: (
             c: TransformPropsToFunctionsReturnPropertyType<NewPropertyType>
         ) => any
     ): Promise<void>;
+
+
+    <NewPropertyType, ConcatKey extends NestedKeysOf<NonNullableRecursive<NewPropertyType>, keyof NonNullableRecursive<NewPropertyType>, ''>>
+        (
+        newPropertyClass: new () => NewPropertyType,
+        ...columnNames: ConcatKey[]):
+        Promise<void>;
 }
 
 interface IJoinTableMultipleOnClauses<Model, _SelectableModel, Row> {
@@ -401,15 +445,26 @@ type TransformPropsToFunctionsReturnPropertyType<Model> = {
 
 
 interface IOrderBy<Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <NewRow>(
         selectColumnFunction: (
             c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
         ) => () => NewRow,
         direction?: 'asc' | 'desc'
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<SelectableModel>, keyof NonNullableRecursive<SelectableModel>, ''>, TName extends keyof any>
+        (columnNames: ConcatKey, direction?: 'asc' | 'desc'):
+        ITypedQueryBuilder<Model, SelectableModel, Row & Record<TName, GetNestedPropertyType<SelectableModel, ConcatKey>>>;
 }
 
 interface IDbFunctionWithAlias<Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <NewPropertyType, TName extends keyof any>(
         selectColumnFunction: (
             c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
@@ -420,14 +475,23 @@ interface IDbFunctionWithAlias<Model, SelectableModel, Row> {
         SelectableModel,
         Record<TName, ObjectToPrimitive<NewPropertyType>> & Row
     >;
+
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<SelectableModel>, keyof NonNullableRecursive<SelectableModel>, ''>, TName extends keyof any>
+        (columnNames: ConcatKey, name: TName):
+        ITypedQueryBuilder<Model, SelectableModel, Row & Record<TName, GetNestedPropertyType<SelectableModel, ConcatKey>>>;
+
 }
 
 
 
 
-
+type UnionToIntersection<U> =
+    (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
 
 interface ISelectWithFunctionColumns3<Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <
         R1,
         R2,
@@ -527,14 +591,27 @@ interface ISelectWithFunctionColumns3<Model, SelectableModel, Row> {
         R28 &
         R29
     >;
+
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <R1>(
         selectColumnFunction: (
             c: TransformPropertiesToFunction<SelectableModel>
         ) => () => R1
     ): ITypedQueryBuilder<Model, SelectableModel, Row & R1>;
+
+
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<SelectableModel>, keyof NonNullableRecursive<SelectableModel>, ''>>
+        (...columnNames: ConcatKey[]):
+        ITypedQueryBuilder<Model, SelectableModel, Row & UnionToIntersection<GetNestedProperty<SelectableModel, ConcatKey>>>;
+
 }
 
 interface IFindByPrimaryKey<_Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <
         R1,
         R2,
@@ -634,33 +711,86 @@ interface IFindByPrimaryKey<_Model, SelectableModel, Row> {
         R29
         | undefined
     >;
+
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<SelectableModel>, keyof NonNullableRecursive<SelectableModel>, ''>>
+        (primaryKeyValue: any, ...columnNames: ConcatKey[]):
+        Promise<Row & UnionToIntersection<GetNestedProperty<SelectableModel, ConcatKey>> | undefined>;
 }
 
+
 interface IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     (
         selectColumnFunction: (
             c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
         ) => void
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     (
         selectColumnFunction: (
             c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
         ) => void,
         setToNullIfNullFunction: (r: Row) => void
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+
+    <ConcatKey extends NestedForeignKeyKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
+        key: ConcatKey
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+}
+
+interface ISelectableColumnKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
+    (
+        selectColumnFunction: (
+            c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
+        ) => void
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
+    (
+        selectColumnFunction: (
+            c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
+        ) => void,
+        setToNullIfNullFunction: (r: Row) => void
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
+        key: ConcatKey
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
 interface IWhere<Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <PropertyType>(
         selectColumnFunction: (
             c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<SelectableModel>>
         ) => () => PropertyType,
         value: PropertyType
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
+        key: ConcatKey,
+        value: GetNestedPropertyType<Model, ConcatKey>
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
 interface IWhereWithOperator<Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <PropertyType>(
         selectColumnFunction: (
             c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<SelectableModel>>
@@ -668,6 +798,9 @@ interface IWhereWithOperator<Model, SelectableModel, Row> {
         value: PropertyType
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <PropertyType>(
         selectColumnFunction: (
             c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<SelectableModel>>
@@ -675,27 +808,60 @@ interface IWhereWithOperator<Model, SelectableModel, Row> {
         operator: Operator,
         value: PropertyType
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
+        key: ConcatKey,
+        value: GetNestedPropertyType<Model, ConcatKey>
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
+        key: ConcatKey,
+        operator: Operator,
+        value: GetNestedPropertyType<Model, ConcatKey>
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
 interface IWhereIn<Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <PropertyType>(
         selectColumnFunction: (
             c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<SelectableModel>>
         ) => () => PropertyType,
         values: PropertyType[]
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
+        key: ConcatKey,
+        value: GetNestedPropertyType<Model, ConcatKey>[]
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
 }
 
 interface IWhereBetween<Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <PropertyType>(
         selectColumnFunction: (
             c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<SelectableModel>>
         ) => () => PropertyType,
         range: [PropertyType, PropertyType]
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>,
+        PropertyType extends GetNestedPropertyType<Model, ConcatKey>>(
+        key: ConcatKey,
+        value: [PropertyType, PropertyType]
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
 }
 
 interface IHaving<Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <PropertyType>(
         selectColumnFunction: (
             c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<SelectableModel>>
@@ -703,9 +869,18 @@ interface IHaving<Model, SelectableModel, Row> {
         operator: Operator,
         value: PropertyType
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
+        key: ConcatKey,
+        operator: Operator,
+        value: GetNestedPropertyType<Model, ConcatKey>
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
 interface IWhereCompareTwoColumns<Model, SelectableModel, Row> {
+    /**
+     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
+     */
     <PropertyType1, _PropertyType2, Model2>(
         selectColumn1Function: (
             c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
@@ -715,6 +890,16 @@ interface IWhereCompareTwoColumns<Model, SelectableModel, Row> {
             c: TransformPropsToFunctionsReturnPropertyType<Model2>
         ) => any
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+
+
+    <_PropertyType1, _PropertyType2, Model2>(
+        key1: NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>,
+        operator: Operator,
+        key2: NestedKeysOf<NonNullableRecursive<Model2>, keyof NonNullableRecursive<Model2>, ''>
+    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+
 }
 
 interface IWhereExists<Model, SelectableModel, Row> {
@@ -825,7 +1010,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     public columns: { name: string }[];
 
     public onlyLogQuery = false;
-    public queryLog = "";
+    public queryLog = '';
 
     private queryBuilder: Knex.QueryBuilder;
     private tableName: string;
@@ -837,10 +1022,13 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
     private transaction?: Knex.Transaction;
 
+
+
     constructor(
         private tableClass: new () => ModelType,
         private knex: Knex,
-        queryBuilder?: Knex.QueryBuilder
+        queryBuilder?: Knex.QueryBuilder,
+        private parentTypedQueryBuilder?: any
     ) {
         this.tableName = getTableMetadata(tableClass).tableName;
         this.columns = getColumnProperties(tableClass);
@@ -1089,9 +1277,14 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     }
 
     public select() {
-        const f = arguments[0];
+        let columnArgumentsList: string[][];
 
-        const columnArgumentsList = this.getArgumentsFromColumnFunction3(f);
+        if (typeof arguments[0] === 'string') {
+            columnArgumentsList = [...arguments].map((concatKey: string) => concatKey.split('.'));
+        } else {
+            const f = arguments[0];
+            columnArgumentsList = this.getArgumentsFromColumnFunction3(f);
+        }
 
         for (const columnArguments of columnArgumentsList) {
             this.queryBuilder.select(
@@ -1105,7 +1298,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
     public orderBy() {
         this.queryBuilder.orderBy(
-            this.getColumnNameWithoutAliasFromFunction(arguments[0]),
+            this.getColumnNameWithoutAliasFromFunctionOrString(arguments[0]),
             arguments[1]
         );
 
@@ -1202,22 +1395,35 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     }
 
     public whereColumn() {
-        const column1Name = this.getColumnName(
-            ...this.getArgumentsFromColumnFunction(arguments[0])
-        );
+        // This is called from the sub-query
+        // The first column is from the sub-query
+        // The second column is from the parent query
+        let column1Name;
+        let column2Name;
+
+        if (typeof arguments[0] === 'string') {
+            column1Name = this.getColumnName(...arguments[0].split('.'));
+            if (!this.parentTypedQueryBuilder) {
+                throw new Error('Parent query builder is missing, "whereColumn" can only be used in sub-query.');
+            }
+            column2Name = this.parentTypedQueryBuilder.getColumnName(...arguments[2].split('.'));
+        } else {
+            column1Name = this.getColumnName(
+                ...this.getArgumentsFromColumnFunction(arguments[0])
+            );
+
+            if (typeof arguments[2] === 'string') {
+                column2Name = arguments[2];
+            } else if (arguments[2].memories !== undefined) {
+                column2Name = arguments[2].getColumnName; // parent this needed ...
+            } else {
+                column2Name = this.getColumnName(
+                    ...this.getArgumentsFromColumnFunction(arguments[2])
+                );
+            }
+        }
 
         const operator = arguments[1];
-
-        let column2Name;
-        if (typeof arguments[2] === 'string') {
-            column2Name = arguments[2];
-        } else if (arguments[2].memories !== undefined) {
-            column2Name = arguments[2].getColumnName; // parent this needed ...
-        } else {
-            column2Name = this.getColumnName(
-                ...this.getArgumentsFromColumnFunction(arguments[2])
-            );
-        }
 
         this.queryBuilder.whereRaw(`?? ${operator} ??`, [
             column1Name,
@@ -1249,6 +1455,11 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     }
 
     public getArgumentsFromColumnFunction(f: any) {
+
+        if (typeof f === 'string') {
+            return f.split('.');
+        }
+
         const { root, memories } = getProxyAndMemories();
 
         f(root);
@@ -1261,9 +1472,14 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
         const primaryKeyValue = arguments[0];
 
-        const f = arguments[1];
-
-        const columnArgumentsList = this.getArgumentsFromColumnFunction3(f);
+        let columnArgumentsList;
+        if (typeof arguments[1] === 'string') {
+            const [, ...columnArguments] = arguments;
+            columnArgumentsList = columnArguments.map((concatKey: string) => concatKey.split('.'));
+        } else {
+            const f = arguments[1];
+            columnArgumentsList = this.getArgumentsFromColumnFunction3(f);
+        }
 
         for (const columnArguments of columnArgumentsList) {
             this.queryBuilder.select(
@@ -1275,16 +1491,26 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
         this.queryBuilder.where(primaryKeyColumnInfo.name, primaryKeyValue);
 
-        return await this.queryBuilder.first();
+        if (this.onlyLogQuery) {
+            this.queryLog += this.queryBuilder.toQuery() + '\n';
+        } else {
+            return this.queryBuilder.first();
+        }
     }
 
 
 
     public where() {
+        if (typeof arguments[0] === 'string') {
+            return this.callKnexFunctionWithConcatKeyColumn(this.queryBuilder.where.bind(this.queryBuilder), ...arguments);
+        }
         return this.callKnexFunctionWithColumnFunction(this.queryBuilder.where.bind(this.queryBuilder), ...arguments);
     }
 
     public whereNot() {
+        if (typeof arguments[0] === 'string') {
+            return this.callKnexFunctionWithConcatKeyColumn(this.queryBuilder.whereNot.bind(this.queryBuilder), ...arguments);
+        }
         const columnArguments = this.getArgumentsFromColumnFunction(
             arguments[0]
         );
@@ -1305,70 +1531,31 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     }
 
     public whereIn() {
-        const range = arguments[1];
-        this.queryBuilder.whereIn(
-            this.getColumnNameFromFunction(arguments[0]),
-            range
-        );
-        return this;
+        return this.callKnexFunctionWithColumnFunction(this.queryBuilder.whereIn.bind(this.queryBuilder), ...arguments);
     }
+
     public whereNotIn() {
-        const range = arguments[1];
-        this.queryBuilder.whereNotIn(
-            this.getColumnNameFromFunction(arguments[0]),
-            range
-        );
-        return this;
+        return this.callKnexFunctionWithColumnFunction(this.queryBuilder.whereNotIn.bind(this.queryBuilder), ...arguments);
     }
     public orWhereIn() {
-        const range = arguments[1];
-        this.queryBuilder.orWhereIn(
-            this.getColumnNameFromFunction(arguments[0]),
-            range
-        );
-        return this;
+        return this.callKnexFunctionWithColumnFunction(this.queryBuilder.orWhereIn.bind(this.queryBuilder), ...arguments);
     }
     public orWhereNotIn() {
-        const range = arguments[1];
-        this.queryBuilder.orWhereNotIn(
-            this.getColumnNameFromFunction(arguments[0]),
-            range
-        );
-        return this;
+        return this.callKnexFunctionWithColumnFunction(this.queryBuilder.orWhereNotIn.bind(this.queryBuilder), ...arguments);
     }
 
     public whereBetween() {
-        const value = arguments[1];
-        this.queryBuilder.whereBetween(
-            this.getColumnNameFromFunction(arguments[0]),
-            value
-        );
-        return this;
+        return this.callKnexFunctionWithColumnFunction(this.queryBuilder.whereBetween.bind(this.queryBuilder), ...arguments);
     }
     public whereNotBetween() {
-        const value = arguments[1];
-        this.queryBuilder.whereNotBetween(
-            this.getColumnNameFromFunction(arguments[0]),
-            value
-        );
-        return this;
+        return this.callKnexFunctionWithColumnFunction(this.queryBuilder.whereNotBetween.bind(this.queryBuilder), ...arguments);
     }
 
     public orWhereBetween() {
-        const value = arguments[1];
-        this.queryBuilder.orWhereBetween(
-            this.getColumnNameFromFunction(arguments[0]),
-            value
-        );
-        return this;
+        return this.callKnexFunctionWithColumnFunction(this.queryBuilder.orWhereBetween.bind(this.queryBuilder), ...arguments);
     }
     public orWhereNotBetween() {
-        const value = arguments[1];
-        this.queryBuilder.orWhereNotBetween(
-            this.getColumnNameFromFunction(arguments[0]),
-            value
-        );
-        return this;
+        return this.callKnexFunctionWithColumnFunction(this.queryBuilder.orWhereNotBetween.bind(this.queryBuilder), ...arguments);
     }
 
     public callQueryCallbackFunction(
@@ -1383,7 +1570,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
             const subQuery = this;
             const { root, memories } = getProxyAndMemories(that);
 
-            const subQB = new TypedQueryBuilder(typeOfSubQuery, that.knex, subQuery);
+            const subQB = new TypedQueryBuilder(typeOfSubQuery, that.knex, subQuery, that);
             subQB.extraJoinedProperties = that.extraJoinedProperties;
             functionToCall(
                 subQB,
@@ -1402,7 +1589,9 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
         const subQueryBuilder = new TypedQueryBuilder(
             typeOfSubQuery,
-            this.knex
+            this.knex,
+            undefined,
+            this
         );
         functionToCall(subQueryBuilder, root, memories);
 
@@ -1476,7 +1665,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
         const operator = arguments[1];
         const value = arguments[2];
         this.queryBuilder.having(
-            this.getColumnNameFromFunction(arguments[0]),
+            this.getColumnNameFromFunctionOrString(arguments[0]),
             operator,
             value
         );
@@ -1486,7 +1675,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     public havingIn() {
         const value = arguments[1];
         this.queryBuilder.havingIn(
-            this.getColumnNameFromFunction(arguments[0]),
+            this.getColumnNameFromFunctionOrString(arguments[0]),
             value
         );
         return this;
@@ -1495,7 +1684,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     public havingNotIn() {
         const value = arguments[1];
         (this.queryBuilder as any).havingNotIn(
-            this.getColumnNameFromFunction(arguments[0]),
+            this.getColumnNameFromFunctionOrString(arguments[0]),
             value
         );
         return this;
@@ -1503,14 +1692,14 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
     public havingNull() {
         (this.queryBuilder as any).havingNull(
-            this.getColumnNameFromFunction(arguments[0])
+            this.getColumnNameFromFunctionOrString(arguments[0])
         );
         return this;
     }
 
     public havingNotNull() {
         (this.queryBuilder as any).havingNotNull(
-            this.getColumnNameFromFunction(arguments[0])
+            this.getColumnNameFromFunctionOrString(arguments[0])
         );
         return this;
     }
@@ -1549,7 +1738,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     public havingBetween() {
         const value = arguments[1];
         (this.queryBuilder as any).havingBetween(
-            this.getColumnNameFromFunction(arguments[0]),
+            this.getColumnNameFromFunctionOrString(arguments[0]),
             value
         );
         return this;
@@ -1558,7 +1747,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     public havingNotBetween() {
         const value = arguments[1];
         (this.queryBuilder as any).havingNotBetween(
-            this.getColumnNameFromFunction(arguments[0]),
+            this.getColumnNameFromFunctionOrString(arguments[0]),
             value
         );
         return this;
@@ -1681,9 +1870,15 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
             this.knex
 
         );
+        let columnArgumentsList;
+        if (typeof arguments[1] === 'string') {
+            const [, ...columnArguments] = arguments;
+            columnArgumentsList = columnArguments.map((concatKey: string) => concatKey.split('.'));
+        } else {
+            const f = arguments[1];
+            columnArgumentsList = this.getArgumentsFromColumnFunction3(f);
+        }
 
-        const f = arguments[1];
-        const columnArgumentsList = typedQueryBuilderForInsert.getArgumentsFromColumnFunction3(f);
         const insertColumns = columnArgumentsList.map(i => typedQueryBuilderForInsert.getColumnName(...i));
 
         // https://github.com/knex/knex/issues/1056
@@ -1728,7 +1923,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     }
 
     public groupBy() {
-        this.queryBuilder.groupBy(this.getColumnNameFromFunction(arguments[0]));
+        this.queryBuilder.groupBy(this.getColumnNameFromFunctionOrString(arguments[0]));
         return this;
     }
 
@@ -1832,23 +2027,43 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
         aliasName: string
     ) {
         (this.queryBuilder as any)[knexFunctionName](
-            `${this.getColumnNameWithoutAliasFromFunction(f)} as ${aliasName}`
+            `${this.getColumnNameWithoutAliasFromFunctionOrString(f)} as ${aliasName}`
         );
         return this as any;
     }
 
-    private getColumnNameFromFunction(f: any) {
-        return this.getColumnName(...this.getArgumentsFromColumnFunction(f));
+    private getColumnNameFromFunctionOrString(f: any) {
+        let columnParts;
+        if (typeof f === 'string') {
+            columnParts = f.split('.');
+        } else {
+            columnParts = this.getArgumentsFromColumnFunction(f);
+        }
+
+        return this.getColumnName(...columnParts);
     }
 
-    private getColumnNameWithoutAliasFromFunction(f: any) {
+    private getColumnNameWithoutAliasFromFunctionOrString(f: any) {
+        let columnParts;
+        if (typeof f === 'string') {
+            columnParts = f.split('.');
+        } else {
+            columnParts = this.getArgumentsFromColumnFunction(f);
+        }
+
         return this.getColumnNameWithoutAlias(
-            ...this.getArgumentsFromColumnFunction(f)
+            ...columnParts
         );
     }
 
     private joinColumn(joinType: 'innerJoin' | 'leftOuterJoin', f: any) {
-        const columnToJoinArguments = this.getArgumentsFromColumnFunction(f);
+        let columnToJoinArguments: string[];
+
+        if (typeof f === 'string') {
+            columnToJoinArguments = f.split('.');
+        } else {
+            columnToJoinArguments = this.getArgumentsFromColumnFunction(f);
+        }
 
         const columnToJoinName = this.getColumnName(...columnToJoinArguments);
 
@@ -1984,12 +2199,21 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
         );
 
         const onWithJoinedColumnOperatorColumn = (joinedColumn: any, operator: any, modelColumn: any, functionName: string) => {
-            const column1Arguments = this.getArgumentsFromColumnFunction(
-                modelColumn
-            );
-            const column2Arguments = this.getArgumentsFromColumnFunction(
-                joinedColumn
-            );
+            let column1Arguments;
+            let column2Arguments;
+
+            if (typeof modelColumn === 'string') {
+                column1Arguments = modelColumn.split('.');
+                column2Arguments = joinedColumn.split('.');
+            } else {
+                column1Arguments = this.getArgumentsFromColumnFunction(
+                    modelColumn
+                );
+                column2Arguments = this.getArgumentsFromColumnFunction(
+                    joinedColumn
+                );
+            }
+
             const column2ArgumentsWithJoinedTable = [
                 tableToJoinAlias,
                 ...column2Arguments,
@@ -2068,6 +2292,9 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     }
 
     private callKnexFunctionWithColumnFunction(knexFunction: any, ...args: any[]) {
+        if (typeof args[0] === 'string') {
+            return this.callKnexFunctionWithConcatKeyColumn(knexFunction, ...args);
+        }
         const columnArguments = this.getArgumentsFromColumnFunction(
             args[0]
         );
@@ -2087,4 +2314,25 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
         return this;
     }
+
+
+    private callKnexFunctionWithConcatKeyColumn(knexFunction: any, ...args: any[]) {
+        const columnName = this.getColumnName(...args[0].split('.'));
+
+        if (args.length === 3) {
+            knexFunction(
+                columnName,
+                args[1],
+                args[2]
+            );
+        } else {
+            knexFunction(
+                columnName,
+                args[1]
+            );
+        }
+
+        return this;
+    }
+
 }
