@@ -1,3 +1,9 @@
+# *** Important upgrade notice ***
+Because TypeScript 4.1 supports template literal string types, the function syntax is no longer necessary. You can now use strings while maintaining type-safety. The function syntax is being deprecated and will be removed in version 4.
+
+To help with the upgrade, you can run `npx typed-knex -u string-parameters` to automatically switch over to the string syntax.
+
+
 # typed-knex
 
 [![npm version](https://img.shields.io/npm/v/@wwwouter/typed-knex.svg)](https://www.npmjs.com/package/@wwwouter/typed-knex)
@@ -37,14 +43,16 @@ _Tested with Knex.js v0.21.6, TypeScript v4.1.0 and Node.js v14.11.0_
 
 # Breaking changes in next major release
 
--   `.onColumn()` will be deprecated. Use `.on()`. Remember that the columns switched eg `.onColumns(i=>i.prop1, '=' j=>j.prop2) should become .on("prop2", '=', "prop1")`.
--   The use of optional columns (`@Column() public nickName?: string;`) will be deprecated. This was used to signal a nullable column. The correct way to do this is `@Column() public nickName: string | null;`.
+- Because TypeScript 4.1 supports template literal string types, the function syntax is no longer necessary. You can now use strings while maintaining type-safety. The function syntax is deprecated and will be removed.
+Run `npx typed-knex -u string-parameters` to automatically upgrade.
+-   `.onColumn()` is deprecated. Use `.on()`. Remember that the columns switched eg `.onColumns(i=>i.prop1, '=' j=>j.prop2) should become .on("prop2", '=', "prop1")`. Run `npx typed-knex -u join-on-columns-to-on` to automatically upgrade.
+-   The use of optional columns (`@Column() public nickName?: string;`) is deprecated. This was used to signal a nullable column. The correct way to do this is `@Column() public nickName: string | null;`.
 
 # Documentation
 
 ## Quick example
 
-To reference a column, use the name. Like this `.select('name')` or this `.where('name', "Hejlsberg")`
+To reference a column, use the name. Like this `.select("name")` or this `.where("name", "Hejlsberg")`
 
 ```ts
 import * as Knex from "knex";
