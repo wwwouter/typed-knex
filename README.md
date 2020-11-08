@@ -107,6 +107,8 @@ export class User {
     public id: string;
     @Column()
     public name: string;
+    @Column()
+    public categoryId: string;
     @Column({ name: "categoryId" })
     public category: UserCategory;
     @Column()

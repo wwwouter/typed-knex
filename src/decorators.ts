@@ -134,20 +134,17 @@ export function getColumnInformation(
     target: Function,
     propertyKey: string
 ): { columnClass: new () => any } & IColumnData {
-    // console.log('target: ', target);
-    // console.log('target: ', target.name);
     const properties = getColumnProperties(target);
 
     const property = properties.find(i => i.propertyKey === propertyKey);
-    // console.log('properties: ', properties);
-    // console.log('propertyKey: ', propertyKey);
-    // console.log('property: ', property);
-    // const columnData = Reflect.getMetadata(columnMetadataKey, target, propertyKey);
-    // console.log('columnData: ', columnData);
     if (!property) {
+        const fkObject = properties.find(p => p.name === propertyKey);
+        if (typeof fkObject?.designType === 'function') {
+            throw new Error(`It seems that class "${target.name}" only has a foreign key object "${fkObject.propertyKey}", but is missing the foreign key property "${propertyKey}". Try adding "@column() ${propertyKey} : [correct type]" to class "${target.name}"`);
+
+        }
         throw new Error(
-            `Cannot get column data. Did you set @Column() attribute on ${
-            target.name
+            `Cannot get column data. Did you set @Column() attribute on ${target.name
             }.${propertyKey}?`
         );
     }
@@ -169,8 +166,7 @@ export function getColumnProperties(tableClass: Function): IColumnData[] {
     const columns = tableColumns.get(tableClass);
     if (!columns) {
         throw new Error(
-            `Cannot get column data from ${
-            tableClass.constructor.name
+            `Cannot get column data from ${tableClass.constructor.name
             }, did you set @Column() attribute?`
         );
     }
@@ -182,16 +178,14 @@ export function getPrimaryKeyColumn(tableClass: Function): IColumnData {
     const columns = tableColumns.get(tableClass);
     if (!columns) {
         throw new Error(
-            `Cannot get column data from ${
-            tableClass.constructor.name
+            `Cannot get column data from ${tableClass.constructor.name
             }, did you set @Column() attribute?`
         );
     }
     const primaryKeyColumn = columns.find(i => i.primary);
     if (primaryKeyColumn === undefined) {
         throw new Error(
-            `Cannot get primary key column ${
-            tableClass.constructor.name
+            `Cannot get primary key column ${tableClass.constructor.name
             }, did you set @Column({primary:true}) attribute?`
         );
     }

@@ -2,6 +2,7 @@
 
 -   Dropped support for Node 8 (Knex.js v0.21.0)
 -   Updated all functions to use strings as parameters and deprecated the use of lambas. Use `npx typed-knex -u string-parameters` to upgrade.
+- Better error message when there is a foreign key object, but not a foreign key property.
 
 ## 2.18.0
 
