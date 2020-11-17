@@ -1938,7 +1938,11 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     }
 
     public getColumnName(...keys: string[]): string {
-        const firstPartName = this.getColumnNameWithoutAlias(keys[0]);
+        return this.getColumnNameTable(undefined, undefined, ...keys);
+    }
+
+    public getColumnNameTable(tableName?: string, tableClass?: new () => ModelType, ...keys: string[]): string {
+        const firstPartName = this.getColumnNameWithoutAliasTable(tableName, tableClass, keys[0]);
 
         if (keys.length === 1) {
             return firstPartName;
@@ -2117,7 +2121,20 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
         return this.getColumnName(...argumentsExceptLast);
     }
 
+
     private getColumnNameWithoutAlias(...keys: string[]): string {
+        return this.getColumnNameWithoutAliasTable(undefined, undefined, ...keys);
+    }
+
+    private getColumnNameWithoutAliasTable(tableName?: string, tableClass?: new () => ModelType, ...keys: string[]): string {
+        if(!tableName) {
+            tableName = this.tableName;
+        }
+
+        if(!tableClass) {
+            tableClass = this.tableClass;
+        }
+
         if (keys.length === 1) {
             const extraJoinedProperty = this.extraJoinedProperties.find(
                 i => i.name === keys[0]
@@ -2126,14 +2143,14 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
                 return extraJoinedProperty.name;
             } else {
                 const columnInfo = getColumnInformation(
-                    this.tableClass,
+                    tableClass,
                     keys[0]
                 );
-                return this.tableName + '.' + columnInfo.name;
+                return tableName + '.' + columnInfo.name;
             }
         } else {
             let currentColumnPart = getColumnInformation(
-                this.tableClass,
+                tableClass,
                 keys[0]
             );
 
@@ -2214,14 +2231,19 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
                 );
             }
 
-            const column2ArgumentsWithJoinedTable = [
-                tableToJoinAlias,
-                ...column2Arguments,
-            ];
+            const column1Name = this.getColumnName(...column1Arguments);
+            const column2Name = this.getColumnNameTable(getTableMetadata(tableToJoinClass).tableName, tableToJoinClass, ...column2Arguments);
+
+            const column2NameWithAlias = (() => {
+                const column2AliasArr = column2Name.split(".");
+                column2AliasArr[0] = tableToJoinAlias;
+                return column2AliasArr.join(".");
+            })();
+           
             knexOnObject[functionName](
-                this.getColumnName(...column1Arguments),
+                column1Name,
                 operator,
-                column2ArgumentsWithJoinedTable.join('.')
+                column2NameWithAlias
             );
         };
 
