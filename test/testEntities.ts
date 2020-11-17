@@ -25,6 +25,8 @@ export class UserCategory {
     public phoneNumber?: string;
     @Column({ name: 'backupRegionId' })
     public backupRegion?: Region;
+    @Column({ name: 'INTERNAL_NAME' })
+    public specialRegionId!: string;
 }
 
 // tslint:disable-next-line: no-empty-interfaces

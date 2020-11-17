@@ -4,7 +4,7 @@ import { getEntities, getTableName } from '../../src';
 import { getColumnName } from '../../src/decorators';
 import { TypedKnex } from '../../src/typedKnex';
 import { setToNull, unflatten } from '../../src/unflatten';
-import { User, UserCategory, UserSetting } from '../testEntities';
+import { Region, User, UserCategory, UserSetting } from '../testEntities';
 
 describe('TypedKnexQueryBuilder', () => {
     it('should return select * from "users"', done => {
@@ -2846,6 +2846,23 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         assert.equal(
             queryString,
             'select * from "userSettings" left outer join "userSettings" as "evilTwin" on "userSettings"."id" = "evilTwin"."id" left outer join "userSettings" as "evilTwin2" on "evilTwin"."id" = "evilTwin2"."id"'
+        );
+
+        done();
+    });
+
+    it('should left outer join with function with other table with an column alias', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(UserCategory)
+            .leftOuterJoinTableOnFunction('specialRegion', Region, join => {
+                join.on('id', '=', 'specialRegionId');
+            });
+
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select * from "userCategories" left outer join "regions" as "specialRegion" on "userCategories"."INTERNAL_NAME" = "specialRegion"."id"'
         );
 
         done();
