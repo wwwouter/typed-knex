@@ -40,7 +40,6 @@ dump.rdb
 .idea
 
 /build/
-/dist/
 
 .packagejson.checksum
 

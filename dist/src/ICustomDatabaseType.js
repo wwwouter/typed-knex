@@ -1,0 +1,7 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ICustomDatabaseType = void 0;
+class ICustomDatabaseType {
+}
+exports.ICustomDatabaseType = ICustomDatabaseType;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiSUN1c3RvbURhdGFiYXNlVHlwZS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9JQ3VzdG9tRGF0YWJhc2VUeXBlLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7OztBQUFBLE1BQWEsbUJBQW1CO0NBRS9CO0FBRkQsa0RBRUMiLCJzb3VyY2VzQ29udGVudCI6WyJleHBvcnQgY2xhc3MgSUN1c3RvbURhdGFiYXNlVHlwZSB7XG4gICAgcHVibGljIF8/OiAoKSA9PiB2b2lkO1xufVxuIl19

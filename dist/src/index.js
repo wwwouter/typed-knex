@@ -1,0 +1,21 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ICustomDatabaseType = exports.FlattenOption = exports.validateTables = exports.validateEntities = exports.registerBeforeUpdateTransform = exports.registerBeforeInsertTransform = exports.TypedKnex = exports.getTableName = exports.getEntities = exports.Table = exports.Entity = exports.Column = void 0;
+var decorators_1 = require("./decorators");
+Object.defineProperty(exports, "Column", { enumerable: true, get: function () { return decorators_1.Column; } });
+Object.defineProperty(exports, "Entity", { enumerable: true, get: function () { return decorators_1.Entity; } });
+Object.defineProperty(exports, "Table", { enumerable: true, get: function () { return decorators_1.Table; } });
+Object.defineProperty(exports, "getEntities", { enumerable: true, get: function () { return decorators_1.getEntities; } });
+Object.defineProperty(exports, "getTableName", { enumerable: true, get: function () { return decorators_1.getTableName; } });
+var typedKnex_1 = require("./typedKnex");
+Object.defineProperty(exports, "TypedKnex", { enumerable: true, get: function () { return typedKnex_1.TypedKnex; } });
+Object.defineProperty(exports, "registerBeforeInsertTransform", { enumerable: true, get: function () { return typedKnex_1.registerBeforeInsertTransform; } });
+Object.defineProperty(exports, "registerBeforeUpdateTransform", { enumerable: true, get: function () { return typedKnex_1.registerBeforeUpdateTransform; } });
+var validateEntities_1 = require("./validateEntities");
+Object.defineProperty(exports, "validateEntities", { enumerable: true, get: function () { return validateEntities_1.validateEntities; } });
+Object.defineProperty(exports, "validateTables", { enumerable: true, get: function () { return validateEntities_1.validateTables; } });
+var unflatten_1 = require("./unflatten");
+Object.defineProperty(exports, "FlattenOption", { enumerable: true, get: function () { return unflatten_1.FlattenOption; } });
+var ICustomDatabaseType_1 = require("./ICustomDatabaseType");
+Object.defineProperty(exports, "ICustomDatabaseType", { enumerable: true, get: function () { return ICustomDatabaseType_1.ICustomDatabaseType; } });
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi9zcmMvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7O0FBQUEsMkNBQWdGO0FBQXZFLG9HQUFBLE1BQU0sT0FBQTtBQUFFLG9HQUFBLE1BQU0sT0FBQTtBQUFFLG1HQUFBLEtBQUssT0FBQTtBQUFFLHlHQUFBLFdBQVcsT0FBQTtBQUFFLDBHQUFBLFlBQVksT0FBQTtBQUN6RCx5Q0FLcUI7QUFIakIsc0dBQUEsU0FBUyxPQUFBO0FBQ1QsMEhBQUEsNkJBQTZCLE9BQUE7QUFDN0IsMEhBQUEsNkJBQTZCLE9BQUE7QUFFakMsdURBQXNFO0FBQTdELG9IQUFBLGdCQUFnQixPQUFBO0FBQUUsa0hBQUEsY0FBYyxPQUFBO0FBQ3pDLHlDQUE0QztBQUFuQywwR0FBQSxhQUFhLE9BQUE7QUFDdEIsNkRBQTREO0FBQW5ELDBIQUFBLG1CQUFtQixPQUFBIiwic291cmNlc0NvbnRlbnQiOlsiZXhwb3J0IHsgQ29sdW1uLCBFbnRpdHksIFRhYmxlLCBnZXRFbnRpdGllcywgZ2V0VGFibGVOYW1lIH0gZnJvbSAnLi9kZWNvcmF0b3JzJztcbmV4cG9ydCB7XG4gICAgSVR5cGVkUXVlcnlCdWlsZGVyLFxuICAgIFR5cGVkS25leCxcbiAgICByZWdpc3RlckJlZm9yZUluc2VydFRyYW5zZm9ybSxcbiAgICByZWdpc3RlckJlZm9yZVVwZGF0ZVRyYW5zZm9ybVxufSBmcm9tICcuL3R5cGVkS25leCc7XG5leHBvcnQgeyB2YWxpZGF0ZUVudGl0aWVzLCB2YWxpZGF0ZVRhYmxlcyB9IGZyb20gJy4vdmFsaWRhdGVFbnRpdGllcyc7XG5leHBvcnQgeyBGbGF0dGVuT3B0aW9uIH0gZnJvbSAnLi91bmZsYXR0ZW4nO1xuZXhwb3J0IHsgSUN1c3RvbURhdGFiYXNlVHlwZSB9IGZyb20gJy4vSUN1c3RvbURhdGFiYXNlVHlwZSc7XG4iXX0=
