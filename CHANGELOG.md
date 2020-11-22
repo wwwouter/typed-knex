@@ -1,8 +1,11 @@
 # Changelog
 
+## 3.0.0
+
 -   Dropped support for Node 8 (Knex.js v0.21.0)
+-   Minimal TypeScript version is 4.1.
 -   Updated all functions to use strings as parameters and deprecated the use of lambas. Use `npx typed-knex -u string-parameters` to upgrade.
-- Better error message when there is a foreign key object, but not a foreign key property.
+-   Better error message when there is a foreign key object, but not a foreign key property.
 
 ## 2.18.0
 
