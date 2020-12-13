@@ -1,6 +1,8 @@
 # Changelog
 
 
+## 3.0.1
+
 - Fix: `orderBy` with `innerJoinTableOnFunction`.
 
 ## 3.0.0
