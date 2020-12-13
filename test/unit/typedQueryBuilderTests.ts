@@ -286,6 +286,23 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+    it('should inner join with function with other table and use order by on joined table', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(UserSetting)
+            .innerJoinTableOnFunction('otherUser', User, join => {
+                join.on(i => i.id, '=', j => j.user2Id);
+            }).orderBy(i => i.otherUser.name);
+
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select * from "userSettings" inner join "users" as "otherUser" on "userSettings"."user2Id" = "otherUser"."id" order by "otherUser"."name" asc'
+        );
+
+        done();
+    });
+
     it('should select 2 columns at once', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex.query(User).select(c => [c.id, c.name]);
@@ -1937,6 +1954,46 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
 
         done();
     });
+
+    it('should inner join with function with other table and use order by on joined table', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(UserSetting)
+            .innerJoinTableOnFunction('otherUser', User, join => {
+                join.on('id', '=', 'user2Id');
+            })
+            .orderBy('otherUser.name');
+
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select * from "userSettings" inner join "users" as "otherUser" on "userSettings"."user2Id" = "otherUser"."id" order by "otherUser"."name" asc'
+        );
+
+        done();
+    });
+
+    it.only('should inner join with function with other tables and use order by on joined table', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(UserSetting)
+            .innerJoinTableOnFunction('otherUser', User, join => {
+                join.on('id', '=', 'user2Id');
+            })
+            .innerJoinTableOnFunction('otherCategory', UserCategory, join => {
+                join.on('id', '=', 'otherUser.categoryId');
+            })
+            .orderBy('otherCategory.name');
+
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select * from "userSettings" inner join "users" as "otherUser" on "userSettings"."user2Id" = "otherUser"."id" inner join "userCategories" as "otherCategory" on "otherUser"."categoryId" = "otherCategory"."id" order by "otherCategory"."name" asc'
+        );
+
+        done();
+    });
+
 
     it('should select 2 columns at once', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));

@@ -2118,19 +2118,41 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     }
 
     private getColumnNameWithoutAlias(...keys: string[]): string {
-        if (keys.length === 1) {
-            const extraJoinedProperty = this.extraJoinedProperties.find(
-                i => i.name === keys[0]
-            );
-            if (extraJoinedProperty) {
+        const extraJoinedProperty = this.extraJoinedProperties.find(
+            i => i.name === keys[0]
+        );
+        if (extraJoinedProperty) {
+            if (keys.length === 1) {
                 return extraJoinedProperty.name;
-            } else {
-                const columnInfo = getColumnInformation(
-                    this.tableClass,
-                    keys[0]
-                );
-                return this.tableName + '.' + columnInfo.name;
             }
+            const columnInfo = getColumnInformation(
+                extraJoinedProperty.propertyType,
+                keys[1]
+            );
+            return extraJoinedProperty.name + '.' + columnInfo.name;
+        }
+
+        if (keys.length === 1) {
+            // const extraJoinedProperty = this.extraJoinedProperties.find(
+            //     i => i.name === keys[0]
+            // );
+            // if (extraJoinedProperty) {
+            //     return extraJoinedProperty.name;
+            //     // if (keys.length === 1) {
+            //     // }
+            //     // const columnInfo = getColumnInformation(
+            //     //     extraJoinedProperty.propertyType,
+            //     //     keys[1]
+            //     // );
+            //     // return extraJoinedProperty.name + '.' + columnInfo.name;
+            // }
+
+            const columnInfo = getColumnInformation(
+                this.tableClass,
+                keys[0]
+            );
+            return this.tableName + '.' + columnInfo.name;
+
         } else {
             let currentColumnPart = getColumnInformation(
                 this.tableClass,

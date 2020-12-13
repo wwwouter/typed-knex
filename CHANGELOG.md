@@ -1,5 +1,8 @@
 # Changelog
 
+
+- Fix: `orderBy` with `innerJoinTableOnFunction`.
+
 ## 3.0.0
 
 -   Dropped support for Node 8 (Knex.js v0.21.0)
