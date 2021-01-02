@@ -158,11 +158,11 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     useKnexQueryBuilder(f: (query: Knex.QueryBuilder) => void): ITypedQueryBuilder<Model, SelectableModel, Row>;
     toQuery(): string;
 
-    getFirstOrNull(flattenOption?: FlattenOption): Promise<Row | null>;
-    getFirst(flattenOption?: FlattenOption): Promise<Row>;
-    getSingleOrNull(flattenOption?: FlattenOption): Promise<Row | null>;
-    getSingle(flattenOption?: FlattenOption): Promise<Row>;
-    getMany(flattenOption?: FlattenOption): Promise<Row[]>;
+    getFirstOrNull(flattenOption?: FlattenOption): Promise<Row extends Model ? RemoveObjectsFrom<Model> : Row | null>;
+    getFirst(flattenOption?: FlattenOption): Promise<Row extends Model ? RemoveObjectsFrom<Model> : Row>;
+    getSingleOrNull(flattenOption?: FlattenOption): Promise<Row extends Model ? RemoveObjectsFrom<Model> : Row | null>;
+    getSingle(flattenOption?: FlattenOption): Promise<Row extends Model ? RemoveObjectsFrom<Model> : Row>;
+    getMany(flattenOption?: FlattenOption): Promise<(Row extends Model ? RemoveObjectsFrom<Model> : Row)[]>;
     getCount(): Promise<number>;
     insertItem(newObject: Partial<RemoveObjectsFrom<Model>>): Promise<void>;
     insertItems(items: Partial<RemoveObjectsFrom<Model>>[]): Promise<void>;
@@ -1011,6 +1011,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
 
     public onlyLogQuery = false;
     public queryLog = '';
+    private hasSelectClause = false;
 
     private queryBuilder: Knex.QueryBuilder;
     private tableName: string;
@@ -1198,44 +1199,77 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     }
 
     public async getFirstOrNull() {
-        const items = await this.queryBuilder;
-        if (!items || items.length === 0) {
-            return null;
+        if (this.hasSelectClause === false) {
+            this.selectAllModelProperties()
         }
+        if (this.onlyLogQuery) {
+            this.queryLog += this.queryBuilder.toQuery() + '\n';
+            return [];
+        } else {
+            const items = await this.queryBuilder;
+            if (!items || items.length === 0) {
+                return null;
+            }
 
-        return this.flattenByOption(items[0], arguments[0]);
+            return this.flattenByOption(items[0], arguments[0]);
+        }
     }
 
     public async getFirst() {
-        const items = await this.queryBuilder;
-        if (!items || items.length === 0) {
-            throw new Error('Item not found.');
+        if (this.hasSelectClause === false) {
+            this.selectAllModelProperties()
         }
+        if (this.onlyLogQuery) {
+            this.queryLog += this.queryBuilder.toQuery() + '\n';
+            return [];
+        } else {
+            const items = await this.queryBuilder;
+            if (!items || items.length === 0) {
+                throw new Error('Item not found.');
+            }
 
-        return this.flattenByOption(items[0], arguments[0]);
+            return this.flattenByOption(items[0], arguments[0]);
+        }
     }
 
     public async getSingleOrNull() {
-        const items = await this.queryBuilder;
-        if (!items || items.length === 0) {
-            return null;
-        } else if (items.length > 1) {
-            throw new Error(`More than one item found: ${items.length}.`);
+        if (this.hasSelectClause === false) {
+            this.selectAllModelProperties()
         }
-        return this.flattenByOption(items[0], arguments[0]);
+        if (this.onlyLogQuery) {
+            this.queryLog += this.queryBuilder.toQuery() + '\n';
+            return [];
+        } else {
+            const items = await this.queryBuilder;
+            if (!items || items.length === 0) {
+                return null;
+            } else if (items.length > 1) {
+                throw new Error(`More than one item found: ${items.length}.`);
+            }
+            return this.flattenByOption(items[0], arguments[0]);
+        }
     }
 
     public async getSingle() {
-        const items = await this.queryBuilder;
-        if (!items || items.length === 0) {
-            throw new Error('Item not found.');
-        } else if (items.length > 1) {
-            throw new Error(`More than one item found: ${items.length}.`);
+        if (this.hasSelectClause === false) {
+            this.selectAllModelProperties()
         }
-        return this.flattenByOption(items[0], arguments[0]);
+        if (this.onlyLogQuery) {
+            this.queryLog += this.queryBuilder.toQuery() + '\n';
+            return [];
+        } else {
+            const items = await this.queryBuilder;
+            if (!items || items.length === 0) {
+                throw new Error('Item not found.');
+            } else if (items.length > 1) {
+                throw new Error(`More than one item found: ${items.length}.`);
+            }
+            return this.flattenByOption(items[0], arguments[0]);
+        }
     }
 
     public selectColumn() {
+        this.hasSelectClause = true;
         let calledArguments = [] as string[];
 
         function saveArguments(...args: string[]) {
@@ -1262,6 +1296,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     }
 
     public select2() {
+        this.hasSelectClause = true;
         const f = arguments[0];
 
         const columnArgumentsList = this.getArgumentsFromColumnFunction3(f);
@@ -1277,6 +1312,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     }
 
     public select() {
+        this.hasSelectClause = true;
         let columnArgumentsList: string[][];
 
         if (typeof arguments[0] === 'string') {
@@ -1305,13 +1341,24 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
         return this as any;
     }
 
-    public async getMany() {
-        const items = await this.queryBuilder;
-
-        return this.flattenByOption(items, arguments[0]) as Row[];
+    public async getMany(): Promise<(Row extends ModelType ? RemoveObjectsFrom<ModelType> : Row)[]> {
+        if (this.hasSelectClause === false) {
+            this.selectAllModelProperties()
+        }
+        if (this.onlyLogQuery) {
+            this.queryLog += this.queryBuilder.toQuery() + '\n';
+            return [];
+        } else {
+            const items = await this.queryBuilder;
+            return this.flattenByOption(items, arguments[0]) as (Row extends ModelType ? RemoveObjectsFrom<ModelType> : Row)[];
+        }
     }
 
+
+
+
     public selectRaw() {
+        this.hasSelectClause = true;
         const name = arguments[0];
         const query = arguments[2];
 
@@ -1581,6 +1628,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
     }
 
     public selectQuery() {
+        this.hasSelectClause = true;
         const name = arguments[0];
         const typeOfSubQuery = arguments[2];
         const functionToCall = arguments[3];
@@ -2026,6 +2074,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
         f: any,
         aliasName: string
     ) {
+        this.hasSelectClause = true;
         (this.queryBuilder as any)[knexFunctionName](
             `${this.getColumnNameWithoutAliasFromFunctionOrString(f)} as ${aliasName}`
         );
@@ -2355,6 +2404,13 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}>
         }
 
         return this;
+    }
+
+    private selectAllModelProperties() {
+        const properties = getColumnProperties(this.tableClass);
+        for (const property of properties) {
+            this.queryBuilder.select(`${property.name} as ${property.propertyKey}`)
+        }
     }
 
 }

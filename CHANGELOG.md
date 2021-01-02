@@ -1,6 +1,10 @@
 # Changelog
 
 
+## 3.1.0
+
+- Return correct object(s) when omitting a select clause.
+
 ## 3.0.1
 
 - Fix: `orderBy` with `innerJoinTableOnFunction`.

@@ -1973,7 +1973,7 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
         done();
     });
 
-    it.only('should inner join with function with other tables and use order by on joined table', done => {
+    it('should inner join with function with other tables and use order by on joined table', done => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex
             .query(UserSetting)
@@ -3327,6 +3327,112 @@ describe('TypedKnexQueryBuilder with string parameters', () => {
             (query as any).queryLog.trim(),
             `select "users"."id" as "id", "users"."name" as "name" from "users" where "id" = '1'`
         );
+
     });
+
+    it('should select * when querybuilder has no select specified', done => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex
+            .query(User)
+
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            'select * from "users"'
+        );
+
+        done();
+    });
+
+
+    it('getMany should select all columns of root type with correct aliases', async () => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex
+            .query(UserCategory);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.getMany();
+
+        assert.equal(
+            (query as any).queryLog.trim(),
+            `select "id" as "id", "name" as "name", "regionId" as "region", "regionId" as "regionId", "year" as "year", "phoneNumber" as "phoneNumber", "backupRegionId" as "backupRegion", "INTERNAL_NAME" as "specialRegionId" from "userCategories"`
+        );
+
+    });
+
+    it('getFirst should select all columns of root type with correct aliases', async () => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex
+            .query(UserCategory);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.getFirst();
+
+        assert.equal(
+            (query as any).queryLog.trim(),
+            `select "id" as "id", "name" as "name", "regionId" as "region", "regionId" as "regionId", "year" as "year", "phoneNumber" as "phoneNumber", "backupRegionId" as "backupRegion", "INTERNAL_NAME" as "specialRegionId" from "userCategories"`
+        );
+    });
+
+    it('getFirstOrNull should select all columns of root type with correct aliases', async () => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex
+            .query(UserCategory);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.getFirstOrNull();
+
+        assert.equal(
+            (query as any).queryLog.trim(),
+            `select "id" as "id", "name" as "name", "regionId" as "region", "regionId" as "regionId", "year" as "year", "phoneNumber" as "phoneNumber", "backupRegionId" as "backupRegion", "INTERNAL_NAME" as "specialRegionId" from "userCategories"`
+        );
+    });
+
+    it('getSingle should select all columns of root type with correct aliases', async () => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex
+            .query(UserCategory);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.getSingle();
+
+        assert.equal(
+            (query as any).queryLog.trim(),
+            `select "id" as "id", "name" as "name", "regionId" as "region", "regionId" as "regionId", "year" as "year", "phoneNumber" as "phoneNumber", "backupRegionId" as "backupRegion", "INTERNAL_NAME" as "specialRegionId" from "userCategories"`
+        );
+    });
+
+
+    it('getSingleOrNull should select all columns of root type with correct aliases', async () => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex
+            .query(UserCategory);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.getSingleOrNull();
+
+        assert.equal(
+            (query as any).queryLog.trim(),
+            `select "id" as "id", "name" as "name", "regionId" as "region", "regionId" as "regionId", "year" as "year", "phoneNumber" as "phoneNumber", "backupRegionId" as "backupRegion", "INTERNAL_NAME" as "specialRegionId" from "userCategories"`
+        );
+    });
+
+
+
 
 });
