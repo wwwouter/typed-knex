@@ -1,5 +1,5 @@
 # *** Important upgrade notice ***
-Because TypeScript 4.1 supports template literal string types, the function syntax is no longer necessary. You can now use strings while maintaining type-safety. The function syntax is being deprecated and will be removed in version 4.
+Because TypeScript 4.1 supports template literal string types, the function syntax is no longer necessary. You can now use strings while maintaining type-safety. The function syntax is removed since version 4.
 
 To help with the upgrade, you can run `npx typed-knex -u string-parameters` to automatically switch over to the string syntax.
 
@@ -43,7 +43,7 @@ _Tested with Knex.js v0.21.6, TypeScript v4.1.2 and Node.js v14.11.0_
 
 # Breaking changes in next major release
 
-- Because TypeScript 4.1 supports template literal string types, the function syntax is no longer necessary. You can now use strings while maintaining type-safety. The function syntax is deprecated and will be removed.
+- Because TypeScript 4.1 supports template literal string types, the function syntax is no longer necessary. You can now use strings while maintaining type-safety. The function syntax is removed.
 Run `npx typed-knex -u string-parameters` to automatically upgrade.
 -   `.onColumn()` is deprecated. Use `.on()`. Remember that the columns switched eg `.onColumns(i=>i.prop1, '=' j=>j.prop2) should become .on("prop2", '=', "prop1")`. Run `npx typed-knex -u join-on-columns-to-on` to automatically upgrade.
 -   The use of optional columns (`@Column() public nickName?: string;`) is deprecated. This was used to signal a nullable column. The correct way to do this is `@Column() public nickName: string | null;`.
