@@ -784,7 +784,7 @@ describe('compile time typed-knex string column parameters', function() {
                 const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
                 const result = await typedKnex
                     .query(User)
-                    .orderBy(c=>c.id)
+                    .orderBy('id')
                     .getMany();
 
                 console.log(result.length);
@@ -808,7 +808,7 @@ describe('compile time typed-knex string column parameters', function() {
                 const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
                 const result = await typedKnex
                     .query(User)
-                    .orderBy(c=>c.birthDate)
+                    .orderBy('birthDate')
                     .getMany();
 
                 console.log(result.length);
@@ -832,7 +832,7 @@ describe('compile time typed-knex string column parameters', function() {
                 const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
                 const result = await typedKnex
                     .query(User)
-                    .orderBy(c=>c.deathDate)
+                    .orderBy('deathDate')
                     .getMany();
 
                 console.log(result.length);

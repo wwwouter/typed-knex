@@ -12,7 +12,6 @@ import { NonForeignKeyObjects } from './NonForeignKeyObjects';
 import { NonNullableRecursive } from './NonNullableRecursive';
 import { GetNestedProperty, GetNestedPropertyType } from './PropertyTypes';
 import { SelectableColumnTypes } from './SelectableColumnTypes';
-import { TransformPropertiesToFunction } from './TransformPropertiesToFunction';
 import { FlattenOption, setToNull, unflatten } from './unflatten';
 
 export class TypedKnex {
@@ -234,48 +233,18 @@ export type AddPropertyWithType<
     > = Original & Record<NewKey, NewKeyType>;
 
 interface IColumnParameterNoRowTransformation<Model, SelectableModel, Row> {
-    /**
-     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
-     */
-    <PropertyType1>(
-        selectColumn1Function: (
-            c: TransformPropsToFunctionsReturnPropertyType<Model>
-        ) => () => PropertyType1
-    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
 
     <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
         key: ConcatKey
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
-// deprecated
-interface IJoinOnColumns<Model, JoinedModel> {
 
-    <PropertyType1, PropertyType2>(
-        selectColumn1Function: (
-            c: TransformPropsToFunctionsReturnPropertyType<Model>
-        ) => () => PropertyType1,
-        operator: Operator,
-        selectColumn2Function: (
-            c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
-        ) => () => PropertyType2
-    ): IJoinOnClause2<Model, JoinedModel>;
-}
 
 interface IJoinOn<Model, JoinedModel> {
 
-    /**
-     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
-     */
-    <PropertyType1, PropertyType2>(
-        selectColumn1Function: (
-            c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
-        ) => () => PropertyType1,
-        operator: Operator,
-        selectColumn2Function: (
-            c: TransformPropsToFunctionsReturnPropertyType<Model>
-        ) => () => PropertyType2
-    ): IJoinOnClause2<Model, JoinedModel>;
+
 
     <ConcatKey1 extends NestedKeysOf<NonNullableRecursive<JoinedModel>, keyof NonNullableRecursive<JoinedModel>, ''>,
         ConcatKey2 extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
@@ -288,16 +257,7 @@ interface IJoinOn<Model, JoinedModel> {
 
 interface IJoinOnVal<Model, JoinedModel> {
 
-    /**
-     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
-     */
-    <PropertyType1>(
-        selectColumn1Function: (
-            c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
-        ) => () => PropertyType1,
-        operator: Operator,
-        value: any
-    ): IJoinOnClause2<Model, JoinedModel>;
+
 
     <ConcatKey extends NestedKeysOf<NonNullableRecursive<JoinedModel>, keyof NonNullableRecursive<JoinedModel>, ''>>(
         key: ConcatKey,
@@ -308,14 +268,7 @@ interface IJoinOnVal<Model, JoinedModel> {
 
 interface IJoinOnNull<Model, JoinedModel> {
 
-    /**
-     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
-     */
-    <X>(
-        selectColumn1Function: (
-            c: TransformPropsToFunctionsReturnPropertyType<JoinedModel>
-        ) => () => X
-    ): IJoinOnClause2<Model, JoinedModel>;
+
 
     <ConcatKey extends NestedKeysOf<NonNullableRecursive<JoinedModel>, keyof NonNullableRecursive<JoinedModel>, ''>>(
         key: ConcatKey
@@ -324,11 +277,7 @@ interface IJoinOnNull<Model, JoinedModel> {
 
 
 interface IJoinOnClause2<Model, JoinedModel> {
-    /**
-     * @deprecated since version 2.9, use .on(). Remember that the columns switched eg .onColumns(i=>i.prop, '=' j=>j.prop) should become .on(j=>j.prop, '=', i=>i.prop).
-     * Use `npx typed-knex -u join-on-columns-to-on` to upgrade.
-     */
-    onColumns: IJoinOnColumns<Model, JoinedModel>;
+
     on: IJoinOn<Model, JoinedModel>;
     orOn: IJoinOn<Model, JoinedModel>;
     andOn: IJoinOn<Model, JoinedModel>;
@@ -339,15 +288,6 @@ interface IJoinOnClause2<Model, JoinedModel> {
 }
 
 interface IInsertSelect {
-    /**
-     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
-     */
-    <NewPropertyType>(
-        newPropertyClass: new () => NewPropertyType,
-        selectColumn1Function: (
-            c: TransformPropsToFunctionsReturnPropertyType<NewPropertyType>
-        ) => any
-    ): Promise<void>;
 
 
     <NewPropertyType, ConcatKey extends NestedKeysOf<NonNullableRecursive<NewPropertyType>, keyof NonNullableRecursive<NewPropertyType>, ''>>
@@ -412,13 +352,6 @@ interface ISelectQuery<Model, SelectableModel, Row> {
     >;
 }
 
-type TransformPropsToFunctionsOnlyLevel1<Level1Type> = {
-    [Level1Property in keyof RemoveObjectsFrom<
-        Level1Type
-    >]: Level1Type[Level1Property] extends SelectableColumnTypes
-    ? (() => Pick<Level1Type, Level1Property>)
-    : never
-};
 
 type TransformPropsToFunctionsReturnPropertyName<Model> = {
     [P in keyof Model]: Model[P] extends object ?
@@ -431,29 +364,7 @@ type TransformPropsToFunctionsReturnPropertyName<Model> = {
 };
 
 
-
-type TransformPropsToFunctionsReturnPropertyType<Model> = {
-    [P in keyof Model]:
-    Model[P] extends object ?
-    Model[P] extends Required<NonForeignKeyObjects> ?
-    () => Model[P]
-    :
-    TransformPropsToFunctionsReturnPropertyType<Model[P]>
-    :
-    () => Model[P]
-};
-
-
 interface IOrderBy<Model, SelectableModel, Row> {
-    /**
-     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
-     */
-    <NewRow>(
-        selectColumnFunction: (
-            c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
-        ) => () => NewRow,
-        direction?: 'asc' | 'desc'
-    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
 
     <ConcatKey extends NestedKeysOf<NonNullableRecursive<SelectableModel>, keyof NonNullableRecursive<SelectableModel>, ''>, TName extends keyof any>
@@ -462,19 +373,7 @@ interface IOrderBy<Model, SelectableModel, Row> {
 }
 
 interface IDbFunctionWithAlias<Model, SelectableModel, Row> {
-    /**
-     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
-     */
-    <NewPropertyType, TName extends keyof any>(
-        selectColumnFunction: (
-            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
-        ) => () => NewPropertyType,
-        name: TName
-    ): ITypedQueryBuilder<
-        Model,
-        SelectableModel,
-        Record<TName, ObjectToPrimitive<NewPropertyType>> & Row
-    >;
+
 
     <ConcatKey extends NestedKeysOf<NonNullableRecursive<SelectableModel>, keyof NonNullableRecursive<SelectableModel>, ''>, TName extends keyof any>
         (columnNames: ConcatKey, name: TName):
@@ -489,117 +388,7 @@ type UnionToIntersection<U> =
     (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
 
 interface ISelectWithFunctionColumns3<Model, SelectableModel, Row> {
-    /**
-     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
-     */
-    <
-        R1,
-        R2,
-        R3,
-        R4,
-        R5,
-        R6,
-        R7,
-        R8,
-        R9,
-        R10,
-        R11,
-        R12,
-        R13,
-        R14,
-        R15,
-        R16,
-        R17,
-        R18,
-        R19,
-        R20,
-        R21,
-        R22,
-        R23,
-        R24,
-        R25,
-        R26,
-        R27,
-        R28,
-        R29
-        >(
-        selectColumnFunction: (
-            c: TransformPropertiesToFunction<SelectableModel>
-        ) => [
-                () => R1,
-                (() => R2)?,
-                (() => R3)?,
-                (() => R4)?,
-                (() => R5)?,
-                (() => R6)?,
-                (() => R7)?,
-                (() => R8)?,
-                (() => R9)?,
-                (() => R10)?,
-                (() => R12)?,
-                (() => R13)?,
-                (() => R14)?,
-                (() => R15)?,
-                (() => R16)?,
-                (() => R17)?,
-                (() => R18)?,
-                (() => R19)?,
-                (() => R20)?,
-                (() => R22)?,
-                (() => R23)?,
-                (() => R24)?,
-                (() => R25)?,
-                (() => R26)?,
-                (() => R27)?,
-                (() => R28)?,
-                (() => R29)?
-            ]
-    ): ITypedQueryBuilder<
-        Model,
-        SelectableModel,
-        Row &
-        R1 &
-        R2 &
-        R3 &
-        R4 &
-        R5 &
-        R6 &
-        R7 &
-        R8 &
-        R8 &
-        R9 &
-        R10 &
-        R11 &
-        R12 &
-        R13 &
-        R14 &
-        R15 &
-        R16 &
-        R17 &
-        R18 &
-        R18 &
-        R19 &
-        R20 &
-        R21 &
-        R22 &
-        R23 &
-        R24 &
-        R25 &
-        R26 &
-        R27 &
-        R28 &
-        R28 &
-        R29
-    >;
 
-    /**
-     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
-     */
-    <R1>(
-        selectColumnFunction: (
-            c: TransformPropertiesToFunction<SelectableModel>
-        ) => () => R1
-    ): ITypedQueryBuilder<Model, SelectableModel, Row & R1>;
 
 
     <ConcatKey extends NestedKeysOf<NonNullableRecursive<SelectableModel>, keyof NonNullableRecursive<SelectableModel>, ''>>
@@ -609,108 +398,7 @@ interface ISelectWithFunctionColumns3<Model, SelectableModel, Row> {
 }
 
 interface IFindByPrimaryKey<_Model, SelectableModel, Row> {
-    /**
-     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
-     */
-    <
-        R1,
-        R2,
-        R3,
-        R4,
-        R5,
-        R6,
-        R7,
-        R8,
-        R9,
-        R10,
-        R11,
-        R12,
-        R13,
-        R14,
-        R15,
-        R16,
-        R17,
-        R18,
-        R19,
-        R20,
-        R21,
-        R22,
-        R23,
-        R24,
-        R25,
-        R26,
-        R27,
-        R28,
-        R29
-        >(
-        primaryKeyValue: any,
-        selectColumnFunction: (
-            c: TransformPropsToFunctionsOnlyLevel1<SelectableModel>
-        ) => [
-                () => R1,
-                (() => R2)?,
-                (() => R3)?,
-                (() => R4)?,
-                (() => R5)?,
-                (() => R6)?,
-                (() => R7)?,
-                (() => R8)?,
-                (() => R9)?,
-                (() => R10)?,
-                (() => R12)?,
-                (() => R13)?,
-                (() => R14)?,
-                (() => R15)?,
-                (() => R16)?,
-                (() => R17)?,
-                (() => R18)?,
-                (() => R19)?,
-                (() => R20)?,
-                (() => R22)?,
-                (() => R23)?,
-                (() => R24)?,
-                (() => R25)?,
-                (() => R26)?,
-                (() => R27)?,
-                (() => R28)?,
-                (() => R29)?
-            ]
-    ): Promise<
-        | Row &
-        R1 &
-        R2 &
-        R3 &
-        R4 &
-        R5 &
-        R6 &
-        R7 &
-        R8 &
-        R8 &
-        R9 &
-        R10 &
-        R11 &
-        R12 &
-        R13 &
-        R14 &
-        R15 &
-        R16 &
-        R17 &
-        R18 &
-        R18 &
-        R19 &
-        R20 &
-        R21 &
-        R22 &
-        R23 &
-        R24 &
-        R25 &
-        R26 &
-        R27 &
-        R28 &
-        R28 &
-        R29
-        | undefined
-    >;
+
 
     <ConcatKey extends NestedKeysOf<NonNullableRecursive<SelectableModel>, keyof NonNullableRecursive<SelectableModel>, ''>>
         (primaryKeyValue: any, ...columnNames: ConcatKey[]):
@@ -719,24 +407,7 @@ interface IFindByPrimaryKey<_Model, SelectableModel, Row> {
 
 
 interface IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row> {
-    /**
-     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
-     */
-    (
-        selectColumnFunction: (
-            c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
-        ) => void
-    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
-    /**
-     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
-     */
-    (
-        selectColumnFunction: (
-            c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
-        ) => void,
-        setToNullIfNullFunction: (r: Row) => void
-    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
 
     <ConcatKey extends NestedForeignKeyKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
@@ -745,24 +416,7 @@ interface IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>
 }
 
 interface ISelectableColumnKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row> {
-    /**
-     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
-     */
-    (
-        selectColumnFunction: (
-            c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
-        ) => void
-    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
-    /**
-     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
-     */
-    (
-        selectColumnFunction: (
-            c: TransformPropertiesToFunction<NonNullableRecursive<Model>>
-        ) => void,
-        setToNullIfNullFunction: (r: Row) => void
-    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
 
     <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
@@ -771,15 +425,7 @@ interface ISelectableColumnKeyFunctionAsParametersReturnQueryBuider<Model, Selec
 }
 
 interface IWhere<Model, SelectableModel, Row> {
-    /**
-     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
-     */
-    <PropertyType>(
-        selectColumnFunction: (
-            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<SelectableModel>>
-        ) => () => PropertyType,
-        value: PropertyType
-    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
 
     <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
         key: ConcatKey,
@@ -788,26 +434,7 @@ interface IWhere<Model, SelectableModel, Row> {
 }
 
 interface IWhereWithOperator<Model, SelectableModel, Row> {
-    /**
-     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
-     */
-    <PropertyType>(
-        selectColumnFunction: (
-            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<SelectableModel>>
-        ) => () => PropertyType,
-        value: PropertyType
-    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
-    /**
-     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
-     */
-    <PropertyType>(
-        selectColumnFunction: (
-            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<SelectableModel>>
-        ) => () => PropertyType,
-        operator: Operator,
-        value: PropertyType
-    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
     <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
         key: ConcatKey,
@@ -822,15 +449,7 @@ interface IWhereWithOperator<Model, SelectableModel, Row> {
 }
 
 interface IWhereIn<Model, SelectableModel, Row> {
-    /**
-     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
-     */
-    <PropertyType>(
-        selectColumnFunction: (
-            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<SelectableModel>>
-        ) => () => PropertyType,
-        values: PropertyType[]
-    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
 
     <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
         key: ConcatKey,
@@ -840,15 +459,7 @@ interface IWhereIn<Model, SelectableModel, Row> {
 }
 
 interface IWhereBetween<Model, SelectableModel, Row> {
-    /**
-     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
-     */
-    <PropertyType>(
-        selectColumnFunction: (
-            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<SelectableModel>>
-        ) => () => PropertyType,
-        range: [PropertyType, PropertyType]
-    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
 
     <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>,
         PropertyType extends GetNestedPropertyType<Model, ConcatKey>>(
@@ -859,16 +470,7 @@ interface IWhereBetween<Model, SelectableModel, Row> {
 }
 
 interface IHaving<Model, SelectableModel, Row> {
-    /**
-     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
-     */
-    <PropertyType>(
-        selectColumnFunction: (
-            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<SelectableModel>>
-        ) => () => PropertyType,
-        operator: Operator,
-        value: PropertyType
-    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
 
     <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
         key: ConcatKey,
@@ -878,18 +480,7 @@ interface IHaving<Model, SelectableModel, Row> {
 }
 
 interface IWhereCompareTwoColumns<Model, SelectableModel, Row> {
-    /**
-     * @deprecated Use strings instead of functions since version 3.0, use `npx typed-knex -u string-parameters` to upgrade.
-     */
-    <PropertyType1, _PropertyType2, Model2>(
-        selectColumn1Function: (
-            c: TransformPropsToFunctionsReturnPropertyType<NonNullableRecursive<Model>>
-        ) => () => PropertyType1,
-        operator: Operator,
-        selectColumn2Function: (
-            c: TransformPropsToFunctionsReturnPropertyType<Model2>
-        ) => any
-    ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
 
 
 

@@ -1,5 +1,6 @@
 # Changelog
 
+- Dropped lamba support.
 
 ## 3.1.0
 
