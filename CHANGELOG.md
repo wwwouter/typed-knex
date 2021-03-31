@@ -2,6 +2,7 @@
 
 - Upgrade Knex.js to v0.95.0.
 - Upgrade TypeScript to v4.2.3.
+- Fix example code for `registerBeforeInsertTransform`.
 
 ## 4.0.0
 

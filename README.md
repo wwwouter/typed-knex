@@ -253,13 +253,13 @@ Hook that is run before doing an insert. Execute this function as soon as possib
 
 ```
 registerBeforeInsertTransform((item: any, typedQueryBuilder: ITypedQueryBuilder<{}, {}, {}>) => {
-    if (typedQueryBuilder.columns.find("name" === 'created_at') && !item.hasOwnProperty('created_at')) {
+    if (typedQueryBuilder.columns.find(column => column.name === 'created_at') && !item.hasOwnProperty('created_at')) {
         item.created_at = new Date();
     }
-    if (typedQueryBuilder.columns.find("name" === 'updated_at') && !item.hasOwnProperty('updated_at')) {
+    if (typedQueryBuilder.columns.find(column => column.name === 'updated_at') && !item.hasOwnProperty('updated_at')) {
         item.updated_at = new Date();
     }
-    if (typedQueryBuilder.columns.find("name" === 'id') && !item.hasOwnProperty('id')) {
+    if (typedQueryBuilder.columns.find(column => column.name === 'id') && !item.hasOwnProperty('id')) {
         item.id = guid();
     }
     return item;
