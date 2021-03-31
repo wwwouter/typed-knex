@@ -1,4 +1,4 @@
-import * as Knex from 'knex';
+import { Knex } from 'knex';
 import { getColumnProperties, getEntities } from './decorators';
 
 export async function validateEntities(knex: Knex) {
@@ -8,11 +8,7 @@ export async function validateEntities(knex: Knex) {
         const doesTableExists = await knex.schema.hasTable(entity.tableName);
 
         if (doesTableExists === false) {
-            throw new Error(
-                `Table "${entity.tableName}" of class "${
-                entity.entityClass.name
-                }" does not exist in database.`
-            );
+            throw new Error(`Table "${entity.tableName}" of class "${entity.entityClass.name}" does not exist in database.`);
         }
 
         const columns = getColumnProperties(entity.entityClass);
@@ -22,19 +18,10 @@ export async function validateEntities(knex: Knex) {
                 continue;
             }
 
-            const doesColumnExists = await knex.schema.hasColumn(
-                entity.tableName,
-                column.name
-            );
+            const doesColumnExists = await knex.schema.hasColumn(entity.tableName, column.name);
 
             if (doesColumnExists === false) {
-                throw new Error(
-                    `Column "${column.name}" of table "${
-                    entity.tableName
-                    }" of class "${
-                    entity.entityClass.name
-                    }" does not exist in database.`
-                );
+                throw new Error(`Column "${column.name}" of table "${entity.tableName}" of class "${entity.entityClass.name}" does not exist in database.`);
             }
         }
     }

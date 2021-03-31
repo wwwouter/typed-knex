@@ -1,29 +1,22 @@
-import { assert } from 'chai';
-import * as Knex from 'knex';
-import { validateEntities } from '../../src/validateEntities';
-import { } from '../testEntities';
+import { assert } from "chai";
+import { knex } from "knex";
+import { validateEntities } from "../../src/validateEntities";
+import {} from "../testEntities";
 
-
-describe('validateEntitiesTests', () => {
-
-    it('should fail on empty database', async () => {
-
-        const knex = Knex({
-            client: 'sqlite3',
+describe("validateEntitiesTests", () => {
+    it("should fail on empty database", async () => {
+        const db = knex({
+            client: "sqlite3",
             useNullAsDefault: false,
-            connection: { filename: ':memory:' },
+            connection: { filename: ":memory:" },
         });
 
         try {
-
-            await validateEntities(knex);
+            await validateEntities(db);
             assert.isFalse(true);
             // tslint:disable-next-line:no-empty
-        } catch (_error) {
+        } catch (_error) {}
 
-        }
-
-        await knex.destroy();
-
+        await db.destroy();
     });
 });

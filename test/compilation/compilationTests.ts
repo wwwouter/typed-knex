@@ -10,53 +10,46 @@ function getDiagnostics(code: string) {
     fs.writeFileSync(testFilename, code);
 
     const options: ts.CompilerOptions = {
-
-        'module': ts.ModuleKind.CommonJS,
-        'sourceMap': false,
-        'target': ts.ScriptTarget.ES2017,
-        'experimentalDecorators': true,
-        'strict': true,
-        'strictPropertyInitialization': false,
-        'noUnusedLocals': true,
-        'emitDecoratorMetadata': true,
-        'skipLibCheck': true,
-        'outDir': 'build',
-        'noUnusedParameters': true,
-        'inlineSourceMap': true,
-        'inlineSources': true,
-        'noImplicitReturns': true,
-        'noImplicitThis': true,
-        'declaration': true,
-    }
-
+        module: ts.ModuleKind.CommonJS,
+        sourceMap: false,
+        target: ts.ScriptTarget.ES2017,
+        experimentalDecorators: true,
+        strict: true,
+        strictPropertyInitialization: false,
+        noUnusedLocals: true,
+        emitDecoratorMetadata: true,
+        skipLibCheck: true,
+        outDir: 'build',
+        noUnusedParameters: true,
+        inlineSourceMap: true,
+        inlineSources: true,
+        noImplicitReturns: true,
+        noImplicitThis: true,
+        declaration: true,
+    };
 
     const program = ts.createProgram([testFilename], options);
     const emitResult = program.emit();
 
-    const allDiagnostics = ts
-        .getPreEmitDiagnostics(program)
-        .concat(emitResult.diagnostics);
+    const allDiagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
 
     return allDiagnostics;
 }
 
-
-
-describe('compile time typed-knex string column parameters', function() {
+describe('compile time typed-knex string column parameters', function () {
     this.timeout(1000000);
-
 
     afterEach(() => {
         try {
             fs.unlinkSync(testFilename);
             // tslint:disable-next-line: no-empty
-        } catch (_e) { }
+        } catch (_e) {}
     });
 
-    it('should return type with properties from the selectColumn method', done => {
-
+    it('should return type with properties from the selectColumn method', (done) => {
         const allDiagnostics = getDiagnostics(`
-        import * as knex from 'knex';
+        import { knex} from 'knex';
+
         import { TypedKnex } from '../src/typedKnex';
         import { User } from './testEntities';
 
@@ -74,16 +67,15 @@ describe('compile time typed-knex string column parameters', function() {
         })();
     `);
 
-
         assert.equal(allDiagnostics.length, 0);
 
         done();
     });
 
-    it('should error on calling property not used in selectColumn method', done => {
-
+    it('should error on calling property not used in selectColumn method', (done) => {
         const allDiagnostics = getDiagnostics(`
-        import * as knex from 'knex';
+        import { knex} from 'knex';
+
         import { TypedKnex } from '../src/typedKnex';
         import { User } from './testEntities';
 
@@ -106,9 +98,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-    it('should return type with properties from the select method', done => {
+    it('should return type with properties from the select method', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User } from './testEntities';
 
@@ -131,9 +124,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-    it('should error on calling property not used in select method', done => {
+    it('should error on calling property not used in select method', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User } from './testEntities';
 
@@ -156,9 +150,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-    it('should allow to call whereIn with type of property', done => {
+    it('should allow to call whereIn with type of property', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User } from './testEntities';
 
@@ -179,9 +174,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-    it('should error on calling whereIn with different type', done => {
+    it('should error on calling whereIn with different type', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User } from './testEntities';
 
@@ -199,9 +195,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-    it('should allow to call whereBetween with type of property', done => {
+    it('should allow to call whereBetween with type of property', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User } from './testEntities';
 
@@ -221,9 +218,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-    it('should error on calling whereBetween with different type', done => {
+    it('should error on calling whereBetween with different type', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User } from './testEntities';
 
@@ -241,9 +239,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-    it('should error on calling whereBetween with array of more than 2', done => {
+    it('should error on calling whereBetween with array of more than 2', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User } from './testEntities';
 
@@ -261,9 +260,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-    it('should allow property of parent query in where exists', done => {
+    it('should allow property of parent query in where exists', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User, UserSetting } from './testEntities';
 
@@ -285,9 +285,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-    it('should not allow unknown property of parent query in where exists', done => {
+    it('should not allow unknown property of parent query in where exists', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User, UserSetting } from './testEntities';
 
@@ -309,9 +310,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-    it('should return type with properties from the min method', done => {
+    it('should return type with properties from the min method', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User } from './testEntities';
 
@@ -333,9 +335,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-    it('should error on calling property not used in min method', done => {
+    it('should error on calling property not used in min method', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User } from './testEntities';
 
@@ -357,9 +360,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-    it('should return all Model properties after clearSelect', done => {
+    it('should return all Model properties after clearSelect', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User } from './testEntities';
 
@@ -387,7 +391,8 @@ describe('compile time typed-knex string column parameters', function() {
     //     file = project.createSourceFile(
     //         'test/test4.ts',
     //         `
-    //         import * as knex from 'knex';
+    //         import { knex} from 'knex';
+
     //         import { TypedKnex } from '../src/typedKnex';
     //         import { User } from './testEntities';
 
@@ -412,9 +417,10 @@ describe('compile time typed-knex string column parameters', function() {
     //     done();
     // });
 
-    it('should return correct type from findByPrimaryKey', done => {
+    it('should return correct type from findByPrimaryKey', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User } from './testEntities';
 
@@ -438,9 +444,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-    it('should findByPrimaryKey not accept objects in select', done => {
+    it('should findByPrimaryKey not accept objects in select', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User } from './testEntities';
 
@@ -464,9 +471,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-    it('should findByPrimaryKey not accept optional objects in select', done => {
+    it('should findByPrimaryKey not accept optional objects in select', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User } from './testEntities';
 
@@ -490,9 +498,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-    it('should findByPrimaryKey not accept nullable objects in select', done => {
+    it('should findByPrimaryKey not accept nullable objects in select', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User } from './testEntities';
 
@@ -516,10 +525,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-
-    it('should findByPrimaryKey accept Date objects in select', done => {
+    it('should findByPrimaryKey accept Date objects in select', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User } from './testEntities';
 
@@ -543,9 +552,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-    it('should findByPrimaryKey accept unknown objects in select', done => {
+    it('should findByPrimaryKey accept unknown objects in select', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User } from './testEntities';
 
@@ -569,10 +579,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-
-    it('should findByPrimaryKey accept nullable Date objects in select', done => {
+    it('should findByPrimaryKey accept nullable Date objects in select', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User } from './testEntities';
 
@@ -596,9 +606,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-    it('should findByPrimaryKey accept nullable string objects in select', done => {
+    it('should findByPrimaryKey accept nullable string objects in select', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User } from './testEntities';
 
@@ -622,10 +633,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-
-    it('should findByPrimaryKey accept optional string objects in select', done => {
+    it('should findByPrimaryKey accept optional string objects in select', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User } from './testEntities';
 
@@ -649,9 +660,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-    it('should return correct type from leftOuterJoinTableOnFunction', done => {
+    it('should return correct type from leftOuterJoinTableOnFunction', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User, UserSetting } from './testEntities';
 
@@ -680,9 +692,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-    it('should not return type from leftOuterJoinTableOnFunction with not selected from joined table', done => {
+    it('should not return type from leftOuterJoinTableOnFunction with not selected from joined table', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User, UserSetting } from './testEntities';
 
@@ -710,9 +723,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-    it('should not return type from leftOuterJoinTableOnFunction with not selected from main table', done => {
+    it('should not return type from leftOuterJoinTableOnFunction with not selected from main table', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User, UserSetting } from './testEntities';
 
@@ -740,10 +754,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-
-    it('should  return any when keepFlat() is used', done => {
+    it('should  return any when keepFlat() is used', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User, UserSetting } from './testEntities';
 
@@ -772,9 +786,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-    it('should accept string column in orderBy', done => {
+    it('should accept string column in orderBy', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User } from './testEntities';
 
@@ -796,9 +811,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-    it('should accept Date column in orderBy', done => {
+    it('should accept Date column in orderBy', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User } from './testEntities';
 
@@ -820,9 +836,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-    it('should accept nullable Date column in orderBy', done => {
+    it('should accept nullable Date column in orderBy', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User } from './testEntities';
 
@@ -844,9 +861,10 @@ describe('compile time typed-knex string column parameters', function() {
         done();
     });
 
-    it('should not accept foreign key column in orderBy', done => {
+    it('should not accept foreign key column in orderBy', (done) => {
         const allDiagnostics = getDiagnostics(`
-            import * as knex from 'knex';
+            import { knex} from 'knex';
+
             import { TypedKnex } from '../src/typedKnex';
             import { User } from './testEntities';
 
