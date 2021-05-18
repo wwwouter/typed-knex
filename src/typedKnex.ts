@@ -235,7 +235,7 @@ interface IJoinTableMultipleOnClauses<Model, _SelectableModel, Row> {
 interface IJoin<Model, _SelectableModel, Row> {
     <NewPropertyType, NewPropertyKey extends keyof any,
         ConcatKey2 extends keyof NewPropertyType,
-        ConcatKey extends NestedKeysOf<NonNullableRecursive<AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>>, keyof NonNullableRecursive<AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>>, ''>>(
+        ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
         newPropertyKey: NewPropertyKey,
         newPropertyClass: new () => NewPropertyType,
         key: ConcatKey2, operator: Operator, key2: ConcatKey
