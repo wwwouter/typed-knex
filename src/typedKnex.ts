@@ -10,7 +10,7 @@ import { SelectableColumnTypes } from './SelectableColumnTypes';
 import { FlattenOption, setToNull, unflatten } from './unflatten';
 
 export class TypedKnex {
-    constructor(private knex: Knex) {}
+    constructor(private knex: Knex) { }
 
     public query<T>(tableClass: new () => T): ITypedQueryBuilder<T, T, T> {
         return new TypedQueryBuilder<T, T, T>(tableClass, this.knex);
@@ -22,7 +22,7 @@ export class TypedKnex {
                 .transaction((tr) => resolve(tr))
                 // If this error is not caught here, it will throw, resulting in an unhandledRejection
                 // tslint:disable-next-line:no-empty
-                .catch((_e) => {});
+                .catch((_e) => { });
         });
     }
 }
@@ -69,6 +69,9 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
 
     leftOuterJoinTableOnFunction: IJoinTableMultipleOnClauses<Model, SelectableModel, Row extends Model ? {} : Row>;
     innerJoinTableOnFunction: IJoinTableMultipleOnClauses<Model, SelectableModel, Row extends Model ? {} : Row>;
+
+    innerJoin: IJoin<Model, SelectableModel, Row extends Model ? {} : Row>;
+    leftOuterJoin: IJoin<Model, SelectableModel, Row extends Model ? {} : Row>;
 
     selectRaw: ISelectRaw<Model, SelectableModel, Row extends Model ? {} : Row>;
 
@@ -179,7 +182,7 @@ export type ObjectToPrimitive<T> = T extends String ? string : T extends Number 
 export type Operator = '=' | '!=' | '>' | '<' | string;
 
 interface IConstructor<T> {
-    new (...args: any[]): T;
+    new(...args: any[]): T;
 }
 
 export type AddPropertyWithType<Original, NewKey extends keyof any, NewKeyType> = Original & Record<NewKey, NewKeyType>;
@@ -226,6 +229,16 @@ interface IJoinTableMultipleOnClauses<Model, _SelectableModel, Row> {
         newPropertyKey: NewPropertyKey,
         newPropertyClass: new () => NewPropertyType,
         on: (join: IJoinOnClause2<AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, NewPropertyType>) => void
+    ): ITypedQueryBuilder<AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, Row>;
+}
+
+interface IJoin<Model, _SelectableModel, Row> {
+    <NewPropertyType, NewPropertyKey extends keyof any,
+        ConcatKey2 extends keyof NewPropertyType,
+        ConcatKey extends NestedKeysOf<NonNullableRecursive<AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>>, keyof NonNullableRecursive<AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>>, ''>>(
+        newPropertyKey: NewPropertyKey,
+        newPropertyClass: new () => NewPropertyType,
+        key: ConcatKey2, operator: Operator, key2: ConcatKey
     ): ITypedQueryBuilder<AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, Row>;
 }
 
@@ -776,6 +789,15 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         return this;
     }
 
+
+
+    public innerJoin() {
+        return this.join('innerJoin', arguments[0], arguments[1], arguments[2], arguments[3], arguments[4])
+    }
+    public leftOuterJoin() {
+        return this.join('leftOuterJoin', arguments[0], arguments[1], arguments[2], arguments[3], arguments[4])
+    }
+
     public innerJoinTableOnFunction() {
         return this.joinTableOnFunction(this.queryBuilder.innerJoin.bind(this.queryBuilder), arguments[0], arguments[1], arguments[2]);
     }
@@ -954,7 +976,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
     public callQueryCallbackFunction(functionName: string, typeOfSubQuery: any, functionToCall: any) {
         const that = this;
-        ((this.queryBuilder as any)[functionName] as (callback: Knex.QueryCallback) => Knex.QueryBuilder)(function () {
+        ((this.queryBuilder as any)[functionName] as (callback: Knex.QueryCallback) => Knex.QueryBuilder)(function() {
             const subQuery = this;
             const { root, memories } = getProxyAndMemories(that);
 
@@ -1443,7 +1465,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         const tableToJoinAlias = newPropertyKey;
 
         let knexOnObject: any;
-        queryBuilderJoin(`${tableToJoinName} as ${tableToJoinAlias}`, function () {
+        queryBuilderJoin(`${tableToJoinName} as ${tableToJoinAlias}`, function() {
             knexOnObject = this;
         });
 
@@ -1553,5 +1575,24 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         for (const property of properties) {
             this.queryBuilder.select(`${property.name} as ${property.propertyKey}`);
         }
+    }
+
+    private join(joinFunctionName: string, tableToJoinAlias: any, tableToJoinClass: any, joinTableColumnString: any, operator: any, existingTableColumnString: any) {
+        this.extraJoinedProperties.push({
+            name: tableToJoinAlias,
+            propertyType: tableToJoinClass,
+        });
+
+        const tableToJoinName = getTableMetadata(tableToJoinClass).tableName;
+
+        const joinTableColumnInformation = getColumnInformation(tableToJoinClass, joinTableColumnString);
+
+        const joinTableColumnArguments = `${tableToJoinAlias}.${joinTableColumnInformation.name}`;
+
+        const existingTableColumnName = this.getColumnName(...existingTableColumnString.split('.'));
+
+        (this.queryBuilder as any)[joinFunctionName](`${tableToJoinName} as ${tableToJoinAlias}`, joinTableColumnArguments, operator, existingTableColumnName);
+
+        return this as any;
     }
 }

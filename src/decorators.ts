@@ -158,7 +158,7 @@ export function getColumnInformation(
         primary: property.primary,
         propertyKey: property.propertyKey,
         designType: property.designType,
-        isForeignKey: property.isForeignKey
+        isForeignKey: property.isForeignKey,
     };
 }
 

@@ -92,6 +92,8 @@ export class UserSetting {
     public value!: string;
     @Column()
     public initialValue!: string;
+    @Column({ name: 'other_value' })
+    public otherValue!: string;
 }
 
 
