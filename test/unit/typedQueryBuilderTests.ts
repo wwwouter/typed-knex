@@ -273,12 +273,16 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should left outer join with other table with name attribute', (done) => {
+    it('should left outer join with other tables', (done) => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).leftOuterJoin('otherUser', User, 'status', '=', 'otherValue');
+        const query = typedKnex.query(UserSetting)
+            .leftOuterJoin('otherUser', User, 'status', '=', 'otherValue')
+            .leftOuterJoin('otherUser.otherOtherUser', User, 'status', '=', 'otherUser.status')
+            .select('otherUser.otherOtherUser.name');
+
 
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select * from "userSettings" left outer join "users" as "otherUser" on "otherUser"."weirdDatabaseName" = "userSettings"."other_value"');
+        assert.equal(queryString, 'select "otherUser_otherOtherUser"."name" as "otherUser.otherOtherUser.name" from "userSettings" left outer join "users" as "otherUser" on "otherUser"."weirdDatabaseName" = "userSettings"."other_value" left outer join "users" as "otherUser_otherOtherUser" on "otherUser_otherOtherUser"."weirdDatabaseName" = "otherUser"."status"');
 
         done();
     });

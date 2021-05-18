@@ -3,6 +3,7 @@ import { Knex } from 'knex';
 import { getColumnInformation, getColumnProperties, getPrimaryKeyColumn, getTableMetadata } from './decorators';
 import { mapObjectToTableObject } from './mapObjectToTableObject';
 import { NestedForeignKeyKeysOf, NestedKeysOf } from './NestedKeysOf';
+import { NestedRecord } from './NestedRecord';
 import { NonForeignKeyObjects } from './NonForeignKeyObjects';
 import { NonNullableRecursive } from './NonNullableRecursive';
 import { GetNestedProperty, GetNestedPropertyType } from './PropertyTypes';
@@ -185,7 +186,7 @@ interface IConstructor<T> {
     new(...args: any[]): T;
 }
 
-export type AddPropertyWithType<Original, NewKey extends keyof any, NewKeyType> = Original & Record<NewKey, NewKeyType>;
+export type AddPropertyWithType<Original, NewKey extends keyof any, NewKeyType> = Original & NestedRecord<NewKey, NewKeyType>;
 
 interface IColumnParameterNoRowTransformation<Model, SelectableModel, Row> {
     <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(key: ConcatKey): ITypedQueryBuilder<Model, SelectableModel, Row>;
@@ -1268,29 +1269,32 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         if (keys.length === 1) {
             return firstPartName;
         } else {
-            let columnName;
+            let columnName = '';
             let columnAlias;
             let currentClass;
             let currentColumnPart;
-            const extraJoinedProperty = this.extraJoinedProperties.find((i) => i.name === keys[0]);
+            // console.log('keys: ', keys);
+            const prefix = keys.slice(0, -1).join('.');
+            const extraJoinedProperty = this.extraJoinedProperties.find((i) => i.name === prefix);
             if (extraJoinedProperty) {
-                columnName = '';
                 columnAlias = extraJoinedProperty.name;
                 currentClass = extraJoinedProperty.propertyType;
+                currentColumnPart = getColumnInformation(currentClass, keys[keys.length - 1]);
+                columnName = keys.slice(0, -1).join('_') + '.' + currentColumnPart.propertyKey;
+
             } else {
                 currentColumnPart = getColumnInformation(this.tableClass, keys[0]);
-
-                columnName = '';
                 columnAlias = currentColumnPart.propertyKey;
                 currentClass = currentColumnPart.columnClass;
-            }
-            for (let i = 1; i < keys.length; i++) {
-                currentColumnPart = getColumnInformation(currentClass, keys[i]);
+                for (let i = 1; i < keys.length; i++) {
+                    currentColumnPart = getColumnInformation(currentClass, keys[i]);
 
-                columnName = columnAlias + '.' + (keys.length - 1 === i ? currentColumnPart.name : currentColumnPart.propertyKey);
-                columnAlias += '_' + (keys.length - 1 === i ? currentColumnPart.name : currentColumnPart.propertyKey);
-                currentClass = currentColumnPart.columnClass;
+                    columnName = columnAlias + '.' + (keys.length - 1 === i ? currentColumnPart.name : currentColumnPart.propertyKey);
+                    columnAlias += '_' + (keys.length - 1 === i ? currentColumnPart.name : currentColumnPart.propertyKey);
+                    currentClass = currentColumnPart.columnClass;
+                }
             }
+
             return columnName;
         }
     }
@@ -1583,15 +1587,17 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
             propertyType: tableToJoinClass,
         });
 
+        const tableToJoinAliasWithUnderscores = tableToJoinAlias.split('.').join('_');
+
         const tableToJoinName = getTableMetadata(tableToJoinClass).tableName;
 
         const joinTableColumnInformation = getColumnInformation(tableToJoinClass, joinTableColumnString);
 
-        const joinTableColumnArguments = `${tableToJoinAlias}.${joinTableColumnInformation.name}`;
+        const joinTableColumnArguments = `${tableToJoinAliasWithUnderscores}.${joinTableColumnInformation.name}`;
 
         const existingTableColumnName = this.getColumnName(...existingTableColumnString.split('.'));
 
-        (this.queryBuilder as any)[joinFunctionName](`${tableToJoinName} as ${tableToJoinAlias}`, joinTableColumnArguments, operator, existingTableColumnName);
+        (this.queryBuilder as any)[joinFunctionName](`${tableToJoinName} as ${tableToJoinAliasWithUnderscores}`, joinTableColumnArguments, operator, existingTableColumnName);
 
         return this as any;
     }
