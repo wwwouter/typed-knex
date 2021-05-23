@@ -1,8 +1,8 @@
-# *** Important upgrade notice ***
+# **_ Important upgrade notice _**
+
 Because TypeScript 4.1 supports template literal string types, the function syntax is no longer necessary. You can now use strings while maintaining type-safety. The function syntax is removed since version 4.
 
 To help with the upgrade, you can run `npx typed-knex -u string-parameters` to automatically switch over to the string syntax.
-
 
 # typed-knex
 
@@ -43,8 +43,8 @@ _Tested with Knex.js v0.95.0, TypeScript v4.2.3 and Node.js v14.11.0_
 
 # Breaking changes in v4
 
-- Because TypeScript 4.1 supports template literal string types, the function syntax is no longer necessary. You can now use strings while maintaining type-safety. The function syntax is removed.
-Run `npx typed-knex -u string-parameters` to automatically upgrade.
+-   Because TypeScript 4.1 supports template literal string types, the function syntax is no longer necessary. You can now use strings while maintaining type-safety. The function syntax is removed.
+    Run `npx typed-knex -u string-parameters` to automatically upgrade.
 -   `.onColumn()` is deprecated. Use `.on()`. Remember that the columns switched eg `.onColumns(i=>i.prop1, '=' j=>j.prop2) should become .on("prop2", '=', "prop1")`. Run `npx typed-knex -u join-on-columns-to-on` to automatically upgrade.
 -   The use of optional columns (`@Column() public nickName?: string;`) is deprecated. This was used to signal a nullable column. The correct way to do this is `@Column() public nickName: string | null;`.
 
@@ -66,11 +66,7 @@ const knex = Knex({
 async function example() {
     const typedKnex = new TypedKnex(knex);
 
-    const query = typedKnex
-        .query(User)
-        .innerJoin("category")
-        .where("name", "Hejlsberg")
-        .select("id", "category.name");
+    const query = typedKnex.query(User).innerJoin("category", UserCategory, "id", "=", "categoryId").where("name", "Hejlsberg").select("id", "category.name");
 
     const oneUser = await query.getSingle();
 
@@ -181,7 +177,9 @@ const typedKnex = new TypedKnex(knex);
 -   [orderBy](#orderBy)
 -   [orderByRaw](#orderByRaw)
 -   [innerJoinColumn](#innerJoinColumn)
+-   [innerJoin](#innerJoin)
 -   [innerJoinTableOnFunction](#innerJoinTableOnFunction)
+-   [leftOuterJoin](#leftOuterJoin)
 -   [leftOuterJoinColumn](#leftOuterJoinColumn)
 -   [leftOuterJoinTableOnFunction](#leftOuterJoinTableOnFunction)
 -   [selectRaw](#selectRaw)
@@ -296,7 +294,7 @@ typedKnex.query(User).select("id");
 ```
 
 ```ts
-typedKnex.query(User).select("id","name");
+typedKnex.query(User).select("id", "name");
 ```
 
 ### where
@@ -318,33 +316,21 @@ typedKnex.query(User).where("name", "like", "%user%");
 ### andWhere
 
 ```ts
-typedKnex
-    .query(User)
-    .where("name", "name")
-    .andWhere("name", "name");
+typedKnex.query(User).where("name", "name").andWhere("name", "name");
 ```
 
 ```ts
-typedKnex
-    .query(User)
-    .where("name", "name")
-    .andWhere("name", "like", "%na%");
+typedKnex.query(User).where("name", "name").andWhere("name", "like", "%na%");
 ```
 
 ### orWhere
 
 ```ts
-typedKnex
-    .query(User)
-    .where("name", "name")
-    .orWhere("name", "name");
+typedKnex.query(User).where("name", "name").orWhere("name", "name");
 ```
 
 ```ts
-typedKnex
-    .query(User)
-    .where("name", "name")
-    .orWhere("name", "like", "%na%");
+typedKnex.query(User).where("name", "name").orWhere("name", "like", "%na%");
 ```
 
 ### whereNot
@@ -374,10 +360,7 @@ typedKnex.query(User).whereNull("name");
 ### orWhereNull
 
 ```ts
-typedKnex
-    .query(User)
-    .whereNull("name")
-    .orWhereNull("name");
+typedKnex.query(User).whereNull("name").orWhereNull("name");
 ```
 
 ### whereNotNull
@@ -389,10 +372,7 @@ typedKnex.query(User).whereNotNull("name");
 ### orWhereNotNull
 
 ```ts
-typedKnex
-    .query(User)
-    .whereNotNull("name")
-    .orWhereNotNull("name");
+typedKnex.query(User).whereNotNull("name").orWhereNotNull("name");
 ```
 
 ### orderBy
@@ -412,6 +392,14 @@ await typedKnex.query(User).orderByRaw("SUM(??) DESC", "users.year");
 ### innerJoinColumn
 
 ```ts
+typedKnex.query(User).innerJoin("category", UserCategory, "id", "=", "categoryId");
+
+// select * from "users" inner join "userCategories" as "category" on "category"."id" = "users"."categoryId"
+```
+
+### innerJoinColumn
+
+```ts
 typedKnex.query(User).innerJoinColumn("category");
 ```
 
@@ -419,26 +407,16 @@ typedKnex.query(User).innerJoinColumn("category");
 
 ```ts
 typedKnex.query(User).innerJoinTableOnFunction("evilTwin", User, (join) => {
-    join.on(
-        "id",
-        "=",
-        "id"
-    )
-        .andOn(
-            "name",
-            "=",
-            "id"
-        )
-        .orOn(
-            "someValue",
-            "=",
-            "id"
-        )
-        .onVal("name", "=", "1")
-        .andOnVal("name", "=", "2")
-        .orOnVal("name", "=", "3")
-        .onNull("name");
+    join.on("id", "=", "id").andOn("name", "=", "id").orOn("someValue", "=", "id").onVal("name", "=", "1").andOnVal("name", "=", "2").orOnVal("name", "=", "3").onNull("name");
 });
+```
+
+### outerJoinColumn
+
+```ts
+typedKnex.query(User).outerJoin("category", UserCategory, "id", "=", "categoryId");
+
+// select * from "users" outer join "userCategories" as "category" on "category"."id" = "users"."categoryId"
 ```
 
 ### leftOuterJoinColumn
@@ -451,25 +429,7 @@ typedKnex.query(User).leftOuterJoinColumn("category");
 
 ```ts
 typedKnex.query(User).leftOuterJoinTableOnFunction("evilTwin", User, (join) => {
-    join.on(
-        "id",
-        "=",
-        "id"
-    )
-        .andOn(
-            "name",
-            "=",
-            "id"
-        )
-        .orOn(
-            "someValue",
-            "=",
-            "id"
-        )
-        .onVal("name", "=", "1")
-        .andOnVal("name", "=", "2")
-        .orOnVal("name", "=", "3")
-        .onNull("name");
+    join.on("id", "=", "id").andOn("name", "=", "id").orOn("someValue", "=", "id").onVal("name", "=", "1").andOnVal("name", "=", "2").orOnVal("name", "=", "3").onNull("name");
 });
 ```
 
@@ -497,7 +457,7 @@ select "userCategories"."id" as "id", (select count("users"."id") as "total" fro
 ### findByPrimaryKey
 
 ```ts
-const user = await typedKnex.query(User).findByPrimaryKey("id", "d","name");
+const user = await typedKnex.query(User).findByPrimaryKey("id", "d", "name");
 ```
 
 ### whereIn
@@ -515,19 +475,13 @@ typedKnex.query(User).whereNotIn("name", ["user1", "user2"]);
 ### orWhereIn
 
 ```ts
-typedKnex
-    .query(User)
-    .whereIn("name", ["user1", "user2"])
-    .orWhereIn("name", ["user3", "user4"]);
+typedKnex.query(User).whereIn("name", ["user1", "user2"]).orWhereIn("name", ["user3", "user4"]);
 ```
 
 ### orWhereNotIn
 
 ```ts
-typedKnex
-    .query(User)
-    .whereIn("name", ["user1", "user2"])
-    .orWhereNotIn("name", ["user3", "user4"]);
+typedKnex.query(User).whereIn("name", ["user1", "user2"]).orWhereNotIn("name", ["user3", "user4"]);
 ```
 
 ### whereBetween
@@ -545,19 +499,13 @@ typedKnex.query(User).whereNotBetween("year", [1, 2037]);
 ### orWhereBetween
 
 ```ts
-typedKnex
-    .query(User)
-    .whereBetween("year", [1, 10])
-    .orWhereBetween("year", [100, 1000]);
+typedKnex.query(User).whereBetween("year", [1, 10]).orWhereBetween("year", [100, 1000]);
 ```
 
 ### orWhereNotBetween
 
 ```ts
-typedKnex
-    .query(User)
-    .whereBetween("year", [1, 10])
-    .orWhereNotBetween("year", [100, 1000]);
+typedKnex.query(User).whereBetween("year", [1, 10]).orWhereNotBetween("year", [100, 1000]);
 ```
 
 ### whereExists
@@ -613,11 +561,7 @@ select * from "users" where ("users"."id" = '1' or "users"."id" = '2') or "users
 ### groupBy
 
 ```ts
-typedKnex
-    .query(User)
-    .select("someValue")
-    .selectRaw("total", Number, 'SUM("numericValue")')
-    .groupBy("someValue");
+typedKnex.query(User).select("someValue").selectRaw("total", Number, 'SUM("numericValue")').groupBy("someValue");
 ```
 
 ### having
@@ -748,11 +692,7 @@ typedKnex.query(User).avgDistinct("numericValue", "avgDistinctNumericValue");
 ### clearSelect
 
 ```ts
-typedKnex
-    .query(User)
-    .select("id")
-    .clearSelect()
-    .select("name");
+typedKnex.query(User).select("id").clearSelect().select("name");
 ```
 
 ### clearWhere
@@ -841,10 +781,7 @@ console.log(query.toQuery()); // select * from "users"
 | `getSingleOrNull` | `null`  | Item     | `Error`    |
 
 ```ts
-const user = await typedKnex
-    .query(User)
-    .where("name", "name")
-    .getFirstOrNull();
+const user = await typedKnex.query(User).where("name", "name").getFirstOrNull();
 ```
 
 ### getFirst
@@ -857,10 +794,7 @@ const user = await typedKnex
 | `getSingleOrNull` | `null`  | Item     | `Error`    |
 
 ```ts
-const user = await typedKnex
-    .query(User)
-    .where("name", "name")
-    .getFirst();
+const user = await typedKnex.query(User).where("name", "name").getFirst();
 ```
 
 ### getSingleOrNull
@@ -873,10 +807,7 @@ const user = await typedKnex
 | `getSingleOrNull` | `null`  | Item     | `Error`    |
 
 ```ts
-const user = await typedKnex
-    .query(User)
-    .where("name", "name")
-    .getSingleOrNull();
+const user = await typedKnex.query(User).where("name", "name").getSingleOrNull();
 ```
 
 ### getSingle
@@ -889,19 +820,13 @@ const user = await typedKnex
 | `getSingleOrNull` | `null`  | Item     | `Error`    |
 
 ```ts
-const user = await typedKnex
-    .query(User)
-    .where("name", "name")
-    .getSingle();
+const user = await typedKnex.query(User).where("name", "name").getSingle();
 ```
 
 ### getMany
 
 ```ts
-const users = await typedKnex
-    .query(User)
-    .whereNotNull("name")
-    .getMany();
+const users = await typedKnex.query(User).whereNotNull("name").getMany();
 ```
 
 ### getCount
