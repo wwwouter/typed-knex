@@ -452,19 +452,31 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
     private transaction?: Knex.Transaction;
 
-    constructor(private tableClass: new () => ModelType, private knex: Knex, queryBuilder?: Knex.QueryBuilder, private parentTypedQueryBuilder?: any) {
+    private subQueryCounter = 0;
+
+    constructor(private tableClass: new () => ModelType, private knex: Knex, queryBuilder?: Knex.QueryBuilder, private parentTypedQueryBuilder?: any, private subQueryPrefix?: string) {
         this.tableName = getTableMetadata(tableClass).tableName;
         this.columns = getColumnProperties(tableClass);
 
         if (queryBuilder !== undefined) {
             this.queryBuilder = queryBuilder;
-            this.queryBuilder.from(this.tableName);
+            if (this.subQueryPrefix) {
+                this.queryBuilder.from({ [`${this.subQueryPrefix}${this.tableName}`]: this.tableName });
+            } else {
+                this.queryBuilder.from(this.tableName);
+            }
         } else {
             this.queryBuilder = this.knex.from(this.tableName);
         }
 
         this.extraJoinedProperties = [];
         this.shouldUnflatten = true;
+    }
+
+    public getNextSubQueryPrefix() {
+        const result = `subquery${this.subQueryCounter}$`;
+        this.subQueryCounter++;
+        return result;
     }
 
     public keepFlat() {
@@ -977,11 +989,16 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
     public callQueryCallbackFunction(functionName: string, typeOfSubQuery: any, functionToCall: any) {
         const that = this;
+        let subQueryPrefix: string | undefined;
+        if (['whereExists', 'orWhereExists', 'whereNotExists', 'orWhereNotExists', 'havingExists',
+            'havingNotExists'].includes(functionName)) {
+            subQueryPrefix = this.getNextSubQueryPrefix();
+        }
         ((this.queryBuilder as any)[functionName] as (callback: Knex.QueryCallback) => Knex.QueryBuilder)(function() {
             const subQuery = this;
             const { root, memories } = getProxyAndMemories(that);
 
-            const subQB = new TypedQueryBuilder(typeOfSubQuery, that.knex, subQuery, that);
+            const subQB = new TypedQueryBuilder(typeOfSubQuery, that.knex, subQuery, that, subQueryPrefix);
             subQB.extraJoinedProperties = that.extraJoinedProperties;
             functionToCall(subQB, root, memories);
         });
@@ -1403,22 +1420,8 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         }
 
         if (keys.length === 1) {
-            // const extraJoinedProperty = this.extraJoinedProperties.find(
-            //     i => i.name === keys[0]
-            // );
-            // if (extraJoinedProperty) {
-            //     return extraJoinedProperty.name;
-            //     // if (keys.length === 1) {
-            //     // }
-            //     // const columnInfo = getColumnInformation(
-            //     //     extraJoinedProperty.propertyType,
-            //     //     keys[1]
-            //     // );
-            //     // return extraJoinedProperty.name + '.' + columnInfo.name;
-            // }
-
             const columnInfo = getColumnInformation(this.tableClass, keys[0]);
-            return this.tableName + '.' + columnInfo.name;
+            return `${this.subQueryPrefix ?? ''}${this.tableName}.${columnInfo.name}`;
         } else {
             let currentColumnPart = getColumnInformation(this.tableClass, keys[0]);
 

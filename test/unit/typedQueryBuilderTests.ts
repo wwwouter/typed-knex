@@ -384,7 +384,7 @@ describe('TypedKnexQueryBuilder', () => {
         });
 
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select * from "users" where exists (select * from "userSettings" where "userSettings"."userId" = "users"."id")');
+        assert.equal(queryString, `select * from "users" where exists (select * from "userSettings" as "subquery0$userSettings" where "subquery0$userSettings"."userId" = "users"."id")`);
 
         done();
     });
@@ -396,7 +396,7 @@ describe('TypedKnexQueryBuilder', () => {
         });
 
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select * from "users" where exists (select * from "userSettings" where "user"."weirdDatabaseName2" = "users"."weirdDatabaseName2")');
+        assert.equal(queryString, `select * from "users" where exists (select * from "userSettings" as "subquery0$userSettings" where "user"."weirdDatabaseName2" = "users"."weirdDatabaseName2")`);
 
         done();
     });
@@ -411,7 +411,7 @@ describe('TypedKnexQueryBuilder', () => {
             });
 
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select * from "users" where "users"."name" = \'name\' or exists (select * from "userSettings" where "userSettings"."userId" = "users"."id")');
+        assert.equal(queryString, 'select * from "users" where "users"."name" = \'name\' or exists (select * from "userSettings" as "subquery0$userSettings" where "subquery0$userSettings"."userId" = "users"."id")');
 
         done();
     });
@@ -423,7 +423,7 @@ describe('TypedKnexQueryBuilder', () => {
         });
 
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select * from "users" where not exists (select * from "userSettings" where "userSettings"."userId" = "users"."id")');
+        assert.equal(queryString, 'select * from "users" where not exists (select * from "userSettings" as "subquery0$userSettings" where "subquery0$userSettings"."userId" = "users"."id")');
 
         done();
     });
@@ -438,7 +438,7 @@ describe('TypedKnexQueryBuilder', () => {
             });
 
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select * from "users" where "users"."name" = \'name\' or not exists (select * from "userSettings" where "userSettings"."userId" = "users"."id")');
+        assert.equal(queryString, 'select * from "users" where "users"."name" = \'name\' or not exists (select * from "userSettings" as "subquery0$userSettings" where "subquery0$userSettings"."userId" = "users"."id")');
 
         done();
     });
@@ -520,7 +520,7 @@ describe('TypedKnexQueryBuilder', () => {
         });
 
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select * from "users" having exists (select * from "userSettings" where "userSettings"."userId" = "users"."id")');
+        assert.equal(queryString, 'select * from "users" having exists (select * from "userSettings" as "subquery0$userSettings" where "subquery0$userSettings"."userId" = "users"."id")');
 
         done();
     });
@@ -532,7 +532,7 @@ describe('TypedKnexQueryBuilder', () => {
         });
 
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select * from "users" having not exists (select * from "userSettings" where "userSettings"."userId" = "users"."id")');
+        assert.equal(queryString, 'select * from "users" having not exists (select * from "userSettings" as "subquery0$userSettings" where "subquery0$userSettings"."userId" = "users"."id")');
 
         done();
     });
@@ -1078,7 +1078,7 @@ describe('TypedKnexQueryBuilder', () => {
         });
 
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select * from "users" where exists (select * from "userSettings" where "userSettings"."userId" = "users"."id")');
+        assert.equal(queryString, 'select * from "users" where exists (select * from "userSettings" as "subquery0$userSettings" where "subquery0$userSettings"."userId" = "users"."id")');
 
         done();
     });
@@ -1320,5 +1320,18 @@ describe('TypedKnexQueryBuilder', () => {
             (query as any).queryLog.trim(),
             `select "id" as "id", "name" as "name", "regionId" as "region", "regionId" as "regionId", "year" as "year", "phoneNumber" as "phoneNumber", "backupRegionId" as "backupRegion", "INTERNAL_NAME" as "specialRegionId" from "userCategories"`
         );
+    });
+
+
+    it('should handle where exists on same table as main table', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex.query(User).whereExists(User, (subQuery => {
+            subQuery.whereColumn('status', '=', 'status').whereColumn('id', '<>', 'id');
+        }));
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, `select * from "users" where exists (select * from "users" as "subquery0$users" where "subquery0$users"."weirdDatabaseName" = "users"."weirdDatabaseName" and "subquery0$users"."id" <> "users"."id")`);
+
+        done();
     });
 });
