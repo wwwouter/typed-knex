@@ -411,12 +411,12 @@ typedKnex.query(User).innerJoinTableOnFunction("evilTwin", User, (join) => {
 });
 ```
 
-### outerJoin
+### leftOuterJoin
 
 ```ts
-typedKnex.query(User).outerJoin("category", UserCategory, "id", "=", "categoryId");
+typedKnex.query(User).leftOuterJoin("category", UserCategory, "id", "=", "categoryId");
 
-// select * from "users" outer join "userCategories" as "category" on "category"."id" = "users"."categoryId"
+// select * from "users" left outer join "userCategories" as "category" on "category"."id" = "users"."categoryId"
 ```
 
 ### leftOuterJoinColumn
