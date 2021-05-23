@@ -1,22 +1,24 @@
 # Changelog
 
+-   Added functions `innerJoin` and `leftOuterJoin`.
+
 ## 4.1.0
 
-- Upgrade Knex.js to v0.95.0.
-- Upgrade TypeScript to v4.2.3.
-- Fix example code for `registerBeforeInsertTransform`.
+-   Upgrade Knex.js to v0.95.0.
+-   Upgrade TypeScript to v4.2.3.
+-   Fix example code for `registerBeforeInsertTransform`.
 
 ## 4.0.0
 
-- Dropped lamba support.
+-   Dropped lamba support.
 
 ## 3.1.0
 
-- Return correct object(s) when omitting a select clause.
+-   Return correct object(s) when omitting a select clause.
 
 ## 3.0.1
 
-- Fix: `orderBy` with `innerJoinTableOnFunction`.
+-   Fix: `orderBy` with `innerJoinTableOnFunction`.
 
 ## 3.0.0
 

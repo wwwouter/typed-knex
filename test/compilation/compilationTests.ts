@@ -36,14 +36,14 @@ function getDiagnostics(code: string) {
     return allDiagnostics;
 }
 
-describe('compile time typed-knex string column parameters', function () {
+describe('compile time typed-knex string column parameters', function() {
     this.timeout(1000000);
 
     afterEach(() => {
         try {
             fs.unlinkSync(testFilename);
             // tslint:disable-next-line: no-empty
-        } catch (_e) {}
+        } catch (_e) { }
     });
 
     it('should return type with properties from the selectColumn method', (done) => {
@@ -882,6 +882,36 @@ describe('compile time typed-knex string column parameters', function () {
             })();
         `);
         assert.notEqual(allDiagnostics.length, 0);
+
+        done();
+    });
+
+    it('should return correct type from nested left outer join', (done) => {
+        const allDiagnostics = getDiagnostics(`
+            import { knex} from 'knex';
+
+            import { TypedKnex } from '../src/typedKnex';
+            import { User, UserSetting } from './testEntities';
+
+
+            (async () => {
+
+                const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+
+                const item = await typedKnex
+                .query(UserSetting)
+                .leftOuterJoin('otherUser', User, 'status', '=', 'otherValue')
+                .leftOuterJoin('otherUser.otherOtherUser', User, 'status', '=', 'otherUser.status')
+                .select('otherUser.otherOtherUser.name')
+                .getFirst();
+
+                if (item !== undefined) {
+                    console.log(item.otherUser.otherOtherUser.name);
+                }
+
+            })();
+        `);
+        assert.equal(allDiagnostics.length, 0);
 
         done();
     });
