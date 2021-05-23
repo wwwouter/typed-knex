@@ -1321,4 +1321,60 @@ describe('TypedKnexQueryBuilder', () => {
             `select "id" as "id", "name" as "name", "regionId" as "region", "regionId" as "regionId", "year" as "year", "phoneNumber" as "phoneNumber", "backupRegionId" as "backupRegion", "INTERNAL_NAME" as "specialRegionId" from "userCategories"`
         );
     });
+
+    it('getSingleOrNull should select all columns of root type with correct aliases', async () => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex.query(UserCategory);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.getSingleOrNull();
+
+        assert.equal(
+            (query as any).queryLog.trim(),
+            `select "id" as "id", "name" as "name", "regionId" as "region", "regionId" as "regionId", "year" as "year", "phoneNumber" as "phoneNumber", "backupRegionId" as "backupRegion", "INTERNAL_NAME" as "specialRegionId" from "userCategories"`
+        );
+    });
+
+    describe.only('getColumnAlias', () => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+
+        it('should return root column name', async () => {
+            const query = typedKnex.query(UserCategory);
+            assert.equal(query.getColumnAlias('id'), '"userCategories"."id"');
+        });
+
+        it('should return root column name with mapped name', async () => {
+            const query = typedKnex.query(UserCategory);
+            assert.equal(query.getColumnAlias('specialRegionId'), '"userCategories"."INTERNAL_NAME"');
+        });
+
+        it('should return named joined column name', async () => {
+            const query = typedKnex.query(UserCategory).innerJoin('user', User, 'categoryId', '=', 'id');
+            assert.equal(query.getColumnAlias('user.id'), '"user"."id"');
+        });
+
+        it('should return named joined column name with mapped name', async () => {
+            const query = typedKnex.query(UserCategory).innerJoin('user', User, 'categoryId', '=', 'id');
+            assert.equal(query.getColumnAlias('user.status'), '"user"."weirdDatabaseName"');
+        });
+
+
+        it('should return two levels joined column name', async () => {
+            const query = typedKnex.query(User).innerJoinColumn('category').innerJoinColumn('category.region');
+            assert.equal(query.getColumnAlias('category.region.code'), '"category_region"."code"');
+        });
+
+        it('should return select with alias', async () => {
+            const query = typedKnex.query(UserCategory);
+            query.selectRaw('hash', String, `hashFunction(${query.getColumnAlias('name')})`).select('id');
+
+            const queryString = query.toQuery();
+
+            assert.equal(queryString, 'select (hashFunction("userCategories"."name")) as "hash", "userCategories"."id" as "id" from "userCategories"');
+        });
+    })
 });

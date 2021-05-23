@@ -142,6 +142,7 @@ const typedKnex = new TypedKnex(knex);
 -   [toQuery](#toQuery)
 -   [useKnexQueryBuilder](#useKnexQueryBuilder)
 -   [keepFlat](#keepFlat)
+-   [getColumnAlias](#getColumnAlias)
 
 ### Getting the results (Promises)
 
@@ -283,6 +284,17 @@ Use `typedKnex.query(Type)` to create a query for the table referenced by `Type`
 
 ```ts
 const query = typedKnex.query(User);
+```
+
+### getColumnAlias
+
+Use `getColumnAlias` to get the underlying alias of a column, to use in a `raw` function.
+
+```ts
+const query = typedKnex.query(UserCategory);
+query.selectRaw("hash", String, `hashFunction(${query.getColumnAlias("name")})`).select("id");
+
+// select (hashFunction("userCategories"."name")) as "hash", "userCategories"."id" as "id" from "userCategories"
 ```
 
 ### select

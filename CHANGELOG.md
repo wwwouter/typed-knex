@@ -1,5 +1,7 @@
 # Changelog
 
+-   Feature: added `getColumnAlias` to get alias of column name to use in `raw` functions.
+
 ## 4.2.1
 
 -   Bug: `where` didn't use alias of joined column.

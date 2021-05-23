@@ -49,6 +49,7 @@ class NotImplementedError extends Error {
 export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     columns: { name: string }[];
 
+
     where: IWhereWithOperator<Model, SelectableModel, Row>;
     andWhere: IWhereWithOperator<Model, SelectableModel, Row>;
     orWhere: IWhereWithOperator<Model, SelectableModel, Row>;
@@ -127,6 +128,8 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     avgDistinct: IDbFunctionWithAlias<Model, SelectableModel, Row extends Model ? {} : Row>;
 
     insertSelect: IInsertSelect;
+
+    getColumnAlias(name: NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>): string;
 
     clearSelect(): ITypedQueryBuilder<Model, SelectableModel, Model>;
     clearWhere(): ITypedQueryBuilder<Model, SelectableModel, Row>;
@@ -470,6 +473,10 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
     public keepFlat() {
         this.shouldUnflatten = false;
         return this;
+    }
+
+    public getColumnAlias(name: string) {
+        return this.knex.raw('??', this.getColumnName(...name.split('.'))).toQuery();
     }
 
     public async del() {
@@ -1601,4 +1608,6 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
         return this as any;
     }
+
+
 }
