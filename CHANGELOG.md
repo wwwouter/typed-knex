@@ -1,6 +1,6 @@
 # Changelog
 
--   Added functions `innerJoin` and `leftOuterJoin`
+-   Added functions `innerJoin` and `leftOuterJoin`.
 
 ## 4.1.0
 
