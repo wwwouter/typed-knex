@@ -1280,7 +1280,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
                 columnAlias = extraJoinedProperty.name;
                 currentClass = extraJoinedProperty.propertyType;
                 currentColumnPart = getColumnInformation(currentClass, keys[keys.length - 1]);
-                columnName = keys.slice(0, -1).join('_') + '.' + currentColumnPart.propertyKey;
+                columnName = keys.slice(0, -1).join('_') + '.' + currentColumnPart.name;
 
             } else {
                 currentColumnPart = getColumnInformation(this.tableClass, keys[0]);

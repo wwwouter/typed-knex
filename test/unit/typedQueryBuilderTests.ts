@@ -245,10 +245,13 @@ describe('TypedKnexQueryBuilder', () => {
 
     it('should inner join with other table with name attribute', (done) => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).innerJoin('otherUser', User, 'status', '=', 'otherValue');
+        const query = typedKnex.query(UserSetting)
+            .innerJoin('otherUser', User, 'status', '=', 'otherValue')
+            .where('otherUser.status', 'status1')
+            .where('otherValue', 'other value');
 
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select * from "userSettings" inner join "users" as "otherUser" on "otherUser"."weirdDatabaseName" = "userSettings"."other_value"');
+        assert.equal(queryString, 'select * from "userSettings" inner join "users" as "otherUser" on "otherUser"."weirdDatabaseName" = "userSettings"."other_value" where "otherUser"."weirdDatabaseName" = \'status1\' and "userSettings"."other_value" = \'other value\'');
 
         done();
     });
@@ -282,7 +285,7 @@ describe('TypedKnexQueryBuilder', () => {
 
 
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select "otherUser_otherOtherUser"."name" as "otherUser.otherOtherUser.name" from "userSettings" left outer join "users" as "otherUser" on "otherUser"."weirdDatabaseName" = "userSettings"."other_value" left outer join "users" as "otherUser_otherOtherUser" on "otherUser_otherOtherUser"."weirdDatabaseName" = "otherUser"."status"');
+        assert.equal(queryString, 'select "otherUser_otherOtherUser"."name" as "otherUser.otherOtherUser.name" from "userSettings" left outer join "users" as "otherUser" on "otherUser"."weirdDatabaseName" = "userSettings"."other_value" left outer join "users" as "otherUser_otherOtherUser" on "otherUser_otherOtherUser"."weirdDatabaseName" = "otherUser"."weirdDatabaseName"');
 
         done();
     });

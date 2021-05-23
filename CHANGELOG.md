@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.2.1
+
+-   Bug: `where` didn't use alias of joined column.
+
 ## 4.2.0
 
 -   Added functions `innerJoin` and `leftOuterJoin`.
