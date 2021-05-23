@@ -389,7 +389,7 @@ await typedKnex.query(User).orderByRaw("SUM(??) DESC", "users.year");
 //  select * from "users" order by SUM("users"."year") DESC
 ```
 
-### innerJoinColumn
+### innerJoin
 
 ```ts
 typedKnex.query(User).innerJoin("category", UserCategory, "id", "=", "categoryId");
@@ -411,7 +411,7 @@ typedKnex.query(User).innerJoinTableOnFunction("evilTwin", User, (join) => {
 });
 ```
 
-### outerJoinColumn
+### outerJoin
 
 ```ts
 typedKnex.query(User).outerJoin("category", UserCategory, "id", "=", "categoryId");
