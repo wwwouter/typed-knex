@@ -1083,7 +1083,7 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create insert query with returning', async () => {
+    it('should create insert query with returning all', async () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         (typedKnex as any).onlyLogQuery = true;
 
@@ -1094,6 +1094,19 @@ describe('TypedKnexQueryBuilder', () => {
         await query.insertItemWithReturning({ id: 'newId' });
 
         assert.equal((query as any).queryLog.trim(), `insert into "users" ("id") values ('newId') returning *`);
+    });
+
+    it('should create insert query with returning 1 column', async () => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex.query(User);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.insertItemWithReturning({ id: 'newId' }, [ 'status']);
+
+        assert.equal((query as any).queryLog.trim(), `insert into "users" ("id") values ('newId') returning "users"."weirdDatabaseName"`);
     });
 
     it('should create insert query', async () => {

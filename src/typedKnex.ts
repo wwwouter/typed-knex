@@ -129,6 +129,8 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
 
     insertSelect: IInsertSelect;
 
+    insertItemWithReturning: IinsertItemWithReturning<Model, SelectableModel, Row>;
+
     getColumnAlias(name: NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>): string;
 
     clearSelect(): ITypedQueryBuilder<Model, SelectableModel, Model>;
@@ -148,7 +150,6 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     getMany(flattenOption?: FlattenOption): Promise<(Row extends Model ? RemoveObjectsFrom<Model> : Row)[]>;
     getCount(): Promise<number>;
     insertItem(newObject: Partial<RemoveObjectsFrom<Model>>): Promise<void>;
-    insertItemWithReturning(newObject: Partial<RemoveObjectsFrom<Model>>): Promise<RemoveObjectsFrom<Model>>;
     insertItems(items: Partial<RemoveObjectsFrom<Model>>[]): Promise<void>;
     del(): Promise<void>;
     delByPrimaryKey(primaryKeyValue: any): Promise<void>;
@@ -191,6 +192,12 @@ interface IConstructor<T> {
 }
 
 export type AddPropertyWithType<Original, NewKey extends keyof any, NewKeyType> = Original & NestedRecord<NewKey, NewKeyType>;
+
+
+interface IinsertItemWithReturning<Model, _SelectableModel, _Row> {
+    (newObject: Partial<RemoveObjectsFrom<Model>>): Promise<RemoveObjectsFrom<Model>>;
+    <Keys extends keyof RemoveObjectsFrom<Model>>(newObject: Partial<RemoveObjectsFrom<Model>>, keys:Keys[] ): Promise<Pick<RemoveObjectsFrom<Model>, Keys>>;
+}
 
 interface IColumnParameterNoRowTransformation<Model, SelectableModel, Row> {
     <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(key: ConcatKey): ITypedQueryBuilder<Model, SelectableModel, Row>;
@@ -490,21 +497,31 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         await this.queryBuilder.del().where(primaryKeyColumnInfo.name, value);
     }
 
-    public async insertItemWithReturning(newObject: Partial<RemoveObjectsFrom<ModelType>>) {
+    public  async insertItemWithReturning()   {
+        const newObject  = arguments[0]; 
+        const returnProperties = arguments[1] as string[]|undefined;
         let item = newObject;
         if (beforeInsertTransform) {
             item = beforeInsertTransform(newObject, this);
         }
         item = mapObjectToTableObject(this.tableClass, item);
 
-        const query = this.knex.from(this.tableName).insert(item).returning('*');
+        const query = this.knex.from(this.tableName).insert(item);
+                if(returnProperties){
+                    const mappedNames = returnProperties.map(columnName=>this.getColumnName(columnName))
+                    query.returning(mappedNames);
+        } else{
+            query.returning('*');
+        }
 
         if (this.onlyLogQuery) {
             this.queryLog += query.toQuery() + '\n';
-            return {} as any;
+            
+            return ({} as any);
         } else {
             const result = await query;
-            return result[0];
+
+            return (result[0] as any);
         }
     }
 
