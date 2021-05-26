@@ -148,6 +148,7 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     getMany(flattenOption?: FlattenOption): Promise<(Row extends Model ? RemoveObjectsFrom<Model> : Row)[]>;
     getCount(): Promise<number>;
     insertItem(newObject: Partial<RemoveObjectsFrom<Model>>): Promise<void>;
+    insertItemWithReturning(newObject: Partial<RemoveObjectsFrom<Model>>): Promise<RemoveObjectsFrom<Model>>;
     insertItems(items: Partial<RemoveObjectsFrom<Model>>[]): Promise<void>;
     del(): Promise<void>;
     delByPrimaryKey(primaryKeyValue: any): Promise<void>;
@@ -487,6 +488,24 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         const primaryKeyColumnInfo = getPrimaryKeyColumn(this.tableClass);
 
         await this.queryBuilder.del().where(primaryKeyColumnInfo.name, value);
+    }
+
+    public async insertItemWithReturning(newObject: Partial<RemoveObjectsFrom<ModelType>>) {
+        let item = newObject;
+        if (beforeInsertTransform) {
+            item = beforeInsertTransform(newObject, this);
+        }
+        item = mapObjectToTableObject(this.tableClass, item);
+
+        const query = this.knex.from(this.tableName).insert(item).returning('*');
+
+        if (this.onlyLogQuery) {
+            this.queryLog += query.toQuery() + '\n';
+            return {} as any;
+        } else {
+            const result = await query;
+            return result[0];
+        }
     }
 
     public async insertItem(newObject: Partial<RemoveObjectsFrom<ModelType>>) {
