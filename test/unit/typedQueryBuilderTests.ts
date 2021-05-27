@@ -1104,9 +1104,22 @@ describe('TypedKnexQueryBuilder', () => {
 
         (query as any).onlyLogQuery = true;
 
-        await query.insertItemWithReturning({ id: 'newId' }, [ 'status']);
+        await query.insertItemWithReturning({ id: 'newId' }, ['status']);
 
         assert.equal((query as any).queryLog.trim(), `insert into "users" ("id") values ('newId') returning "users"."weirdDatabaseName"`);
+    });
+
+    it('should create insert query with returning 2 column', async () => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex.query(User);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.insertItemWithReturning({ id: 'newId' }, ['status', 'id']);
+
+        assert.equal((query as any).queryLog.trim(), `insert into "users" ("id") values ('newId') returning "users"."weirdDatabaseName", "users"."id"`);
     });
 
     it('should create insert query', async () => {
