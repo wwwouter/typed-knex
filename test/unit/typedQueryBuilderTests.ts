@@ -1416,4 +1416,54 @@ describe('TypedKnexQueryBuilder', () => {
             assert.equal(queryString, 'select (hashFunction("userCategories"."name")) as "hash", "userCategories"."id" as "id" from "userCategories"');
         });
     })
+
+    describe('distinctOn', () => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+
+        it('should distinct on 1 column', (done) => {
+            const query = typedKnex.query(UserCategory).select('id').distinctOn(['name']);
+
+            const queryString = query.toQuery();
+            assert.equal(queryString, 'select distinct on ("userCategories"."name") "userCategories"."id" as "id" from "userCategories"');
+
+            done();
+        });
+
+        it('should distinct on 2 columns', (done) => {
+            const query = typedKnex.query(UserCategory).select('id').distinctOn(['name', 'phoneNumber']);
+
+            const queryString = query.toQuery();
+            assert.equal(queryString, 'select distinct on ("userCategories"."name", "userCategories"."phoneNumber") "userCategories"."id" as "id" from "userCategories"');
+
+            done();
+        });
+
+        it('should distinct on 1 column with mapping', (done) => {
+            const query = typedKnex.query(UserCategory).select('id').distinctOn(['specialRegionId']);
+
+            const queryString = query.toQuery();
+            assert.equal(queryString, 'select distinct on ("userCategories"."INTERNAL_NAME") "userCategories"."id" as "id" from "userCategories"');
+
+            done();
+        });
+
+
+        it('should distinct on columns with join and with mapping', (done) => {
+            const query = typedKnex.query(User)
+                .innerJoin('category', UserCategory, 'id', '=', 'categoryId')
+                .select('id')
+                .distinctOn(['name', 'category.id', 'category.specialRegionId']);
+
+            const queryString = query.toQuery();
+            assert.equal(queryString, 'select distinct on ("users"."name", "category"."id", "category"."INTERNAL_NAME") "users"."id" as "id" from "users" inner join "userCategories" as "category" on "category"."id" = "users"."categoryId"');
+
+            done();
+        });
+
+
+        // with mapping
+        // with join and mapping
+    });
+
 });

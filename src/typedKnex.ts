@@ -133,6 +133,8 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
 
     getColumnAlias(name: NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>): string;
 
+    distinctOn(columnNames: NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>[]): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
     clearSelect(): ITypedQueryBuilder<Model, SelectableModel, Model>;
     clearWhere(): ITypedQueryBuilder<Model, SelectableModel, Row>;
     clearOrder(): ITypedQueryBuilder<Model, SelectableModel, Row>;
@@ -485,6 +487,14 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
     public getColumnAlias(name: string) {
         return this.knex.raw('??', this.getColumnName(...name.split('.'))).toQuery();
+    }
+
+    public distinctOn(columnNames: NestedKeysOf<NonNullableRecursive<ModelType>, keyof NonNullableRecursive<ModelType>, ''>[]): ITypedQueryBuilder<ModelType, SelectableModel, Row> {
+
+        const mappedColumnNames = columnNames.map(columnName => this.getColumnName(...columnName.split('.')));
+        this.queryBuilder.distinctOn(mappedColumnNames);
+
+        return this as any;
     }
 
     public async del() {
@@ -1019,7 +1029,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
     }
 
     public callQueryCallbackFunction(functionName: string, typeOfSubQuery: any, functionToCall: any) {
-        const that = this;
+        const that = this as any;
         ((this.queryBuilder as any)[functionName] as (callback: Knex.QueryCallback) => Knex.QueryBuilder)(function() {
             const subQuery = this;
             const { root, memories } = getProxyAndMemories(that);
@@ -1036,7 +1046,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         const typeOfSubQuery = arguments[2];
         const functionToCall = arguments[3];
 
-        const { root, memories } = getProxyAndMemories(this);
+        const { root, memories } = getProxyAndMemories(this as any);
 
         const subQueryBuilder = new TypedQueryBuilder(typeOfSubQuery, this.knex, undefined, this);
         functionToCall(subQueryBuilder, root, memories);
@@ -1316,7 +1326,6 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
             let columnAlias;
             let currentClass;
             let currentColumnPart;
-            // console.log('keys: ', keys);
             const prefix = keys.slice(0, -1).join('.');
             const extraJoinedProperty = this.extraJoinedProperties.find((i) => i.name === prefix);
             if (extraJoinedProperty) {
