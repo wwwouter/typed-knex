@@ -129,6 +129,8 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
 
     insertSelect: IInsertSelect;
 
+    insertItemWithReturning: IinsertItemWithReturning<Model, SelectableModel, Row>;
+
     getColumnAlias(name: NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>): string;
 
     clearSelect(): ITypedQueryBuilder<Model, SelectableModel, Model>;
@@ -190,6 +192,12 @@ interface IConstructor<T> {
 }
 
 export type AddPropertyWithType<Original, NewKey extends keyof any, NewKeyType> = Original & NestedRecord<NewKey, NewKeyType>;
+
+
+interface IinsertItemWithReturning<Model, _SelectableModel, _Row> {
+    (newObject: Partial<RemoveObjectsFrom<Model>>): Promise<RemoveObjectsFrom<Model>>;
+    <Keys extends keyof RemoveObjectsFrom<Model>>(newObject: Partial<RemoveObjectsFrom<Model>>, keys:Keys[] ): Promise<Pick<RemoveObjectsFrom<Model>, Keys>>;
+}
 
 interface IColumnParameterNoRowTransformation<Model, SelectableModel, Row> {
     <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(key: ConcatKey): ITypedQueryBuilder<Model, SelectableModel, Row>;
@@ -487,6 +495,34 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         const primaryKeyColumnInfo = getPrimaryKeyColumn(this.tableClass);
 
         await this.queryBuilder.del().where(primaryKeyColumnInfo.name, value);
+    }
+
+    public  async insertItemWithReturning()   {
+        const newObject  = arguments[0]; 
+        const returnProperties = arguments[1] as string[]|undefined;
+        let item = newObject;
+        if (beforeInsertTransform) {
+            item = beforeInsertTransform(newObject, this);
+        }
+        item = mapObjectToTableObject(this.tableClass, item);
+
+        const query = this.knex.from(this.tableName).insert(item);
+                if(returnProperties){
+                    const mappedNames = returnProperties.map(columnName=>this.getColumnName(columnName))
+                    query.returning(mappedNames);
+        } else{
+            query.returning('*');
+        }
+
+        if (this.onlyLogQuery) {
+            this.queryLog += query.toQuery() + '\n';
+            
+            return ({} as any);
+        } else {
+            const result = await query;
+
+            return (result[0] as any);
+        }
     }
 
     public async insertItem(newObject: Partial<RemoveObjectsFrom<ModelType>>) {
