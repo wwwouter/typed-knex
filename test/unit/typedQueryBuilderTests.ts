@@ -1334,4 +1334,20 @@ describe('TypedKnexQueryBuilder', () => {
 
         done();
     });
+
+    it('should handle two levels of where exists', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex.query(User).whereExists(User, (subQuery => {
+            subQuery.whereColumn('status', '=', 'status').whereColumn('id', '<>', 'id');
+
+            subQuery.whereExists(User, (subQuery2 => {
+                subQuery2.whereColumn('status', '=', 'status').whereColumn('id', '<>', 'id');
+            }));
+        }));
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, `select * from "users" where exists (select * from "users" as "subquery0$users" where "subquery0$users"."weirdDatabaseName" = "users"."weirdDatabaseName" and "subquery0$users"."id" <> "users"."id" and exists (select * from "users" as "subquery0$subquery0$users" where "subquery0$subquery0$users"."weirdDatabaseName" = "subquery0$users"."weirdDatabaseName" and "subquery0$subquery0$users"."id" <> "subquery0$users"."id"))`);
+
+        done();
+    });
 });

@@ -474,7 +474,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
     }
 
     public getNextSubQueryPrefix() {
-        const result = `subquery${this.subQueryCounter}$`;
+        const result = `${this.subQueryPrefix ?? ''}subquery${this.subQueryCounter}$`;
         this.subQueryCounter++;
         return result;
     }
