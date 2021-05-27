@@ -154,6 +154,7 @@ const typedKnex = new TypedKnex(knex);
 -   [getMany](#getMany)
 -   [getCount](#getCount)
 -   [insertItem](#insertItem)
+-   [insertItemWithReturning](#insertItemWithReturning)
 -   [insertItems](#insertItems)
 -   [insertSelect](#insertSelect)
 -   [del](#del)
@@ -227,6 +228,7 @@ const typedKnex = new TypedKnex(knex);
 -   [havingRaw](#havingRaw)
 -   [truncate](#truncate)
 -   [distinct](#distinct)
+-   [distinctOn](#distinctOn)
 -   [clone](#clone)
 -   [groupByRaw](#groupByRaw)
 
@@ -853,6 +855,20 @@ typedKnex.query(User);
 typedKnex.query(User);
 ```
 
+### insertItemWithReturning
+
+```ts
+query.insertItemWithReturning({ id: "newId" });
+
+// insert into "users" ("id") values ('newId') returning *
+```
+
+```ts
+query.insertItemWithReturning({ id: "newId" }, ["id"]);
+
+// insert into "users" ("id") values ('newId') returning "users"."id"
+```
+
 ### insertItems
 
 ```ts
@@ -945,6 +961,14 @@ typedKnex.query(User);
 
 ```ts
 typedKnex.query(User);
+```
+
+### distinctOn
+
+```ts
+typedKnex.query(UserCategory).select("id").distinctOn(["name"]);
+
+// select distinct on ("userCategories"."name") "userCategories"."id" as "id" from "userCategories"
 ```
 
 ### clone
