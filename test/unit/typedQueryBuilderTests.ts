@@ -1325,9 +1325,9 @@ describe('TypedKnexQueryBuilder', () => {
 
     it('should handle where exists on same table as main table', (done) => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).whereExists(User, (subQuery => {
+        const query = typedKnex.query(User).whereExists(User, (subQuery) => {
             subQuery.whereColumn('status', '=', 'status').whereColumn('id', '<>', 'id');
-        }));
+        });
 
         const queryString = query.toQuery();
         assert.equal(queryString, `select * from "users" where exists (select * from "users" as "subquery0$users" where "subquery0$users"."weirdDatabaseName" = "users"."weirdDatabaseName" and "subquery0$users"."id" <> "users"."id")`);
@@ -1337,17 +1337,72 @@ describe('TypedKnexQueryBuilder', () => {
 
     it('should handle two levels of where exists', (done) => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).whereExists(User, (subQuery => {
+        const query = typedKnex.query(User).whereExists(User, (subQuery) => {
             subQuery.whereColumn('status', '=', 'status').whereColumn('id', '<>', 'id');
 
             subQuery.whereExists(User, (subQuery2 => {
                 subQuery2.whereColumn('status', '=', 'status').whereColumn('id', '<>', 'id');
             }));
-        }));
+        });
 
         const queryString = query.toQuery();
         assert.equal(queryString, `select * from "users" where exists (select * from "users" as "subquery0$users" where "subquery0$users"."weirdDatabaseName" = "users"."weirdDatabaseName" and "subquery0$users"."id" <> "users"."id" and exists (select * from "users" as "subquery0$subquery0$users" where "subquery0$subquery0$users"."weirdDatabaseName" = "subquery0$users"."weirdDatabaseName" and "subquery0$subquery0$users"."id" <> "subquery0$users"."id"))`);
 
         done();
     });
+
+    it('should get correct column for nested queries', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        let nestedStatusColumnName;
+        // let nestedUserCategoryYear;
+        const query = typedKnex.query(User)
+            .whereExists(User, (subQuery) => {
+                nestedStatusColumnName = subQuery.getColumnNameWithQuotes('status');
+                // nestedUserCategoryYear = subQuery.getColumnNameWithQuotes('category', 'year');
+            });
+
+        query.toQuery();
+        assert.equal(nestedStatusColumnName, '"subquery0$users"."weirdDatabaseName"');
+        // assert.equal(nestedUserCategoryYear, '"subquery0$users"."category"."year"');
+
+        done();
+    });
+
+    // it('should be able to refer to main query in where exists', (done) => {
+    //     const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    //     const query = typedKnex.query(User);
+    //     query.whereExists(User, (subQuery1) => {
+    //         subQuery1.whereColumn('status', '=', 'status'); // Compares subQuery1 with its parent (query). Would have same result as .whereColumnFirstParent
+
+    //         subQuery1.whereExists(User, (subQuery2) => {
+    //             subQuery2.whereColumnFirstParent('status', '=', 'status'); // Compares subQuery2 with the first parent (query)
+
+    //             subQuery2.whereExists(User, (subQuery3) => {
+    //                 subQuery3.whereColumnSecondParent('status', '=', 'status'); // Compares subQuery3 with the second parent (subQuery1)
+    //             });
+    //         });
+    //     });
+
+    //     const queryString = query.toQuery();
+    //     assert.equal(queryString, `select * from "users" where exists (select * from "users" as "subquery0$users" where "subquery0$users"."weirdDatabaseName" = "users"."weirdDatabaseName" and exists (select * from "users" as "subquery0$subquery0$users" where "subquery0$subquery0$users"."weirdDatabaseName" = "users"."weirdDatabaseName" and exists (select * from "users" as "subquery0$subquery0$subquery0$users" where "subquery0$subquery0$subquery0$users"."weirdDatabaseName" = "subquery0$users"."weirdDatabaseName")))`);
+
+    //     done();
+    // })
+
+    it('should be able to refer to main query in raw where exists', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex.query(User);
+        query.whereExists(User, (subQuery) => {
+            subQuery
+                .whereColumn('status', '=', 'status').whereColumn('id', '<>', 'id')
+                .whereRaw(`EXISTS (SELECT 1 FROM users as users2 WHERE ${query.getColumnNameWithQuotes('status')} = users2."weirdDatabaseName" AND ${query.getColumnNameWithQuotes('id')} <> users2."id")
+            `);
+        });
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, `select * from "users" where exists (select * from "users" as "subquery0$users" where "subquery0$users"."weirdDatabaseName" = "users"."weirdDatabaseName" and "subquery0$users"."id" <> "users"."id" and EXISTS (SELECT 1 FROM users as users2 WHERE "users"."weirdDatabaseName" = users2."weirdDatabaseName" AND "users"."id" <> users2."id")
+            )`);
+
+        done();
+    })
 });

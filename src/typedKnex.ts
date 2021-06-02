@@ -49,6 +49,8 @@ class NotImplementedError extends Error {
 export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     columns: { name: string }[];
 
+    getColumnNameWithQuotes: IColumnParameterNoRowTransformationReturnString<Model>;
+
     where: IWhereWithOperator<Model, SelectableModel, Row>;
     andWhere: IWhereWithOperator<Model, SelectableModel, Row>;
     orWhere: IWhereWithOperator<Model, SelectableModel, Row>;
@@ -97,12 +99,12 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
 
     whereParentheses: IWhereParentheses<Model, SelectableModel, Row>;
 
-    groupBy: ISelectableColumnKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
+    groupBy: IColumnParameterNoRowTransformation<Model, SelectableModel, Row>;
 
     having: IHaving<Model, SelectableModel, Row>;
 
-    havingNull: ISelectableColumnKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
-    havingNotNull: ISelectableColumnKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
+    havingNull: IColumnParameterNoRowTransformation<Model, SelectableModel, Row>;
+    havingNotNull: IColumnParameterNoRowTransformation<Model, SelectableModel, Row>;
 
     havingIn: IWhereIn<Model, SelectableModel, Row>;
     havingNotIn: IWhereIn<Model, SelectableModel, Row>;
@@ -190,6 +192,10 @@ export type AddPropertyWithType<Original, NewKey extends keyof any, NewKeyType> 
 
 interface IColumnParameterNoRowTransformation<Model, SelectableModel, Row> {
     <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(key: ConcatKey): ITypedQueryBuilder<Model, SelectableModel, Row>;
+}
+
+interface IColumnParameterNoRowTransformationReturnString<Model> {
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(key: ConcatKey): string;
 }
 
 interface IJoinOn<Model, JoinedModel> {
@@ -297,10 +303,6 @@ interface IFindByPrimaryKey<_Model, SelectableModel, Row> {
 
 interface IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row> {
     <ConcatKey extends NestedForeignKeyKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(key: ConcatKey): ITypedQueryBuilder<Model, SelectableModel, Row>;
-}
-
-interface ISelectableColumnKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row> {
-    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(key: ConcatKey): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
 interface IWhere<Model, SelectableModel, Row> {
@@ -1290,7 +1292,6 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
             let columnAlias;
             let currentClass;
             let currentColumnPart;
-            // console.log('keys: ', keys);
             const prefix = keys.slice(0, -1).join('.');
             const extraJoinedProperty = this.extraJoinedProperties.find((i) => i.name === prefix);
             if (extraJoinedProperty) {
@@ -1314,6 +1315,11 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
             return columnName;
         }
+    }
+
+    public getColumnNameWithQuotes(...keys: string[]): string {
+        const unquotedKeys = this.getColumnName(...keys);
+        return unquotedKeys.split('.').map(col => `"${col}"`).join('.');
     }
 
     public getColumnNameWithDifferentRoot(_rootKey: string, ...keys: string[]): string {
