@@ -142,6 +142,7 @@ const typedKnex = new TypedKnex(knex);
 -   [toQuery](#toQuery)
 -   [useKnexQueryBuilder](#useKnexQueryBuilder)
 -   [keepFlat](#keepFlat)
+-   [getColumnAlias](#getColumnAlias)
 
 ### Getting the results (Promises)
 
@@ -153,6 +154,7 @@ const typedKnex = new TypedKnex(knex);
 -   [getMany](#getMany)
 -   [getCount](#getCount)
 -   [insertItem](#insertItem)
+-   [insertItemWithReturning](#insertItemWithReturning)
 -   [insertItems](#insertItems)
 -   [insertSelect](#insertSelect)
 -   [del](#del)
@@ -226,6 +228,7 @@ const typedKnex = new TypedKnex(knex);
 -   [havingRaw](#havingRaw)
 -   [truncate](#truncate)
 -   [distinct](#distinct)
+-   [distinctOn](#distinctOn)
 -   [clone](#clone)
 -   [groupByRaw](#groupByRaw)
 
@@ -283,6 +286,17 @@ Use `typedKnex.query(Type)` to create a query for the table referenced by `Type`
 
 ```ts
 const query = typedKnex.query(User);
+```
+
+### getColumnAlias
+
+Use `getColumnAlias` to get the underlying alias of a column, to use in a `raw` function.
+
+```ts
+const query = typedKnex.query(UserCategory);
+query.selectRaw("hash", String, `hashFunction(${query.getColumnAlias("name")})`).select("id");
+
+// select (hashFunction("userCategories"."name")) as "hash", "userCategories"."id" as "id" from "userCategories"
 ```
 
 ### select
@@ -841,6 +855,20 @@ typedKnex.query(User);
 typedKnex.query(User);
 ```
 
+### insertItemWithReturning
+
+```ts
+query.insertItemWithReturning({ id: "newId" });
+
+// insert into "users" ("id") values ('newId') returning *
+```
+
+```ts
+query.insertItemWithReturning({ id: "newId" }, ["id"]);
+
+// insert into "users" ("id") values ('newId') returning "users"."id"
+```
+
 ### insertItems
 
 ```ts
@@ -933,6 +961,14 @@ typedKnex.query(User);
 
 ```ts
 typedKnex.query(User);
+```
+
+### distinctOn
+
+```ts
+typedKnex.query(UserCategory).select("id").distinctOn(["name"]);
+
+// select distinct on ("userCategories"."name") "userCategories"."id" as "id" from "userCategories"
 ```
 
 ### clone

@@ -1083,6 +1083,45 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+    it('should create insert query with returning all', async () => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex.query(User);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.insertItemWithReturning({ id: 'newId' });
+
+        assert.equal((query as any).queryLog.trim(), `insert into "users" ("id") values ('newId') returning *`);
+    });
+
+    it('should create insert query with returning 1 column', async () => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex.query(User);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.insertItemWithReturning({ id: 'newId' }, ['status']);
+
+        assert.equal((query as any).queryLog.trim(), `insert into "users" ("id") values ('newId') returning "users"."weirdDatabaseName"`);
+    });
+
+    it('should create insert query with returning 2 column', async () => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex.query(User);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.insertItemWithReturning({ id: 'newId' }, ['status', 'id']);
+
+        assert.equal((query as any).queryLog.trim(), `insert into "users" ("id") values ('newId') returning "users"."weirdDatabaseName", "users"."id"`);
+    });
+
     it('should create insert query', async () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         (typedKnex as any).onlyLogQuery = true;
@@ -1350,4 +1389,109 @@ describe('TypedKnexQueryBuilder', () => {
 
         done();
     });
+    it('getSingleOrNull should select all columns of root type with correct aliases', async () => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex.query(UserCategory);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.getSingleOrNull();
+
+        assert.equal(
+            (query as any).queryLog.trim(),
+            `select "id" as "id", "name" as "name", "regionId" as "region", "regionId" as "regionId", "year" as "year", "phoneNumber" as "phoneNumber", "backupRegionId" as "backupRegion", "INTERNAL_NAME" as "specialRegionId" from "userCategories"`
+        );
+    });
+
+    describe('getColumnAlias', () => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+
+        it('should return root column name', async () => {
+            const query = typedKnex.query(UserCategory);
+            assert.equal(query.getColumnAlias('id'), '"userCategories"."id"');
+        });
+
+        it('should return root column name with mapped name', async () => {
+            const query = typedKnex.query(UserCategory);
+            assert.equal(query.getColumnAlias('specialRegionId'), '"userCategories"."INTERNAL_NAME"');
+        });
+
+        it('should return named joined column name', async () => {
+            const query = typedKnex.query(UserCategory).innerJoin('user', User, 'categoryId', '=', 'id');
+            assert.equal(query.getColumnAlias('user.id'), '"user"."id"');
+        });
+
+        it('should return named joined column name with mapped name', async () => {
+            const query = typedKnex.query(UserCategory).innerJoin('user', User, 'categoryId', '=', 'id');
+            assert.equal(query.getColumnAlias('user.status'), '"user"."weirdDatabaseName"');
+        });
+
+
+        it('should return two levels joined column name', async () => {
+            const query = typedKnex.query(User).innerJoinColumn('category').innerJoinColumn('category.region');
+            assert.equal(query.getColumnAlias('category.region.code'), '"category_region"."code"');
+        });
+
+        it('should return select with alias', async () => {
+            const query = typedKnex.query(UserCategory);
+            query.selectRaw('hash', String, `hashFunction(${query.getColumnAlias('name')})`).select('id');
+
+            const queryString = query.toQuery();
+
+            assert.equal(queryString, 'select (hashFunction("userCategories"."name")) as "hash", "userCategories"."id" as "id" from "userCategories"');
+        });
+    })
+
+    describe('distinctOn', () => {
+
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+
+        it('should distinct on 1 column', (done) => {
+            const query = typedKnex.query(UserCategory).select('id').distinctOn(['name']);
+
+            const queryString = query.toQuery();
+            assert.equal(queryString, 'select distinct on ("userCategories"."name") "userCategories"."id" as "id" from "userCategories"');
+
+            done();
+        });
+
+        it('should distinct on 2 columns', (done) => {
+            const query = typedKnex.query(UserCategory).select('id').distinctOn(['name', 'phoneNumber']);
+
+            const queryString = query.toQuery();
+            assert.equal(queryString, 'select distinct on ("userCategories"."name", "userCategories"."phoneNumber") "userCategories"."id" as "id" from "userCategories"');
+
+            done();
+        });
+
+        it('should distinct on 1 column with mapping', (done) => {
+            const query = typedKnex.query(UserCategory).select('id').distinctOn(['specialRegionId']);
+
+            const queryString = query.toQuery();
+            assert.equal(queryString, 'select distinct on ("userCategories"."INTERNAL_NAME") "userCategories"."id" as "id" from "userCategories"');
+
+            done();
+        });
+
+
+        it('should distinct on columns with join and with mapping', (done) => {
+            const query = typedKnex.query(User)
+                .innerJoin('category', UserCategory, 'id', '=', 'categoryId')
+                .select('id')
+                .distinctOn(['name', 'category.id', 'category.specialRegionId']);
+
+            const queryString = query.toQuery();
+            assert.equal(queryString, 'select distinct on ("users"."name", "category"."id", "category"."INTERNAL_NAME") "users"."id" as "id" from "users" inner join "userCategories" as "category" on "category"."id" = "users"."categoryId"');
+
+            done();
+        });
+
+
+        // with mapping
+        // with join and mapping
+    });
+
 });
