@@ -49,8 +49,6 @@ class NotImplementedError extends Error {
 export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     columns: { name: string }[];
 
-    getColumnNameWithQuotes: IColumnParameterNoRowTransformationReturnString<Model>;
-
     where: IWhereWithOperator<Model, SelectableModel, Row>;
     andWhere: IWhereWithOperator<Model, SelectableModel, Row>;
     orWhere: IWhereWithOperator<Model, SelectableModel, Row>;
@@ -130,6 +128,12 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
 
     insertSelect: IInsertSelect;
 
+    insertItemWithReturning: IInsertItemWithReturning<Model, SelectableModel, Row>;
+
+    getColumnAlias(name: NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>): string;
+
+    distinctOn(columnNames: NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>[]): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
     clearSelect(): ITypedQueryBuilder<Model, SelectableModel, Model>;
     clearWhere(): ITypedQueryBuilder<Model, SelectableModel, Row>;
     clearOrder(): ITypedQueryBuilder<Model, SelectableModel, Row>;
@@ -190,12 +194,14 @@ interface IConstructor<T> {
 
 export type AddPropertyWithType<Original, NewKey extends keyof any, NewKeyType> = Original & NestedRecord<NewKey, NewKeyType>;
 
-interface IColumnParameterNoRowTransformation<Model, SelectableModel, Row> {
-    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(key: ConcatKey): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+interface IInsertItemWithReturning<Model, _SelectableModel, _Row> {
+    (newObject: Partial<RemoveObjectsFrom<Model>>): Promise<RemoveObjectsFrom<Model>>;
+    <Keys extends keyof RemoveObjectsFrom<Model>>(newObject: Partial<RemoveObjectsFrom<Model>>, keys: Keys[]): Promise<Pick<RemoveObjectsFrom<Model>, Keys>>;
 }
 
-interface IColumnParameterNoRowTransformationReturnString<Model> {
-    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(key: ConcatKey): string;
+interface IColumnParameterNoRowTransformation<Model, SelectableModel, Row> {
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(key: ConcatKey): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
 interface IJoinOn<Model, JoinedModel> {
@@ -486,6 +492,18 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         return this;
     }
 
+    public getColumnAlias(name: string) {
+        return this.knex.raw('??', this.getColumnName(...name.split('.'))).toQuery();
+    }
+
+    public distinctOn(columnNames: NestedKeysOf<NonNullableRecursive<ModelType>, keyof NonNullableRecursive<ModelType>, ''>[]): ITypedQueryBuilder<ModelType, SelectableModel, Row> {
+
+        const mappedColumnNames = columnNames.map(columnName => this.getColumnName(...columnName.split('.')));
+        this.queryBuilder.distinctOn(mappedColumnNames);
+
+        return this as any;
+    }
+
     public async del() {
         await this.queryBuilder.del();
     }
@@ -494,6 +512,34 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         const primaryKeyColumnInfo = getPrimaryKeyColumn(this.tableClass);
 
         await this.queryBuilder.del().where(primaryKeyColumnInfo.name, value);
+    }
+
+    public async insertItemWithReturning() {
+        const newObject = arguments[0];
+        const returnProperties = arguments[1] as string[] | undefined;
+        let item = newObject;
+        if (beforeInsertTransform) {
+            item = beforeInsertTransform(newObject, this);
+        }
+        item = mapObjectToTableObject(this.tableClass, item);
+
+        const query = this.knex.from(this.tableName).insert(item);
+        if (returnProperties) {
+            const mappedNames = returnProperties.map(columnName => this.getColumnName(columnName))
+            query.returning(mappedNames);
+        } else {
+            query.returning('*');
+        }
+
+        if (this.onlyLogQuery) {
+            this.queryLog += query.toQuery() + '\n';
+
+            return ({} as any);
+        } else {
+            const result = await query;
+
+            return (result[0] as any);
+        }
     }
 
     public async insertItem(newObject: Partial<RemoveObjectsFrom<ModelType>>) {
@@ -990,7 +1036,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
     }
 
     public callQueryCallbackFunction(functionName: string, typeOfSubQuery: any, functionToCall: any) {
-        const that = this;
+        const that = this as any;
         let subQueryPrefix: string | undefined;
         if (['whereExists', 'orWhereExists', 'whereNotExists', 'orWhereNotExists', 'havingExists',
             'havingNotExists'].includes(functionName)) {
@@ -1012,7 +1058,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         const typeOfSubQuery = arguments[2];
         const functionToCall = arguments[3];
 
-        const { root, memories } = getProxyAndMemories(this);
+        const { root, memories } = getProxyAndMemories(this as any);
 
         const subQueryBuilder = new TypedQueryBuilder(typeOfSubQuery, this.knex, undefined, this);
         functionToCall(subQueryBuilder, root, memories);
