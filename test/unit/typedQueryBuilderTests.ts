@@ -1412,6 +1412,7 @@ describe('TypedKnexQueryBuilder', () => {
         let nestedUserCategoryYear;
         const query = typedKnex.query(User)
             .whereExists(User, (subQuery) => {
+                subQuery.innerJoinColumn('category');
                 nestedStatusColumnName = subQuery.getColumnAlias('status');
                 nestedUserCategoryYear = subQuery.getColumnAlias('category.year');
             });
