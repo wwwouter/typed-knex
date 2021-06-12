@@ -1363,11 +1363,6 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         }
     }
 
-    public getColumnNameWithQuotes(...keys: string[]): string {
-        const unquotedKeys = this.getColumnName(...keys);
-        return unquotedKeys.split('.').map(col => `"${col}"`).join('.');
-    }
-
     public getColumnNameWithDifferentRoot(_rootKey: string, ...keys: string[]): string {
         const firstPartName = this.getColumnNameWithoutAlias(keys[0]);
 
