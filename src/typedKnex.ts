@@ -46,6 +46,18 @@ class NotImplementedError extends Error {
     }
 }
 
+class ColumnFromQuery {
+
+    constructor(private alias: string) {
+
+    }
+
+    public toString() {
+        return this.alias;
+    }
+
+}
+
 export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     columns: { name: string }[];
 
@@ -132,6 +144,7 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     insertItemWithReturning: IInsertItemWithReturning<Model, SelectableModel, Row>;
 
     getColumnAlias(name: NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>): string;
+    getColumn(name: NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>): ColumnFromQuery;
 
     distinctOn(columnNames: NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>[]): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
@@ -355,6 +368,8 @@ interface IWhereCompareTwoColumns<Model, SelectableModel, Row> {
         operator: Operator,
         key2: NestedKeysOf<NonNullableRecursive<Model2>, keyof NonNullableRecursive<Model2>, ''>
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
+
+    (key1: ColumnFromQuery, operator: Operator, key2: ColumnFromQuery): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
 interface IWhereExists<Model, SelectableModel, Row> {
@@ -499,6 +514,10 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
     public getColumnAlias(name: string) {
         return this.knex.raw('??', this.getColumnName(...name.split('.'))).toQuery();
+    }
+
+    public getColumn(name: string) {
+        return new ColumnFromQuery(this.getColumnAlias(name));
     }
 
     public distinctOn(columnNames: NestedKeysOf<NonNullableRecursive<ModelType>, keyof NonNullableRecursive<ModelType>, ''>[]): ITypedQueryBuilder<ModelType, SelectableModel, Row> {
@@ -902,6 +921,14 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         // The second column is from the parent query
         let column1Name;
         let column2Name;
+        const operator = arguments[1];
+
+        if (arguments[0] instanceof ColumnFromQuery) {
+            column1Name = (arguments[0] as ColumnFromQuery).toString();
+            column2Name = (arguments[2] as ColumnFromQuery).toString();
+            this.queryBuilder.whereRaw(`${column1Name} ${operator} ${column2Name}`);
+            return this;
+        }
 
         if (typeof arguments[0] === 'string') {
             column1Name = this.getColumnName(...arguments[0].split('.'));
@@ -920,8 +947,6 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
                 column2Name = this.getColumnName(...this.getArgumentsFromColumnFunction(arguments[2]));
             }
         }
-
-        const operator = arguments[1];
 
         this.queryBuilder.whereRaw(`?? ${operator} ??`, [column1Name, column2Name]);
 
