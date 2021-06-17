@@ -392,11 +392,12 @@ describe('TypedKnexQueryBuilder', () => {
     it('should create query with where exists with column name mapping', (done) => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex.query(User).whereExists(UserSetting, (subQuery) => {
+            subQuery.innerJoinColumn('user');
             subQuery.whereColumn('user.notUndefinedStatus', '=', 'notUndefinedStatus');
         });
 
         const queryString = query.toQuery();
-        assert.equal(queryString, `select * from "users" where exists (select * from "userSettings" as "subquery0$userSettings" where "user"."weirdDatabaseName2" = "users"."weirdDatabaseName2")`);
+        assert.equal(queryString, `select * from "users" where exists (select * from "userSettings" as "subquery0$userSettings" inner join "users" as "subquery0$user" on "subquery0$user"."id" = "subquery0$userSettings"."userId" where "subquery0$user"."weirdDatabaseName2" = "users"."weirdDatabaseName2")`);
 
         done();
     });
@@ -1405,6 +1406,43 @@ describe('TypedKnexQueryBuilder', () => {
         );
     });
 
+    it('should get correct column for nested queries', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        let nestedStatusColumnName;
+        let nestedUserCategoryYear;
+        const query = typedKnex.query(User)
+            .whereExists(User, (subQuery) => {
+                subQuery.innerJoinColumn('category').select('category.id').select('status');
+
+                nestedStatusColumnName = subQuery.getColumnAlias('status');
+                nestedUserCategoryYear = subQuery.getColumnAlias('category.year');
+            });
+
+        const q = query.toQuery();
+        console.log('q', q);
+        assert.equal(nestedStatusColumnName, '"subquery0$users"."weirdDatabaseName"');
+        assert.equal(nestedUserCategoryYear, '"subquery0$category"."year"');
+
+        done();
+    });
+
+    it('should be able to refer to main query in raw where exists', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex.query(User);
+        query.whereExists(User, (subQuery) => {
+            subQuery
+                .whereColumn('status', '=', 'status').whereColumn('id', '<>', 'id')
+                .whereRaw(`EXISTS (SELECT 1 FROM users as users2 WHERE ${query.getColumnAlias('status')} = users2."weirdDatabaseName" AND ${query.getColumnAlias('id')} <> users2."id")
+            `);
+        });
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, `select * from "users" where exists (select * from "users" as "subquery0$users" where "subquery0$users"."weirdDatabaseName" = "users"."weirdDatabaseName" and "subquery0$users"."id" <> "users"."id" and EXISTS (SELECT 1 FROM users as users2 WHERE "users"."weirdDatabaseName" = users2."weirdDatabaseName" AND "users"."id" <> users2."id")
+            )`);
+
+        done();
+    });
+
     describe('getColumnAlias', () => {
 
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
@@ -1443,7 +1481,7 @@ describe('TypedKnexQueryBuilder', () => {
 
             assert.equal(queryString, 'select (hashFunction("userCategories"."name")) as "hash", "userCategories"."id" as "id" from "userCategories"');
         });
-    })
+    });
 
     describe('distinctOn', () => {
 
@@ -1489,9 +1527,6 @@ describe('TypedKnexQueryBuilder', () => {
             done();
         });
 
-
-        // with mapping
-        // with join and mapping
     });
 
 });

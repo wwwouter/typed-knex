@@ -530,7 +530,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
         const query = this.knex.from(this.tableName).insert(item);
         if (returnProperties) {
-            const mappedNames = returnProperties.map(columnName => this.getColumnName(columnName))
+            const mappedNames = returnProperties.map(columnName => this.getColumnName(columnName));
             query.returning(mappedNames);
         } else {
             query.returning('*');
@@ -858,10 +858,10 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
 
     public innerJoin() {
-        return this.join('innerJoin', arguments[0], arguments[1], arguments[2], arguments[3], arguments[4])
+        return this.join('innerJoin', arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
     }
     public leftOuterJoin() {
-        return this.join('leftOuterJoin', arguments[0], arguments[1], arguments[2], arguments[3], arguments[4])
+        return this.join('leftOuterJoin', arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
     }
 
     public innerJoinTableOnFunction() {
@@ -1047,7 +1047,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
             'havingNotExists'].includes(functionName)) {
             subQueryPrefix = this.getNextSubQueryPrefix();
         }
-        ((this.queryBuilder as any)[functionName] as (callback: Knex.QueryCallback) => Knex.QueryBuilder)(function() {
+        ((this.queryBuilder as any)[functionName] as (callback: Knex.QueryCallback) => Knex.QueryBuilder)(function () {
             const subQuery = this;
             const { root, memories } = getProxyAndMemories(that);
 
@@ -1364,7 +1364,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
                 }
             }
 
-            return columnName;
+            return `${this.subQueryPrefix ?? ''}${columnName}`;
         }
     }
 
@@ -1444,7 +1444,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         }
 
         const tableToJoinName = getTableMetadata(secondColumnClass).tableName;
-        const tableToJoinAlias = secondColumnAlias;
+        const tableToJoinAlias = `${this.subQueryPrefix ?? ''}${secondColumnAlias}`;
         const tableToJoinJoinColumnName = `${tableToJoinAlias}.${getPrimaryKeyColumn(secondColumnClass).name}`;
 
         if (joinType === 'innerJoin') {
@@ -1524,7 +1524,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         const tableToJoinAlias = newPropertyKey;
 
         let knexOnObject: any;
-        queryBuilderJoin(`${tableToJoinName} as ${tableToJoinAlias}`, function() {
+        queryBuilderJoin(`${tableToJoinName} as ${tableToJoinAlias}`, function () {
             knexOnObject = this;
         });
 
