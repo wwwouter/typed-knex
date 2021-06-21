@@ -392,11 +392,12 @@ describe('TypedKnexQueryBuilder', () => {
     it('should create query with where exists with column name mapping', (done) => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex.query(User).whereExists(UserSetting, (subQuery) => {
+            subQuery.innerJoinColumn('user');
             subQuery.whereColumn('user.notUndefinedStatus', '=', 'notUndefinedStatus');
         });
 
         const queryString = query.toQuery();
-        assert.equal(queryString, `select * from "users" where exists (select * from "userSettings" as "subquery0$userSettings" where "user"."weirdDatabaseName2" = "users"."weirdDatabaseName2")`);
+        assert.equal(queryString, `select * from "users" where exists (select * from "userSettings" as "subquery0$userSettings" inner join "users" as "subquery0$user" on "subquery0$user"."id" = "subquery0$userSettings"."userId" where "subquery0$user"."weirdDatabaseName2" = "users"."weirdDatabaseName2")`);
 
         done();
     });
@@ -1412,14 +1413,15 @@ describe('TypedKnexQueryBuilder', () => {
         let nestedUserCategoryYear;
         const query = typedKnex.query(User)
             .whereExists(User, (subQuery) => {
-                subQuery.innerJoinColumn('category');
+                subQuery.innerJoinColumn('category').select('category.id').select('status');
                 nestedStatusColumnName = subQuery.getColumnAlias('status');
                 nestedUserCategoryYear = subQuery.getColumnAlias('category.year');
             });
 
-        query.toQuery();
+        const q = query.toQuery();
+        console.log('q', q);
         assert.equal(nestedStatusColumnName, '"subquery0$users"."weirdDatabaseName"');
-        assert.equal(nestedUserCategoryYear, '"subquery0$users"."category"."year"');
+        assert.equal(nestedUserCategoryYear, '"subquery0$category"."year"');
 
         done();
     });
@@ -1462,6 +1464,27 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
+    it('should be able to refer to main query in where exists', (done) => {
+        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const query = typedKnex.query(User);
+        query.whereExists(User, (subQuery1) => {
+            subQuery1.whereColumn('status', '=', 'status'); // Compares subQuery1 with its parent (query). Would have same result as .whereColumnFirstParent
+
+            subQuery1.whereExists(User, (subQuery2) => {
+                subQuery2.whereColumn(subQuery2.getColumn('status'), '=', query.getColumn('status')); // Compares subQuery2 with the first parent (query)
+
+                subQuery2.whereExists(User, (subQuery3) => {
+                    subQuery3.whereColumn(subQuery3.getColumn('status'), '=', subQuery1.getColumn('status')); // Compares subQuery3 with the second parent (subQuery1)
+                });
+            });
+        });
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, `select * from "users" where exists (select * from "users" as "subquery0$users" where "subquery0$users"."weirdDatabaseName" = "users"."weirdDatabaseName" and exists (select * from "users" as "subquery0$subquery0$users" where "subquery0$subquery0$users"."weirdDatabaseName" = "users"."weirdDatabaseName" and exists (select * from "users" as "subquery0$subquery0$subquery0$users" where "subquery0$subquery0$subquery0$users"."weirdDatabaseName" = "subquery0$users"."weirdDatabaseName")))`);
+
+        done();
+    });
+
     describe('getColumnAlias', () => {
 
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
@@ -1500,7 +1523,7 @@ describe('TypedKnexQueryBuilder', () => {
 
             assert.equal(queryString, 'select (hashFunction("userCategories"."name")) as "hash", "userCategories"."id" as "id" from "userCategories"');
         });
-    })
+    });
 
     describe('distinctOn', () => {
 
@@ -1546,8 +1569,5 @@ describe('TypedKnexQueryBuilder', () => {
             done();
         });
 
-
-        // with mapping
-        // with join and mapping
     });
 });
