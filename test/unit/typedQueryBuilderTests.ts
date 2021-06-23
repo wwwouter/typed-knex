@@ -1418,7 +1418,8 @@ describe('TypedKnexQueryBuilder', () => {
                 nestedUserCategoryYear = subQuery.getColumnAlias('category.year');
             });
 
-        const q = query.toQuery();
+        query.toQuery();
+
         assert.equal(nestedStatusColumnName, '"subquery0$users"."weirdDatabaseName"');
         assert.equal(nestedUserCategoryYear, '"subquery0$category"."year"');
 
