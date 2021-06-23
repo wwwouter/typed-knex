@@ -1419,7 +1419,6 @@ describe('TypedKnexQueryBuilder', () => {
             });
 
         const q = query.toQuery();
-        console.log('q', q);
         assert.equal(nestedStatusColumnName, '"subquery0$users"."weirdDatabaseName"');
         assert.equal(nestedUserCategoryYear, '"subquery0$category"."year"');
 
