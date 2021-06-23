@@ -1446,7 +1446,7 @@ describe('TypedKnexQueryBuilder', () => {
         const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
         const query = typedKnex.query(User);
         query.whereExists(User, (subQuery1) => {
-            subQuery1.whereColumn('status', '=', 'status'); // Compares subQuery1 with its parent (query). Would have same result as .whereColumnFirstParent
+            subQuery1.whereColumn('status', '=', 'status'); // Compares subQuery1 with its parent (query)
 
             subQuery1.whereExists(User, (subQuery2) => {
                 subQuery2.whereColumn(subQuery2.getColumn('status'), '=', query.getColumn('status')); // Compares subQuery2 with the first parent (query)
