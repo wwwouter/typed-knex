@@ -1,5 +1,7 @@
 # Changelog
 
+- Feature: use `getColumn` in `whereColumn` in cases with nested subqueries.
+
 ## 4.3.0
 
 -   Feature: added `getColumnAlias` to get alias of column name to use in `raw` functions.
