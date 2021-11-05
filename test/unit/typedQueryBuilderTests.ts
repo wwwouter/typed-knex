@@ -1,14 +1,14 @@
-import { assert } from 'chai';
-import { knex } from 'knex';
-import { getEntities, getTableName } from '../../src';
-import { getColumnName } from '../../src/decorators';
-import { TypedKnex } from '../../src/typedKnex';
-import { setToNull, unflatten } from '../../src/unflatten';
-import { Region, User, UserCategory, UserSetting } from '../testEntities';
+import { assert } from "chai";
+import { knex } from "knex";
+import { getEntities, getTableName } from "../../src";
+import { getColumnName } from "../../src/decorators";
+import { TypedKnex } from "../../src/typedKnex";
+import { setToNull, unflatten } from "../../src/unflatten";
+import { Region, User, UserCategory, UserSetting } from "../testEntities";
 
-describe('TypedKnexQueryBuilder', () => {
+describe("TypedKnexQueryBuilder", () => {
     it('should return select * from "users"', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex.query(User);
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users"');
@@ -17,26 +17,26 @@ describe('TypedKnexQueryBuilder', () => {
     });
 
     it('should return select "id" from "users"', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).select('id');
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).select("id");
         const queryString = query.toQuery();
         assert.equal(queryString, 'select "users"."id" as "id" from "users"');
 
         done();
     });
 
-    it('should return camelCase correctly', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).select('initialValue');
+    it("should return camelCase correctly", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserSetting).select("initialValue");
         const queryString = query.toQuery();
         assert.equal(queryString, 'select "userSettings"."initialValue" as "initialValue" from "userSettings"');
 
         done();
     });
 
-    it('should create query with where on column of own table', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).where('name', 'user1');
+    it("should create query with where on column of own table", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).where("name", "user1");
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where "users"."name" = \'user1\'');
@@ -44,9 +44,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with Date column', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).select('birthDate').where('birthDate', new Date(1979, 0, 1));
+    it("should create query with Date column", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).select("birthDate").where("birthDate", new Date(1979, 0, 1));
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select "users"."birthDate" as "birthDate" from "users" where "users"."birthDate" = \'1979-01-01 00:00:00.000\'');
@@ -54,9 +54,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with array column', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).select('tags').where('tags', ['tag1']);
+    it("should create query with array column", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).select("tags").where("tags", ["tag1"]);
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select "users"."tags" as "tags" from "users" where "users"."tags" = \'{"tag1"}\'');
@@ -64,9 +64,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with where on column of own table with LIKE', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).where('name', 'like', '%user%');
+    it("should create query with where on column of own table with LIKE", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).where("name", "like", "%user%");
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where "users"."name" like \'%user%\'');
@@ -74,23 +74,23 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should handle nullable properties', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        typedKnex.query(UserCategory).select('phoneNumber').where('phoneNumber', 'user1').select('backupRegion.code').toQuery();
+    it("should handle nullable properties", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        typedKnex.query(UserCategory).select("phoneNumber").where("phoneNumber", "user1").select("backupRegion.code").toQuery();
 
         done();
     });
 
-    it('should handle nullable level 2 properties', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        typedKnex.query(User).select('category.phoneNumber').where('category.phoneNumber', 'user1');
+    it("should handle nullable level 2 properties", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        typedKnex.query(User).select("category.phoneNumber").where("category.phoneNumber", "user1");
 
         done();
     });
 
-    it('should create query with where not on column of own table', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).whereNot('name', 'user1');
+    it("should create query with where not on column of own table", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).whereNot("name", "user1");
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where not "users"."name" = \'user1\'');
@@ -98,36 +98,36 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should join a table', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).innerJoinColumn('user');
+    it("should join a table", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserSetting).innerJoinColumn("user");
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "userSettings" inner join "users" as "user" on "user"."id" = "userSettings"."userId"');
 
         done();
     });
 
-    it('should join a table and select a column of joined table', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).select('user.name').innerJoinColumn('user');
+    it("should join a table and select a column of joined table", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserSetting).select("user.name").innerJoinColumn("user");
         const queryString = query.toQuery();
         assert.equal(queryString, 'select "user"."name" as "user.name" from "userSettings" inner join "users" as "user" on "user"."id" = "userSettings"."userId"');
 
         done();
     });
 
-    it('should join a table and use where on a column of joined table', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).where('user.name', 'user1').innerJoinColumn('user');
+    it("should join a table and use where on a column of joined table", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserSetting).where("user.name", "user1").innerJoinColumn("user");
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "userSettings" inner join "users" as "user" on "user"."id" = "userSettings"."userId" where "user"."name" = \'user1\'');
 
         done();
     });
 
-    it('should join two level of tables', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).innerJoinColumn('user').innerJoinColumn('user.category');
+    it("should join two level of tables", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserSetting).innerJoinColumn("user").innerJoinColumn("user.category");
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -137,27 +137,27 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should join three level of tables', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).innerJoinColumn('user.category.region');
+    it("should join three level of tables", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserSetting).innerJoinColumn("user.category.region");
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "userSettings" inner join "regions" as "user_category_region" on "user_category_region"."id" = "user_category"."regionId"');
 
         done();
     });
 
-    it('should join two levels of tables and select a column of the last joined table', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).select('user.category.name').innerJoinColumn('user.category');
+    it("should join two levels of tables and select a column of the last joined table", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserSetting).select("user.category.name").innerJoinColumn("user.category");
         const queryString = query.toQuery();
         assert.equal(queryString, 'select "user_category"."name" as "user.category.name" from "userSettings" inner join "userCategories" as "user_category" on "user_category"."id" = "user"."categoryId"');
 
         done();
     });
 
-    it('should join three levels of tables and select a column of the last joined table', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).select('user.category.region.code').innerJoinColumn('user.category.region');
+    it("should join three levels of tables and select a column of the last joined table", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserSetting).select("user.category.region.code").innerJoinColumn("user.category.region");
         const queryString = query.toQuery();
         assert.equal(
             queryString,
@@ -167,28 +167,28 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should join two levels of tables and use where on a column of last joined table', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).where('user.category.name', 'user1').innerJoinColumn('user.category');
+    it("should join two levels of tables and use where on a column of last joined table", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserSetting).where("user.category.name", "user1").innerJoinColumn("user.category");
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "userSettings" inner join "userCategories" as "user_category" on "user_category"."id" = "user"."categoryId" where "user_category"."name" = \'user1\'');
 
         done();
     });
 
-    it('should join three levels of tables and use where on a column of last joined table', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).where('user.category.region.code', 2).innerJoinColumn('user.category.region');
+    it("should join three levels of tables and use where on a column of last joined table", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserSetting).where("user.category.region.code", 2).innerJoinColumn("user.category.region");
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "userSettings" inner join "regions" as "user_category_region" on "user_category_region"."id" = "user_category"."regionId" where "user_category_region"."code" = 2');
 
         done();
     });
 
-    it('should inner join with function with other table', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).innerJoinTableOnFunction('otherUser', User, (join) => {
-            join.on('id', '=', 'user2Id');
+    it("should inner join with function with other table", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserSetting).innerJoinTableOnFunction("otherUser", User, (join) => {
+            join.on("id", "=", "user2Id");
         });
 
         const queryString = query.toQuery();
@@ -197,14 +197,14 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should inner join with function with other table and use order by on joined table', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should inner join with function with other table and use order by on joined table", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex
             .query(UserSetting)
-            .innerJoinTableOnFunction('otherUser', User, (join) => {
-                join.on('id', '=', 'user2Id');
+            .innerJoinTableOnFunction("otherUser", User, (join) => {
+                join.on("id", "=", "user2Id");
             })
-            .orderBy('otherUser.name');
+            .orderBy("otherUser.name");
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "userSettings" inner join "users" as "otherUser" on "userSettings"."user2Id" = "otherUser"."id" order by "otherUser"."name" asc');
@@ -212,17 +212,17 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should inner join with function with other tables and use order by on joined table', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should inner join with function with other tables and use order by on joined table", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex
             .query(UserSetting)
-            .innerJoinTableOnFunction('otherUser', User, (join) => {
-                join.on('id', '=', 'user2Id');
+            .innerJoinTableOnFunction("otherUser", User, (join) => {
+                join.on("id", "=", "user2Id");
             })
-            .innerJoinTableOnFunction('otherCategory', UserCategory, (join) => {
-                join.on('id', '=', 'otherUser.categoryId');
+            .innerJoinTableOnFunction("otherCategory", UserCategory, (join) => {
+                join.on("id", "=", "otherUser.categoryId");
             })
-            .orderBy('otherCategory.name');
+            .orderBy("otherCategory.name");
 
         const queryString = query.toQuery();
         assert.equal(
@@ -233,9 +233,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should inner join with function with other table', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).innerJoin('otherUser', User, 'nickName', '=', 'value');
+    it("should inner join with function with other table", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserSetting).innerJoin("otherUser", User, "nickName", "=", "value");
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "userSettings" inner join "users" as "otherUser" on "otherUser"."nickName" = "userSettings"."value"');
@@ -243,22 +243,22 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should inner join with other table with name attribute', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting)
-            .innerJoin('otherUser', User, 'status', '=', 'otherValue')
-            .where('otherUser.status', 'status1')
-            .where('otherValue', 'other value');
+    it("should inner join with other table with name attribute", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserSetting).innerJoin("otherUser", User, "status", "=", "otherValue").where("otherUser.status", "status1").where("otherValue", "other value");
 
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select * from "userSettings" inner join "users" as "otherUser" on "otherUser"."weirdDatabaseName" = "userSettings"."other_value" where "otherUser"."weirdDatabaseName" = \'status1\' and "userSettings"."other_value" = \'other value\'');
+        assert.equal(
+            queryString,
+            'select * from "userSettings" inner join "users" as "otherUser" on "otherUser"."weirdDatabaseName" = "userSettings"."other_value" where "otherUser"."weirdDatabaseName" = \'status1\' and "userSettings"."other_value" = \'other value\''
+        );
 
         done();
     });
 
-    it('should left outer join with other table', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).leftOuterJoin('otherUser', User, 'nickName', '=', 'value');
+    it("should left outer join with other table", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserSetting).leftOuterJoin("otherUser", User, "nickName", "=", "value");
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "userSettings" left outer join "users" as "otherUser" on "otherUser"."nickName" = "userSettings"."value"');
@@ -266,9 +266,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should left outer join with other table with name attribute', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).leftOuterJoin('otherUser', User, 'status', '=', 'otherValue');
+    it("should left outer join with other table with name attribute", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserSetting).leftOuterJoin("otherUser", User, "status", "=", "otherValue");
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "userSettings" left outer join "users" as "otherUser" on "otherUser"."weirdDatabaseName" = "userSettings"."other_value"');
@@ -276,50 +276,53 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should left outer join with other tables', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting)
-            .leftOuterJoin('otherUser', User, 'status', '=', 'otherValue')
-            .leftOuterJoin('otherUser.otherOtherUser', User, 'status', '=', 'otherUser.status')
-            .select('otherUser.otherOtherUser.name');
-
+    it("should left outer join with other tables", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex
+            .query(UserSetting)
+            .leftOuterJoin("otherUser", User, "status", "=", "otherValue")
+            .leftOuterJoin("otherUser.otherOtherUser", User, "status", "=", "otherUser.status")
+            .select("otherUser.otherOtherUser.name");
 
         const queryString = query.toQuery();
-        assert.equal(queryString, 'select "otherUser_otherOtherUser"."name" as "otherUser.otherOtherUser.name" from "userSettings" left outer join "users" as "otherUser" on "otherUser"."weirdDatabaseName" = "userSettings"."other_value" left outer join "users" as "otherUser_otherOtherUser" on "otherUser_otherOtherUser"."weirdDatabaseName" = "otherUser"."weirdDatabaseName"');
+        assert.equal(
+            queryString,
+            'select "otherUser_otherOtherUser"."name" as "otherUser.otherOtherUser.name" from "userSettings" left outer join "users" as "otherUser" on "otherUser"."weirdDatabaseName" = "userSettings"."other_value" left outer join "users" as "otherUser_otherOtherUser" on "otherUser_otherOtherUser"."weirdDatabaseName" = "otherUser"."weirdDatabaseName"'
+        );
 
         done();
     });
 
-    it('should select 2 columns at once', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).select('id', 'name');
+    it("should select 2 columns at once", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).select("id", "name");
         const queryString = query.toQuery();
         assert.equal(queryString, 'select "users"."id" as "id", "users"."name" as "name" from "users"');
 
         done();
     });
 
-    it('should select 2 columns at once from parent', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).select('user.id', 'user.name');
+    it("should select 2 columns at once from parent", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserSetting).select("user.id", "user.name");
         const queryString = query.toQuery();
         assert.equal(queryString, 'select "user"."id" as "user.id", "user"."name" as "user.name" from "userSettings"');
 
         done();
     });
 
-    it('should select raw query', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).selectRaw('subQuery', Number, 'select other.id from other');
+    it("should select raw query", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).selectRaw("subQuery", Number, "select other.id from other");
         const queryString = query.toQuery();
         assert.equal(queryString, 'select (select other.id from other) as "subQuery" from "users"');
 
         done();
     });
 
-    it('should create query with AND in where clause', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).where('name', 'user1').andWhere('name', 'user2').andWhere('name', 'like', '%user%');
+    it("should create query with AND in where clause", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).where("name", "user1").andWhere("name", "user2").andWhere("name", "like", "%user%");
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where "users"."name" = \'user1\' and "users"."name" = \'user2\' and "users"."name" like \'%user%\'');
@@ -327,9 +330,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with OR in where clause', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).where('name', 'user1').orWhere('name', 'user2').orWhere('name', 'like', '%user%');
+    it("should create query with OR in where clause", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).where("name", "user1").orWhere("name", "user2").orWhere("name", "like", "%user%");
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where "users"."name" = \'user1\' or "users"."name" = \'user2\' or "users"."name" like \'%user%\'');
@@ -337,9 +340,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with where in', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).whereIn('name', ['user1', 'user2']);
+    it("should create query with where in", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).whereIn("name", ["user1", "user2"]);
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where "users"."name" in (\'user1\', \'user2\')');
@@ -347,9 +350,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with where not in', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).whereNotIn('name', ['user1', 'user2']);
+    it("should create query with where not in", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).whereNotIn("name", ["user1", "user2"]);
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where "users"."name" not in (\'user1\', \'user2\')');
@@ -357,9 +360,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with where between', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).whereBetween('numericValue', [1, 10]);
+    it("should create query with where between", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).whereBetween("numericValue", [1, 10]);
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where "users"."numericValue" between 1 and 10');
@@ -367,9 +370,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with where not between', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).whereNotBetween('numericValue', [1, 10]);
+    it("should create query with where not between", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).whereNotBetween("numericValue", [1, 10]);
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where "users"."numericValue" not between 1 and 10');
@@ -377,10 +380,10 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with where exists', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should create query with where exists", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex.query(User).whereExists(UserSetting, (subQuery) => {
-            subQuery.whereColumn('userId', '=', 'id');
+            subQuery.whereColumn("userId", "=", "id");
         });
 
         const queryString = query.toQuery();
@@ -389,26 +392,29 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with where exists with column name mapping', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should create query with where exists with column name mapping", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex.query(User).whereExists(UserSetting, (subQuery) => {
-            subQuery.innerJoinColumn('user');
-            subQuery.whereColumn('user.notUndefinedStatus', '=', 'notUndefinedStatus');
+            subQuery.innerJoinColumn("user");
+            subQuery.whereColumn("user.notUndefinedStatus", "=", "notUndefinedStatus");
         });
 
         const queryString = query.toQuery();
-        assert.equal(queryString, `select * from "users" where exists (select * from "userSettings" as "subquery0$userSettings" inner join "users" as "subquery0$user" on "subquery0$user"."id" = "subquery0$userSettings"."userId" where "subquery0$user"."weirdDatabaseName2" = "users"."weirdDatabaseName2")`);
+        assert.equal(
+            queryString,
+            `select * from "users" where exists (select * from "userSettings" as "subquery0$userSettings" inner join "users" as "subquery0$user" on "subquery0$user"."id" = "subquery0$userSettings"."userId" where "subquery0$user"."weirdDatabaseName2" = "users"."weirdDatabaseName2")`
+        );
 
         done();
     });
 
-    it('should create query with or where exists', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should create query with or where exists", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex
             .query(User)
-            .where('name', 'name')
+            .where("name", "name")
             .orWhereExists(UserSetting, (subQuery) => {
-                subQuery.whereColumn('userId', '=', 'id');
+                subQuery.whereColumn("userId", "=", "id");
             });
 
         const queryString = query.toQuery();
@@ -417,10 +423,10 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with where not exists', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should create query with where not exists", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex.query(User).whereNotExists(UserSetting, (subQuery) => {
-            subQuery.whereColumn('userId', '=', 'id');
+            subQuery.whereColumn("userId", "=", "id");
         });
 
         const queryString = query.toQuery();
@@ -429,13 +435,13 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with or where not exists', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should create query with or where not exists", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex
             .query(User)
-            .where('name', 'name')
+            .where("name", "name")
             .orWhereNotExists(UserSetting, (subQuery) => {
-                subQuery.whereColumn('userId', '=', 'id');
+                subQuery.whereColumn("userId", "=", "id");
             });
 
         const queryString = query.toQuery();
@@ -444,9 +450,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with where raw', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).whereRaw('?? = ??', 'users.id', 'users.name');
+    it("should create query with where raw", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).whereRaw("?? = ??", "users.id", "users.name");
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where "users"."id" = "users"."name"');
@@ -454,9 +460,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with group by', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).select('someValue').selectRaw('total', Number, 'SUM("numericValue")').groupBy('someValue');
+    it("should create query with group by", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).select("someValue").selectRaw("total", Number, 'SUM("numericValue")').groupBy("someValue");
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select "users"."someValue" as "someValue", (SUM("numericValue")) as "total" from "users" group by "users"."someValue"');
@@ -464,9 +470,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with having', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).having('numericValue', '>', 10);
+    it("should create query with having", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).having("numericValue", ">", 10);
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" having "users"."numericValue" > 10');
@@ -474,9 +480,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with having null', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).havingNull('numericValue');
+    it("should create query with having null", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).havingNull("numericValue");
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" having "users"."numericValue" is null');
@@ -484,9 +490,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with having not null', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).havingNotNull('numericValue');
+    it("should create query with having not null", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).havingNotNull("numericValue");
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" having "users"."numericValue" is not null');
@@ -494,9 +500,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with having in', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).havingIn('name', ['user1', 'user2']);
+    it("should create query with having in", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).havingIn("name", ["user1", "user2"]);
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" having "users"."name" in (\'user1\', \'user2\')');
@@ -504,9 +510,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with having not in', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).havingNotIn('name', ['user1', 'user2']);
+    it("should create query with having not in", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).havingNotIn("name", ["user1", "user2"]);
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" having "users"."name" not in (\'user1\', \'user2\')');
@@ -514,10 +520,10 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with having exists', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should create query with having exists", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex.query(User).havingExists(UserSetting, (subQuery) => {
-            subQuery.whereColumn('userId', '=', 'id');
+            subQuery.whereColumn("userId", "=", "id");
         });
 
         const queryString = query.toQuery();
@@ -526,10 +532,10 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with having not exists', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should create query with having not exists", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex.query(User).havingNotExists(UserSetting, (subQuery) => {
-            subQuery.whereColumn('userId', '=', 'id');
+            subQuery.whereColumn("userId", "=", "id");
         });
 
         const queryString = query.toQuery();
@@ -538,9 +544,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with having raw', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).havingRaw('?? = ??', 'users.id', 'users.name');
+    it("should create query with having raw", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).havingRaw("?? = ??", "users.id", "users.name");
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" having "users"."id" = "users"."name"');
@@ -548,9 +554,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with having between', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).havingBetween('numericValue', [1, 10]);
+    it("should create query with having between", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).havingBetween("numericValue", [1, 10]);
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" having "users"."numericValue" between 1 and 10');
@@ -558,9 +564,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with having not between', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).havingNotBetween('numericValue', [1, 10]);
+    it("should create query with having not between", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).havingNotBetween("numericValue", [1, 10]);
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" having "users"."numericValue" not between 1 and 10');
@@ -568,13 +574,13 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with an union', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should create query with an union", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex
             .query(User)
-            .select('id')
+            .select("id")
             .union(User, (subQuery) => {
-                subQuery.select('id').where('numericValue', 12);
+                subQuery.select("id").where("numericValue", 12);
             });
 
         const queryString = query.toQuery();
@@ -583,13 +589,13 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with an union all', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should create query with an union all", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex
             .query(User)
-            .select('id')
+            .select("id")
             .unionAll(User, (subQuery) => {
-                subQuery.select('id').where('numericValue', 12);
+                subQuery.select("id").where("numericValue", 12);
             });
 
         const queryString = query.toQuery();
@@ -598,99 +604,99 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with min', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).min('numericValue', 'minNumericValue');
+    it("should create query with min", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).min("numericValue", "minNumericValue");
         const queryString = query.toQuery();
         assert.equal(queryString, 'select min("users"."numericValue") as "minNumericValue" from "users"');
         done();
     });
 
-    it('should create query with count', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).count('numericValue', 'countNumericValue');
+    it("should create query with count", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).count("numericValue", "countNumericValue");
         const queryString = query.toQuery();
         assert.equal(queryString, 'select count("users"."numericValue") as "countNumericValue" from "users"');
         done();
     });
 
-    it('should create query with countDistinct', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).countDistinct('numericValue', 'countDistinctNumericValue');
+    it("should create query with countDistinct", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).countDistinct("numericValue", "countDistinctNumericValue");
         const queryString = query.toQuery();
         assert.equal(queryString, 'select count(distinct "users"."numericValue") as "countDistinctNumericValue" from "users"');
         done();
     });
 
-    it('should create query with max', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).max('numericValue', 'maxNumericValue');
+    it("should create query with max", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).max("numericValue", "maxNumericValue");
         const queryString = query.toQuery();
         assert.equal(queryString, 'select max("users"."numericValue") as "maxNumericValue" from "users"');
         done();
     });
 
-    it('should create query with two max', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).max('numericValue', 'maxNumericValue').max('someValue', 'maxSomeValue');
+    it("should create query with two max", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).max("numericValue", "maxNumericValue").max("someValue", "maxSomeValue");
         const queryString = query.toQuery();
         assert.equal(queryString, 'select max("users"."numericValue") as "maxNumericValue", max("users"."someValue") as "maxSomeValue" from "users"');
         done();
     });
 
-    it('should create query with sum', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).sum('numericValue', 'sumNumericValue');
+    it("should create query with sum", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).sum("numericValue", "sumNumericValue");
         const queryString = query.toQuery();
         assert.equal(queryString, 'select sum("users"."numericValue") as "sumNumericValue" from "users"');
         done();
     });
 
-    it('should create query with sumDistinct', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).sumDistinct('numericValue', 'sumDistinctNumericValue');
+    it("should create query with sumDistinct", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).sumDistinct("numericValue", "sumDistinctNumericValue");
         const queryString = query.toQuery();
         assert.equal(queryString, 'select sum(distinct "users"."numericValue") as "sumDistinctNumericValue" from "users"');
         done();
     });
 
-    it('should create query with avg', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).avg('numericValue', 'avgNumericValue');
+    it("should create query with avg", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).avg("numericValue", "avgNumericValue");
         const queryString = query.toQuery();
         assert.equal(queryString, 'select avg("users"."numericValue") as "avgNumericValue" from "users"');
         done();
     });
 
-    it('should create query with avgDistinct', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).avgDistinct('numericValue', 'avgDistinctNumericValue');
+    it("should create query with avgDistinct", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).avgDistinct("numericValue", "avgDistinctNumericValue");
         const queryString = query.toQuery();
         assert.equal(queryString, 'select avg(distinct "users"."numericValue") as "avgDistinctNumericValue" from "users"');
         done();
     });
 
-    it('should create query with order by', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).orderBy('id');
+    it("should create query with order by", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).orderBy("id");
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" order by "users"."id" asc');
 
         done();
     });
 
-    it('should clear select', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).select('id').clearSelect();
+    it("should clear select", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).select("id").clearSelect();
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users"');
 
         done();
     });
 
-    it('should clear where', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).where('name', 'user1').clearWhere();
+    it("should clear where", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).where("name", "user1").clearWhere();
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users"');
@@ -698,32 +704,32 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should clear order', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).orderBy('id').clearOrder();
+    it("should clear order", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).orderBy("id").clearOrder();
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users"');
 
         done();
     });
 
-    it('should create query with distinct', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).select('id').distinct();
+    it("should create query with distinct", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).select("id").distinct();
         const queryString = query.toQuery();
         assert.equal(queryString, 'select distinct "users"."id" as "id" from "users"');
 
         done();
     });
 
-    it('should clone and adjust only the clone', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should clone and adjust only the clone", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
 
-        const query = typedKnex.query(User).select('id');
+        const query = typedKnex.query(User).select("id");
 
         const clonedQuery = query.clone();
 
-        clonedQuery.select('name');
+        clonedQuery.select("name");
 
         assert.equal(query.toQuery(), 'select "users"."id" as "id" from "users"');
         assert.equal(clonedQuery.toQuery(), 'select "users"."id" as "id", "users"."name" as "name" from "users"');
@@ -731,9 +737,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with groupby raw', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).groupByRaw('year WITH ROLLUP');
+    it("should create query with groupby raw", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).groupByRaw("year WITH ROLLUP");
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" group by year WITH ROLLUP');
@@ -741,9 +747,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with or where in', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).whereIn('name', ['user1', 'user2']).orWhereIn('name', ['user3', 'user4']);
+    it("should create query with or where in", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).whereIn("name", ["user1", "user2"]).orWhereIn("name", ["user3", "user4"]);
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where "users"."name" in (\'user1\', \'user2\') or "users"."name" in (\'user3\', \'user4\')');
@@ -751,9 +757,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with or where not in', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).whereNotIn('name', ['user1', 'user2']).orWhereNotIn('name', ['user3', 'user4']);
+    it("should create query with or where not in", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).whereNotIn("name", ["user1", "user2"]).orWhereNotIn("name", ["user3", "user4"]);
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where "users"."name" not in (\'user1\', \'user2\') or "users"."name" not in (\'user3\', \'user4\')');
@@ -761,9 +767,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with or where between', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).whereBetween('numericValue', [1, 10]).orWhereBetween('numericValue', [100, 1000]);
+    it("should create query with or where between", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).whereBetween("numericValue", [1, 10]).orWhereBetween("numericValue", [100, 1000]);
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where "users"."numericValue" between 1 and 10 or "users"."numericValue" between 100 and 1000');
@@ -771,9 +777,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with or where not between', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).whereNotBetween('numericValue', [1, 10]).orWhereNotBetween('numericValue', [100, 1000]);
+    it("should create query with or where not between", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).whereNotBetween("numericValue", [1, 10]).orWhereNotBetween("numericValue", [100, 1000]);
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where "users"."numericValue" not between 1 and 10 or "users"."numericValue" not between 100 and 1000');
@@ -781,12 +787,12 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with parentheses in where', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should create query with parentheses in where", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex
             .query(User)
-            .whereParentheses((sub) => sub.where('id', '1').orWhere('id', '2'))
-            .orWhere('name', 'Tester');
+            .whereParentheses((sub) => sub.where("id", "1").orWhere("id", "2"))
+            .orWhere("name", "Tester");
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where ("users"."id" = \'1\' or "users"."id" = \'2\') or "users"."name" = \'Tester\'');
@@ -794,19 +800,19 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should return metadata from Entities', (done) => {
+    it("should return metadata from Entities", (done) => {
         const entities = getEntities();
 
         assert.equal(entities.length, 5);
-        assert.exists(entities.find((i) => i.tableName === 'users'));
-        assert.exists(entities.find((i) => i.tableName === 'correctTableName'));
+        assert.exists(entities.find((i) => i.tableName === "users"));
+        assert.exists(entities.find((i) => i.tableName === "correctTableName"));
 
         done();
     });
 
-    it('should create query with where null', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).whereNull('name').orWhereNull('name');
+    it("should create query with where null", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).whereNull("name").orWhereNull("name");
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where "users"."name" is null or "users"."name" is null');
@@ -814,9 +820,9 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with where not null', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).whereNotNull('name').orWhereNotNull('name');
+    it("should create query with where not null", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).whereNotNull("name").orWhereNotNull("name");
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where "users"."name" is not null or "users"."name" is not null');
@@ -824,28 +830,28 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should left outer join a table', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).leftOuterJoinColumn('user');
+    it("should left outer join a table", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserSetting).leftOuterJoinColumn("user");
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "userSettings" left outer join "users" as "user" on "user"."id" = "userSettings"."userId"');
 
         done();
     });
 
-    it('should return camelCase correctly', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).select('initialValue');
+    it("should return camelCase correctly", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserSetting).select("initialValue");
         const queryString = query.toQuery();
         assert.equal(queryString, 'select "userSettings"."initialValue" as "initialValue" from "userSettings"');
 
         done();
     });
 
-    it('should left outer join with function with itself', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).leftOuterJoinTableOnFunction('evilTwin', UserSetting, (join) => {
-            join.on('id', '=', 'id');
+    it("should left outer join with function with itself", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserSetting).leftOuterJoinTableOnFunction("evilTwin", UserSetting, (join) => {
+            join.on("id", "=", "id");
         });
 
         const queryString = query.toQuery();
@@ -854,10 +860,10 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should left outer join with function with other table', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).leftOuterJoinTableOnFunction('otherUser', User, (join) => {
-            join.on('id', '=', 'user2Id');
+    it("should left outer join with function with other table", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserSetting).leftOuterJoinTableOnFunction("otherUser", User, (join) => {
+            join.on("id", "=", "user2Id");
         });
 
         const queryString = query.toQuery();
@@ -866,10 +872,10 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should left outer join with function with other table', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).leftOuterJoinTableOnFunction('otherUser', User, (join) => {
-            join.on('id', '=', 'user2Id').onNull('name');
+    it("should left outer join with function with other table", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserSetting).leftOuterJoinTableOnFunction("otherUser", User, (join) => {
+            join.on("id", "=", "user2Id").onNull("name");
         });
 
         const queryString = query.toQuery();
@@ -878,10 +884,10 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should left outer join with function with other table with on and on or on', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).leftOuterJoinTableOnFunction('otherUser', User, (join) => {
-            join.on('id', '=', 'user2Id').andOn('name', '=', 'user2Id').orOn('someValue', '=', 'user2Id');
+    it("should left outer join with function with other table with on and on or on", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserSetting).leftOuterJoinTableOnFunction("otherUser", User, (join) => {
+            join.on("id", "=", "user2Id").andOn("name", "=", "user2Id").orOn("someValue", "=", "user2Id");
         });
 
         const queryString = query.toQuery();
@@ -893,10 +899,10 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should left outer join with function with other table with onVal', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).leftOuterJoinTableOnFunction('otherUser', User, (join) => {
-            join.onVal('name', '=', '1').andOnVal('name', '=', '2').orOnVal('name', '=', '3');
+    it("should left outer join with function with other table with onVal", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserSetting).leftOuterJoinTableOnFunction("otherUser", User, (join) => {
+            join.onVal("name", "=", "1").andOnVal("name", "=", "2").orOnVal("name", "=", "3");
         });
 
         const queryString = query.toQuery();
@@ -905,15 +911,15 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should be able to use joined column in another leftOuterJoinTableOnFunction', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should be able to use joined column in another leftOuterJoinTableOnFunction", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex
             .query(UserSetting)
-            .leftOuterJoinTableOnFunction('evilTwin', UserSetting, (join) => {
-                join.on('id', '=', 'id');
+            .leftOuterJoinTableOnFunction("evilTwin", UserSetting, (join) => {
+                join.on("id", "=", "id");
             })
-            .leftOuterJoinTableOnFunction('evilTwin2', UserSetting, (join) => {
-                join.on('id', '=', 'evilTwin.id');
+            .leftOuterJoinTableOnFunction("evilTwin2", UserSetting, (join) => {
+                join.on("id", "=", "evilTwin.id");
             });
 
         const queryString = query.toQuery();
@@ -925,10 +931,10 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should left outer join with function with other table with an column alias', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserCategory).leftOuterJoinTableOnFunction('specialRegion', Region, (join) => {
-            join.on('id', '=', 'specialRegionId');
+    it("should left outer join with function with other table with an column alias", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserCategory).leftOuterJoinTableOnFunction("specialRegion", Region, (join) => {
+            join.on("id", "=", "specialRegionId");
         });
 
         const queryString = query.toQuery();
@@ -938,7 +944,7 @@ describe('TypedKnexQueryBuilder', () => {
     });
 
     it('should return select * from "users"', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex.query(User).limit(10);
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" limit 10');
@@ -947,7 +953,7 @@ describe('TypedKnexQueryBuilder', () => {
     });
 
     it('should return select * from "users"', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex.query(User).offset(10);
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" offset 10');
@@ -956,42 +962,42 @@ describe('TypedKnexQueryBuilder', () => {
     });
 
     it('should return select * from "users"', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex.query(User);
-        query.useKnexQueryBuilder((queryBuilder) => queryBuilder.where('somethingelse', 'value'));
+        query.useKnexQueryBuilder((queryBuilder) => queryBuilder.where("somethingelse", "value"));
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where "somethingelse" = \'value\'');
 
         done();
     });
 
-    it('should removeNullObjects', (done) => {
+    it("should removeNullObjects", (done) => {
         const result = {
-            id: 'id',
-            'element.id': null,
-            'element.category.id': null,
-            'unit.category.id': null,
-            'category.name': 'cat name',
+            id: "id",
+            "element.id": null,
+            "element.category.id": null,
+            "unit.category.id": null,
+            "category.name": "cat name",
         };
         const flattened = unflatten([result]);
         assert.isNull(flattened[0].element.id);
         assert.isNull(flattened[0].unit.category.id);
-        assert.equal(flattened[0].category.name, 'cat name');
+        assert.equal(flattened[0].category.name, "cat name");
         const nulled = setToNull(flattened);
         assert.isNull(nulled[0].element);
-        assert.equal(nulled[0].category.name, 'cat name');
+        assert.equal(nulled[0].category.name, "cat name");
         assert.isNull(nulled[0].unit);
 
         done();
     });
 
-    it('should return sub query in select', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should return sub query in select", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex
             .query(UserCategory)
-            .select('id')
-            .selectQuery('total', Number, User, (subQuery) => {
-                subQuery.count('id', 'total').whereColumn('categoryId', '=', 'id');
+            .select("id")
+            .selectQuery("total", Number, User, (subQuery) => {
+                subQuery.count("id", "total").whereColumn("categoryId", "=", "id");
             });
 
         const queryString = query.toQuery();
@@ -1000,11 +1006,11 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should left outer join with function with and in on', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(UserSetting).leftOuterJoinTableOnFunction('evilTwin', UserSetting, (join) => {
-            join.on('id', '=', 'id');
-            join.on('key', '=', 'key');
+    it("should left outer join with function with and in on", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserSetting).leftOuterJoinTableOnFunction("evilTwin", UserSetting, (join) => {
+            join.on("id", "=", "id");
+            join.on("key", "=", "key");
         });
 
         const queryString = query.toQuery();
@@ -1013,15 +1019,15 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should left outer join with function and selection of joined table', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should left outer join with function and selection of joined table", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex
             .query(UserSetting)
-            .leftOuterJoinTableOnFunction('evilTwin', UserSetting, (join) => {
-                join.on('id', '=', 'id');
+            .leftOuterJoinTableOnFunction("evilTwin", UserSetting, (join) => {
+                join.on("id", "=", "id");
             })
-            .where('evilTwin.value', 'value')
-            .select('evilTwin.key');
+            .where("evilTwin.value", "value")
+            .select("evilTwin.key");
 
         const queryString = query.toQuery();
         assert.equal(
@@ -1032,28 +1038,28 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should get name of the table', (done) => {
+    it("should get name of the table", (done) => {
         const tableName = getTableName(User);
 
-        assert.equal(tableName, 'users');
+        assert.equal(tableName, "users");
 
         done();
     });
 
-    it('should get name of the column', (done) => {
-        const columnName = getColumnName(User, 'id');
+    it("should get name of the column", (done) => {
+        const columnName = getColumnName(User, "id");
 
-        assert.equal(columnName, 'id');
+        assert.equal(columnName, "id");
 
         done();
     });
 
-    it('should insert a select', async () => {
-        const k = knex({ client: 'postgresql' });
+    it("should insert a select", async () => {
+        const k = knex({ client: "postgresql" });
         const typedKnex = new TypedKnex(k);
         const query = typedKnex.query(User);
         try {
-            await query.selectRaw('f', String, "'fixedValue'").select('name').distinct().whereNotNull('name').insertSelect(UserSetting, 'id', 'initialValue');
+            await query.selectRaw("f", String, "'fixedValue'").select("name").distinct().whereNotNull("name").insertSelect(UserSetting, "id", "initialValue");
         } catch (_e) {
             assert.equal(
                 query.toQuery(),
@@ -1062,9 +1068,9 @@ describe('TypedKnexQueryBuilder', () => {
         }
     });
 
-    it('should create query with order by raw', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).orderByRaw('SUM(??) DESC', 'users.year');
+    it("should create query with order by raw", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).orderByRaw("SUM(??) DESC", "users.year");
 
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" order by SUM("users"."year") DESC');
@@ -1072,10 +1078,10 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create query with where in with subquery', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should create query with where in with subquery", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex.query(User).whereExists(UserSetting, (subQuery) => {
-            subQuery.whereColumn('userId', '=', 'id');
+            subQuery.whereColumn("userId", "=", "id");
         });
 
         const queryString = query.toQuery();
@@ -1084,151 +1090,151 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should create insert query with returning all', async () => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should create insert query with returning all", async () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         (typedKnex as any).onlyLogQuery = true;
 
         const query = typedKnex.query(User);
 
         (query as any).onlyLogQuery = true;
 
-        await query.insertItemWithReturning({ id: 'newId' });
+        await query.insertItemWithReturning({ id: "newId" });
 
         assert.equal((query as any).queryLog.trim(), `insert into "users" ("id") values ('newId') returning *`);
     });
 
-    it('should create insert query with returning 1 column', async () => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should create insert query with returning 1 column", async () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         (typedKnex as any).onlyLogQuery = true;
 
         const query = typedKnex.query(User);
 
         (query as any).onlyLogQuery = true;
 
-        await query.insertItemWithReturning({ id: 'newId' }, ['status']);
+        await query.insertItemWithReturning({ id: "newId" }, ["status"]);
 
         assert.equal((query as any).queryLog.trim(), `insert into "users" ("id") values ('newId') returning "users"."weirdDatabaseName"`);
     });
 
-    it('should create insert query with returning 2 column', async () => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should create insert query with returning 2 column", async () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         (typedKnex as any).onlyLogQuery = true;
 
         const query = typedKnex.query(User);
 
         (query as any).onlyLogQuery = true;
 
-        await query.insertItemWithReturning({ id: 'newId' }, ['status', 'id']);
+        await query.insertItemWithReturning({ id: "newId" }, ["status", "id"]);
 
         assert.equal((query as any).queryLog.trim(), `insert into "users" ("id") values ('newId') returning "users"."weirdDatabaseName", "users"."id"`);
     });
 
-    it('should create insert query', async () => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should create insert query", async () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         (typedKnex as any).onlyLogQuery = true;
 
         const query = typedKnex.query(User);
 
         (query as any).onlyLogQuery = true;
 
-        await query.insertItem({ id: 'newId' });
+        await query.insertItem({ id: "newId" });
 
         assert.equal((query as any).queryLog.trim(), `insert into "users" ("id") values ('newId')`);
     });
 
-    it('should create insert query with column name mapping', async () => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should create insert query with column name mapping", async () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         (typedKnex as any).onlyLogQuery = true;
 
         const query = typedKnex.query(User);
 
         (query as any).onlyLogQuery = true;
 
-        await query.insertItem({ status: 'newStatus' });
+        await query.insertItem({ status: "newStatus" });
 
         assert.equal((query as any).queryLog.trim(), `insert into "users" ("weirdDatabaseName") values ('newStatus')`);
     });
 
-    it('should create multiple insert queries', async () => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should create multiple insert queries", async () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         (typedKnex as any).onlyLogQuery = true;
 
         const query = typedKnex.query(User);
 
         (query as any).onlyLogQuery = true;
 
-        await query.insertItems([{ id: 'newId1' }, { id: 'newId2' }]);
+        await query.insertItems([{ id: "newId1" }, { id: "newId2" }]);
 
         assert.equal((query as any).queryLog.trim(), `insert into "users" ("id") values ('newId1'), ('newId2')`);
     });
 
-    it('should create multiple insert queries with column name mapping', async () => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should create multiple insert queries with column name mapping", async () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         (typedKnex as any).onlyLogQuery = true;
 
         const query = typedKnex.query(User);
 
         (query as any).onlyLogQuery = true;
 
-        await query.insertItems([{ status: 'newStatus1' }, { status: 'newStatus2' }]);
+        await query.insertItems([{ status: "newStatus1" }, { status: "newStatus2" }]);
 
         assert.equal((query as any).queryLog.trim(), `insert into "users" ("weirdDatabaseName") values ('newStatus1'), ('newStatus2')`);
     });
 
-    it('should create update query', async () => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should create update query", async () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         (typedKnex as any).onlyLogQuery = true;
 
         const query = typedKnex.query(User);
 
         (query as any).onlyLogQuery = true;
 
-        await query.updateItem({ id: 'newId' });
+        await query.updateItem({ id: "newId" });
 
         assert.equal((query as any).queryLog.trim(), `update "users" set "id" = 'newId'`);
     });
 
-    it('should create update query with column name mapping', async () => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should create update query with column name mapping", async () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         (typedKnex as any).onlyLogQuery = true;
 
         const query = typedKnex.query(User);
 
         (query as any).onlyLogQuery = true;
 
-        await query.updateItem({ status: 'newStatus' });
+        await query.updateItem({ status: "newStatus" });
 
         assert.equal((query as any).queryLog.trim(), `update "users" set "weirdDatabaseName" = 'newStatus'`);
     });
 
-    it('should create update query by id', async () => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should create update query by id", async () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         (typedKnex as any).onlyLogQuery = true;
 
         const query = typedKnex.query(User);
 
         (query as any).onlyLogQuery = true;
 
-        await query.updateItemByPrimaryKey('userId', { name: 'newName' });
+        await query.updateItemByPrimaryKey("userId", { name: "newName" });
 
         assert.equal((query as any).queryLog.trim(), `update "users" set "name" = 'newName' where "id" = 'userId'`);
     });
 
-    it('should create update query by id with column name mapping', async () => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should create update query by id with column name mapping", async () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         (typedKnex as any).onlyLogQuery = true;
 
         const query = typedKnex.query(User);
 
         (query as any).onlyLogQuery = true;
 
-        await query.updateItemByPrimaryKey('userId', { status: 'newStatus' });
+        await query.updateItemByPrimaryKey("userId", { status: "newStatus" });
 
         assert.equal((query as any).queryLog.trim(), `update "users" set "weirdDatabaseName" = 'newStatus' where "id" = 'userId'`);
     });
 
-    it('should create multiple update queries by id', async () => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should create multiple update queries by id", async () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         (typedKnex as any).onlyLogQuery = true;
 
         const query = typedKnex.query(User);
@@ -1236,15 +1242,15 @@ describe('TypedKnexQueryBuilder', () => {
         (query as any).onlyLogQuery = true;
 
         await query.updateItemsByPrimaryKey([
-            { primaryKeyValue: 'userId1', data: { name: 'newName1' } },
-            { primaryKeyValue: 'userId2', data: { name: 'newName2' } },
+            { primaryKeyValue: "userId1", data: { name: "newName1" } },
+            { primaryKeyValue: "userId2", data: { name: "newName2" } },
         ]);
 
         assert.equal((query as any).queryLog.trim(), `update "users" set "name" = 'newName1' where "id" = 'userId1';\nupdate "users" set "name" = 'newName2' where "id" = 'userId2';`);
     });
 
-    it('should create multiple update queries by id with column name mapping', async () => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should create multiple update queries by id with column name mapping", async () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         (typedKnex as any).onlyLogQuery = true;
 
         const query = typedKnex.query(User);
@@ -1252,28 +1258,28 @@ describe('TypedKnexQueryBuilder', () => {
         (query as any).onlyLogQuery = true;
 
         await query.updateItemsByPrimaryKey([
-            { primaryKeyValue: 'userId1', data: { status: 'newStatus1' } },
-            { primaryKeyValue: 'userId2', data: { status: 'newStatus2' } },
+            { primaryKeyValue: "userId1", data: { status: "newStatus1" } },
+            { primaryKeyValue: "userId2", data: { status: "newStatus2" } },
         ]);
 
         assert.equal((query as any).queryLog.trim(), `update "users" set "weirdDatabaseName" = 'newStatus1' where "id" = 'userId1';\nupdate "users" set "weirdDatabaseName" = 'newStatus2' where "id" = 'userId2';`);
     });
 
-    it('should create findByPrimaryKey query', async () => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should create findByPrimaryKey query", async () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         (typedKnex as any).onlyLogQuery = true;
 
         const query = typedKnex.query(User);
 
         (query as any).onlyLogQuery = true;
 
-        await query.findByPrimaryKey('1', 'id', 'name');
+        await query.findByPrimaryKey("1", "id", "name");
 
         assert.equal((query as any).queryLog.trim(), `select "users"."id" as "id", "users"."name" as "name" from "users" where "id" = '1'`);
     });
 
-    it('should select * when querybuilder has no select specified', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should select * when querybuilder has no select specified", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex.query(User);
 
         const queryString = query.toQuery();
@@ -1282,8 +1288,8 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('getMany should select all columns of root type with correct aliases', async () => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("getMany should select all columns of root type with correct aliases", async () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         (typedKnex as any).onlyLogQuery = true;
 
         const query = typedKnex.query(UserCategory);
@@ -1298,8 +1304,8 @@ describe('TypedKnexQueryBuilder', () => {
         );
     });
 
-    it('getFirst should select all columns of root type with correct aliases', async () => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("getFirst should select all columns of root type with correct aliases", async () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         (typedKnex as any).onlyLogQuery = true;
 
         const query = typedKnex.query(UserCategory);
@@ -1314,8 +1320,8 @@ describe('TypedKnexQueryBuilder', () => {
         );
     });
 
-    it('getFirstOrNull should select all columns of root type with correct aliases', async () => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("getFirstOrNull should select all columns of root type with correct aliases", async () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         (typedKnex as any).onlyLogQuery = true;
 
         const query = typedKnex.query(UserCategory);
@@ -1330,8 +1336,8 @@ describe('TypedKnexQueryBuilder', () => {
         );
     });
 
-    it('getSingle should select all columns of root type with correct aliases', async () => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("getSingle should select all columns of root type with correct aliases", async () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         (typedKnex as any).onlyLogQuery = true;
 
         const query = typedKnex.query(UserCategory);
@@ -1346,8 +1352,58 @@ describe('TypedKnexQueryBuilder', () => {
         );
     });
 
-    it('getSingleOrNull should select all columns of root type with correct aliases', async () => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("getSingleOrNull should select all columns of root type with correct aliases", async () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex.query(UserCategory);
+
+        (query as any).onlyLogQuery = true;
+
+        const a = await query.getSingleOrNull();
+        console.log("a", a?.id);
+
+        assert.equal(
+            (query as any).queryLog.trim(),
+            `select "id" as "id", "name" as "name", "regionId" as "region", "regionId" as "regionId", "year" as "year", "phoneNumber" as "phoneNumber", "backupRegionId" as "backupRegion", "INTERNAL_NAME" as "specialRegionId" from "userCategories"`
+        );
+    });
+
+    it("should handle where exists on same table as main table", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).whereExists(User, (subQuery) => {
+            subQuery.whereColumn("status", "=", "status").whereColumn("id", "<>", "id");
+        });
+
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            `select * from "users" where exists (select * from "users" as "subquery0$users" where "subquery0$users"."weirdDatabaseName" = "users"."weirdDatabaseName" and "subquery0$users"."id" <> "users"."id")`
+        );
+
+        done();
+    });
+
+    it("should handle two levels of where exists", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).whereExists(User, (subQuery) => {
+            subQuery.whereColumn("status", "=", "status").whereColumn("id", "<>", "id");
+
+            subQuery.whereExists(User, (subQuery2) => {
+                subQuery2.whereColumn("status", "=", "status").whereColumn("id", "<>", "id");
+            });
+        });
+
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            `select * from "users" where exists (select * from "users" as "subquery0$users" where "subquery0$users"."weirdDatabaseName" = "users"."weirdDatabaseName" and "subquery0$users"."id" <> "users"."id" and exists (select * from "users" as "subquery0$subquery0$users" where "subquery0$subquery0$users"."weirdDatabaseName" = "subquery0$users"."weirdDatabaseName" and "subquery0$subquery0$users"."id" <> "subquery0$users"."id"))`
+        );
+
+        done();
+    });
+    it("getSingleOrNull should select all columns of root type with correct aliases", async () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         (typedKnex as any).onlyLogQuery = true;
 
         const query = typedKnex.query(UserCategory);
@@ -1362,61 +1418,16 @@ describe('TypedKnexQueryBuilder', () => {
         );
     });
 
-
-    it('should handle where exists on same table as main table', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).whereExists(User, (subQuery => {
-            subQuery.whereColumn('status', '=', 'status').whereColumn('id', '<>', 'id');
-        }));
-
-        const queryString = query.toQuery();
-        assert.equal(queryString, `select * from "users" where exists (select * from "users" as "subquery0$users" where "subquery0$users"."weirdDatabaseName" = "users"."weirdDatabaseName" and "subquery0$users"."id" <> "users"."id")`);
-
-        done();
-    });
-
-    it('should handle two levels of where exists', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        const query = typedKnex.query(User).whereExists(User, (subQuery => {
-            subQuery.whereColumn('status', '=', 'status').whereColumn('id', '<>', 'id');
-
-            subQuery.whereExists(User, (subQuery2 => {
-                subQuery2.whereColumn('status', '=', 'status').whereColumn('id', '<>', 'id');
-            }));
-        }));
-
-        const queryString = query.toQuery();
-        assert.equal(queryString, `select * from "users" where exists (select * from "users" as "subquery0$users" where "subquery0$users"."weirdDatabaseName" = "users"."weirdDatabaseName" and "subquery0$users"."id" <> "users"."id" and exists (select * from "users" as "subquery0$subquery0$users" where "subquery0$subquery0$users"."weirdDatabaseName" = "subquery0$users"."weirdDatabaseName" and "subquery0$subquery0$users"."id" <> "subquery0$users"."id"))`);
-
-        done();
-    });
-    it('getSingleOrNull should select all columns of root type with correct aliases', async () => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-        (typedKnex as any).onlyLogQuery = true;
-
-        const query = typedKnex.query(UserCategory);
-
-        (query as any).onlyLogQuery = true;
-
-        await query.getSingleOrNull();
-
-        assert.equal(
-            (query as any).queryLog.trim(),
-            `select "id" as "id", "name" as "name", "regionId" as "region", "regionId" as "regionId", "year" as "year", "phoneNumber" as "phoneNumber", "backupRegionId" as "backupRegion", "INTERNAL_NAME" as "specialRegionId" from "userCategories"`
-        );
-    });
-
-    it('should get correct column for nested queries', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should get correct column for nested queries", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         let nestedStatusColumnName;
         let nestedUserCategoryYear;
-        const query = typedKnex.query(User)
-            .whereExists(User, (subQuery) => {
-                subQuery.innerJoinColumn('category').select('category.id').select('status');
+        const query = typedKnex.query(User).whereExists(User, (subQuery) => {
+            subQuery.innerJoinColumn("category").select("category.id").select("status");
 
-                nestedStatusColumnName = subQuery.getColumnAlias('status');
-                nestedUserCategoryYear = subQuery.getColumnAlias('category.year');
-            });
+            nestedStatusColumnName = subQuery.getColumnAlias("status");
+            nestedUserCategoryYear = subQuery.getColumnAlias("category.year");
+        });
 
         query.toQuery();
 
@@ -1426,77 +1437,81 @@ describe('TypedKnexQueryBuilder', () => {
         done();
     });
 
-    it('should be able to refer to main query in raw where exists', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should be able to refer to main query in raw where exists", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex.query(User);
         query.whereExists(User, (subQuery) => {
-            subQuery
-                .whereColumn('status', '=', 'status').whereColumn('id', '<>', 'id')
-                .whereRaw(`EXISTS (SELECT 1 FROM users as users2 WHERE ${query.getColumnAlias('status')} = users2."weirdDatabaseName" AND ${query.getColumnAlias('id')} <> users2."id")
+            subQuery.whereColumn("status", "=", "status").whereColumn("id", "<>", "id").whereRaw(`EXISTS (SELECT 1 FROM users as users2 WHERE ${query.getColumnAlias(
+                "status"
+            )} = users2."weirdDatabaseName" AND ${query.getColumnAlias("id")} <> users2."id")
             `);
         });
 
         const queryString = query.toQuery();
-        assert.equal(queryString, `select * from "users" where exists (select * from "users" as "subquery0$users" where "subquery0$users"."weirdDatabaseName" = "users"."weirdDatabaseName" and "subquery0$users"."id" <> "users"."id" and EXISTS (SELECT 1 FROM users as users2 WHERE "users"."weirdDatabaseName" = users2."weirdDatabaseName" AND "users"."id" <> users2."id")
-            )`);
+        assert.equal(
+            queryString,
+            `select * from "users" where exists (select * from "users" as "subquery0$users" where "subquery0$users"."weirdDatabaseName" = "users"."weirdDatabaseName" and "subquery0$users"."id" <> "users"."id" and EXISTS (SELECT 1 FROM users as users2 WHERE "users"."weirdDatabaseName" = users2."weirdDatabaseName" AND "users"."id" <> users2."id")
+            )`
+        );
 
         done();
     });
 
-    it('should be able to refer to main query in where exists', (done) => {
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+    it("should be able to refer to main query in where exists", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex.query(User);
         query.whereExists(User, (subQuery1) => {
-            subQuery1.whereColumn('status', '=', 'status'); // Compares subQuery1 with its parent (query)
+            subQuery1.whereColumn("status", "=", "status"); // Compares subQuery1 with its parent (query)
 
             subQuery1.whereExists(User, (subQuery2) => {
-                subQuery2.whereColumn(subQuery2.getColumn('status'), '=', query.getColumn('status')); // Compares subQuery2 with the first parent (query)
+                subQuery2.whereColumn(subQuery2.getColumn("status"), "=", query.getColumn("status")); // Compares subQuery2 with the first parent (query)
 
                 subQuery2.whereExists(User, (subQuery3) => {
-                    subQuery3.whereColumn(subQuery3.getColumn('status'), '=', subQuery1.getColumn('status')); // Compares subQuery3 with the second parent (subQuery1)
+                    subQuery3.whereColumn(subQuery3.getColumn("status"), "=", subQuery1.getColumn("status")); // Compares subQuery3 with the second parent (subQuery1)
                 });
             });
         });
 
         const queryString = query.toQuery();
-        assert.equal(queryString, `select * from "users" where exists (select * from "users" as "subquery0$users" where "subquery0$users"."weirdDatabaseName" = "users"."weirdDatabaseName" and exists (select * from "users" as "subquery0$subquery0$users" where "subquery0$subquery0$users"."weirdDatabaseName" = "users"."weirdDatabaseName" and exists (select * from "users" as "subquery0$subquery0$subquery0$users" where "subquery0$subquery0$subquery0$users"."weirdDatabaseName" = "subquery0$users"."weirdDatabaseName")))`);
+        assert.equal(
+            queryString,
+            `select * from "users" where exists (select * from "users" as "subquery0$users" where "subquery0$users"."weirdDatabaseName" = "users"."weirdDatabaseName" and exists (select * from "users" as "subquery0$subquery0$users" where "subquery0$subquery0$users"."weirdDatabaseName" = "users"."weirdDatabaseName" and exists (select * from "users" as "subquery0$subquery0$subquery0$users" where "subquery0$subquery0$subquery0$users"."weirdDatabaseName" = "subquery0$users"."weirdDatabaseName")))`
+        );
 
         done();
     });
 
-    describe('getColumnAlias', () => {
+    describe("getColumnAlias", () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
 
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-
-        it('should return root column name', async () => {
+        it("should return root column name", async () => {
             const query = typedKnex.query(UserCategory);
-            assert.equal(query.getColumnAlias('id'), '"userCategories"."id"');
+            assert.equal(query.getColumnAlias("id"), '"userCategories"."id"');
         });
 
-        it('should return root column name with mapped name', async () => {
+        it("should return root column name with mapped name", async () => {
             const query = typedKnex.query(UserCategory);
-            assert.equal(query.getColumnAlias('specialRegionId'), '"userCategories"."INTERNAL_NAME"');
+            assert.equal(query.getColumnAlias("specialRegionId"), '"userCategories"."INTERNAL_NAME"');
         });
 
-        it('should return named joined column name', async () => {
-            const query = typedKnex.query(UserCategory).innerJoin('user', User, 'categoryId', '=', 'id');
-            assert.equal(query.getColumnAlias('user.id'), '"user"."id"');
+        it("should return named joined column name", async () => {
+            const query = typedKnex.query(UserCategory).innerJoin("user", User, "categoryId", "=", "id");
+            assert.equal(query.getColumnAlias("user.id"), '"user"."id"');
         });
 
-        it('should return named joined column name with mapped name', async () => {
-            const query = typedKnex.query(UserCategory).innerJoin('user', User, 'categoryId', '=', 'id');
-            assert.equal(query.getColumnAlias('user.status'), '"user"."weirdDatabaseName"');
+        it("should return named joined column name with mapped name", async () => {
+            const query = typedKnex.query(UserCategory).innerJoin("user", User, "categoryId", "=", "id");
+            assert.equal(query.getColumnAlias("user.status"), '"user"."weirdDatabaseName"');
         });
 
-
-        it('should return two levels joined column name', async () => {
-            const query = typedKnex.query(User).innerJoinColumn('category').innerJoinColumn('category.region');
-            assert.equal(query.getColumnAlias('category.region.code'), '"category_region"."code"');
+        it("should return two levels joined column name", async () => {
+            const query = typedKnex.query(User).innerJoinColumn("category").innerJoinColumn("category.region");
+            assert.equal(query.getColumnAlias("category.region.code"), '"category_region"."code"');
         });
 
-        it('should return select with alias', async () => {
+        it("should return select with alias", async () => {
             const query = typedKnex.query(UserCategory);
-            query.selectRaw('hash', String, `hashFunction(${query.getColumnAlias('name')})`).select('id');
+            query.selectRaw("hash", String, `hashFunction(${query.getColumnAlias("name")})`).select("id");
 
             const queryString = query.toQuery();
 
@@ -1504,12 +1519,11 @@ describe('TypedKnexQueryBuilder', () => {
         });
     });
 
-    describe('distinctOn', () => {
+    describe("distinctOn", () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
 
-        const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
-
-        it('should distinct on 1 column', (done) => {
-            const query = typedKnex.query(UserCategory).select('id').distinctOn(['name']);
+        it("should distinct on 1 column", (done) => {
+            const query = typedKnex.query(UserCategory).select("id").distinctOn(["name"]);
 
             const queryString = query.toQuery();
             assert.equal(queryString, 'select distinct on ("userCategories"."name") "userCategories"."id" as "id" from "userCategories"');
@@ -1517,8 +1531,8 @@ describe('TypedKnexQueryBuilder', () => {
             done();
         });
 
-        it('should distinct on 2 columns', (done) => {
-            const query = typedKnex.query(UserCategory).select('id').distinctOn(['name', 'phoneNumber']);
+        it("should distinct on 2 columns", (done) => {
+            const query = typedKnex.query(UserCategory).select("id").distinctOn(["name", "phoneNumber"]);
 
             const queryString = query.toQuery();
             assert.equal(queryString, 'select distinct on ("userCategories"."name", "userCategories"."phoneNumber") "userCategories"."id" as "id" from "userCategories"');
@@ -1526,8 +1540,8 @@ describe('TypedKnexQueryBuilder', () => {
             done();
         });
 
-        it('should distinct on 1 column with mapping', (done) => {
-            const query = typedKnex.query(UserCategory).select('id').distinctOn(['specialRegionId']);
+        it("should distinct on 1 column with mapping", (done) => {
+            const query = typedKnex.query(UserCategory).select("id").distinctOn(["specialRegionId"]);
 
             const queryString = query.toQuery();
             assert.equal(queryString, 'select distinct on ("userCategories"."INTERNAL_NAME") "userCategories"."id" as "id" from "userCategories"');
@@ -1535,19 +1549,16 @@ describe('TypedKnexQueryBuilder', () => {
             done();
         });
 
-
-        it('should distinct on columns with join and with mapping', (done) => {
-            const query = typedKnex.query(User)
-                .innerJoin('category', UserCategory, 'id', '=', 'categoryId')
-                .select('id')
-                .distinctOn(['name', 'category.id', 'category.specialRegionId']);
+        it("should distinct on columns with join and with mapping", (done) => {
+            const query = typedKnex.query(User).innerJoin("category", UserCategory, "id", "=", "categoryId").select("id").distinctOn(["name", "category.id", "category.specialRegionId"]);
 
             const queryString = query.toQuery();
-            assert.equal(queryString, 'select distinct on ("users"."name", "category"."id", "category"."INTERNAL_NAME") "users"."id" as "id" from "users" inner join "userCategories" as "category" on "category"."id" = "users"."categoryId"');
+            assert.equal(
+                queryString,
+                'select distinct on ("users"."name", "category"."id", "category"."INTERNAL_NAME") "users"."id" as "id" from "users" inner join "userCategories" as "category" on "category"."id" = "users"."categoryId"'
+            );
 
             done();
         });
-
     });
-
 });

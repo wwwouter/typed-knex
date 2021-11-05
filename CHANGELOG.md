@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.4.1
+
+- Bug: result of `getFirstOrNull` and `getSingleOrNull` not always union with `null`.
 ## 4.4.0
 
 - Feature: use `getColumn` in `whereColumn` in cases with nested subqueries.

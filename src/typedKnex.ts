@@ -1,17 +1,17 @@
 // tslint:disable:use-named-parameter
-import { Knex } from 'knex';
-import { getColumnInformation, getColumnProperties, getPrimaryKeyColumn, getTableMetadata } from './decorators';
-import { mapObjectToTableObject } from './mapObjectToTableObject';
-import { NestedForeignKeyKeysOf, NestedKeysOf } from './NestedKeysOf';
-import { NestedRecord } from './NestedRecord';
-import { NonForeignKeyObjects } from './NonForeignKeyObjects';
-import { NonNullableRecursive } from './NonNullableRecursive';
-import { GetNestedProperty, GetNestedPropertyType } from './PropertyTypes';
-import { SelectableColumnTypes } from './SelectableColumnTypes';
-import { FlattenOption, setToNull, unflatten } from './unflatten';
+import { Knex } from "knex";
+import { getColumnInformation, getColumnProperties, getPrimaryKeyColumn, getTableMetadata } from "./decorators";
+import { mapObjectToTableObject } from "./mapObjectToTableObject";
+import { NestedForeignKeyKeysOf, NestedKeysOf } from "./NestedKeysOf";
+import { NestedRecord } from "./NestedRecord";
+import { NonForeignKeyObjects } from "./NonForeignKeyObjects";
+import { NonNullableRecursive } from "./NonNullableRecursive";
+import { GetNestedProperty, GetNestedPropertyType } from "./PropertyTypes";
+import { SelectableColumnTypes } from "./SelectableColumnTypes";
+import { FlattenOption, setToNull, unflatten } from "./unflatten";
 
 export class TypedKnex {
-    constructor(private knex: Knex) { }
+    constructor(private knex: Knex) {}
 
     public query<T>(tableClass: new () => T): ITypedQueryBuilder<T, T, T> {
         return new TypedQueryBuilder<T, T, T>(tableClass, this.knex);
@@ -23,7 +23,7 @@ export class TypedKnex {
                 .transaction((tr) => resolve(tr))
                 // If this error is not caught here, it will throw, resulting in an unhandledRejection
                 // tslint:disable-next-line:no-empty
-                .catch((_e) => { });
+                .catch((_e) => {});
         });
     }
 }
@@ -42,25 +42,20 @@ export function registerBeforeUpdateTransform<T>(f: (item: T, typedQueryBuilder:
 
 class NotImplementedError extends Error {
     constructor() {
-        super('Not implemented');
+        super("Not implemented");
     }
 }
 
 class ColumnFromQuery {
-
-    constructor(private alias: string) {
-
-    }
+    constructor(private alias: string) {}
 
     public toString() {
         return this.alias;
     }
-
 }
 
 export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     columns: { name: string }[];
-
 
     where: IWhereWithOperator<Model, SelectableModel, Row>;
     andWhere: IWhereWithOperator<Model, SelectableModel, Row>;
@@ -143,10 +138,10 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
 
     insertItemWithReturning: IInsertItemWithReturning<Model, SelectableModel, Row>;
 
-    getColumnAlias(name: NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>): string;
-    getColumn(name: NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>): ColumnFromQuery;
+    getColumnAlias(name: NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, "">): string;
+    getColumn(name: NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, "">): ColumnFromQuery;
 
-    distinctOn(columnNames: NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>[]): ITypedQueryBuilder<Model, SelectableModel, Row>;
+    distinctOn(columnNames: NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, "">[]): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
     clearSelect(): ITypedQueryBuilder<Model, SelectableModel, Model>;
     clearWhere(): ITypedQueryBuilder<Model, SelectableModel, Row>;
@@ -158,9 +153,9 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     useKnexQueryBuilder(f: (query: Knex.QueryBuilder) => void): ITypedQueryBuilder<Model, SelectableModel, Row>;
     toQuery(): string;
 
-    getFirstOrNull(flattenOption?: FlattenOption): Promise<Row extends Model ? RemoveObjectsFrom<Model> : Row | null>;
+    getFirstOrNull(flattenOption?: FlattenOption): Promise<(Row extends Model ? RemoveObjectsFrom<Model> : Row) | null>;
     getFirst(flattenOption?: FlattenOption): Promise<Row extends Model ? RemoveObjectsFrom<Model> : Row>;
-    getSingleOrNull(flattenOption?: FlattenOption): Promise<Row extends Model ? RemoveObjectsFrom<Model> : Row | null>;
+    getSingleOrNull(flattenOption?: FlattenOption): Promise<(Row extends Model ? RemoveObjectsFrom<Model> : Row) | null>;
     getSingle(flattenOption?: FlattenOption): Promise<Row extends Model ? RemoveObjectsFrom<Model> : Row>;
     getMany(flattenOption?: FlattenOption): Promise<(Row extends Model ? RemoveObjectsFrom<Model> : Row)[]>;
     getCount(): Promise<number>;
@@ -200,14 +195,13 @@ type RemoveObjectsFrom<T> = { [P in ReturnNonObjectsNamesOnly<T>]: T[P] };
 
 export type ObjectToPrimitive<T> = T extends String ? string : T extends Number ? number : T extends Boolean ? boolean : never;
 
-export type Operator = '=' | '!=' | '>' | '<' | string;
+export type Operator = "=" | "!=" | ">" | "<" | string;
 
 interface IConstructor<T> {
-    new(...args: any[]): T;
+    new (...args: any[]): T;
 }
 
 export type AddPropertyWithType<Original, NewKey extends keyof any, NewKeyType> = Original & NestedRecord<NewKey, NewKeyType>;
-
 
 interface IInsertItemWithReturning<Model, _SelectableModel, _Row> {
     (newObject: Partial<RemoveObjectsFrom<Model>>): Promise<RemoveObjectsFrom<Model>>;
@@ -215,11 +209,11 @@ interface IInsertItemWithReturning<Model, _SelectableModel, _Row> {
 }
 
 interface IColumnParameterNoRowTransformation<Model, SelectableModel, Row> {
-    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(key: ConcatKey): ITypedQueryBuilder<Model, SelectableModel, Row>;
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, "">>(key: ConcatKey): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
 interface IJoinOn<Model, JoinedModel> {
-    <ConcatKey1 extends NestedKeysOf<NonNullableRecursive<JoinedModel>, keyof NonNullableRecursive<JoinedModel>, ''>, ConcatKey2 extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
+    <ConcatKey1 extends NestedKeysOf<NonNullableRecursive<JoinedModel>, keyof NonNullableRecursive<JoinedModel>, "">, ConcatKey2 extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, "">>(
         key1: ConcatKey1,
         operator: Operator,
         key2: ConcatKey2
@@ -227,11 +221,11 @@ interface IJoinOn<Model, JoinedModel> {
 }
 
 interface IJoinOnVal<Model, JoinedModel> {
-    <ConcatKey extends NestedKeysOf<NonNullableRecursive<JoinedModel>, keyof NonNullableRecursive<JoinedModel>, ''>>(key: ConcatKey, operator: Operator, value: any): IJoinOnClause2<Model, JoinedModel>;
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<JoinedModel>, keyof NonNullableRecursive<JoinedModel>, "">>(key: ConcatKey, operator: Operator, value: any): IJoinOnClause2<Model, JoinedModel>;
 }
 
 interface IJoinOnNull<Model, JoinedModel> {
-    <ConcatKey extends NestedKeysOf<NonNullableRecursive<JoinedModel>, keyof NonNullableRecursive<JoinedModel>, ''>>(key: ConcatKey): IJoinOnClause2<Model, JoinedModel>;
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<JoinedModel>, keyof NonNullableRecursive<JoinedModel>, "">>(key: ConcatKey): IJoinOnClause2<Model, JoinedModel>;
 }
 
 interface IJoinOnClause2<Model, JoinedModel> {
@@ -245,7 +239,7 @@ interface IJoinOnClause2<Model, JoinedModel> {
 }
 
 interface IInsertSelect {
-    <NewPropertyType, ConcatKey extends NestedKeysOf<NonNullableRecursive<NewPropertyType>, keyof NonNullableRecursive<NewPropertyType>, ''>>(
+    <NewPropertyType, ConcatKey extends NestedKeysOf<NonNullableRecursive<NewPropertyType>, keyof NonNullableRecursive<NewPropertyType>, "">>(
         newPropertyClass: new () => NewPropertyType,
         ...columnNames: ConcatKey[]
     ): Promise<void>;
@@ -260,12 +254,12 @@ interface IJoinTableMultipleOnClauses<Model, _SelectableModel, Row> {
 }
 
 interface IJoin<Model, _SelectableModel, Row> {
-    <NewPropertyType, NewPropertyKey extends keyof any,
-        ConcatKey2 extends keyof NewPropertyType,
-        ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(
+    <NewPropertyType, NewPropertyKey extends keyof any, ConcatKey2 extends keyof NewPropertyType, ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, "">>(
         newPropertyKey: NewPropertyKey,
         newPropertyClass: new () => NewPropertyType,
-        key: ConcatKey2, operator: Operator, key2: ConcatKey
+        key: ConcatKey2,
+        operator: Operator,
+        key2: ConcatKey
     ): ITypedQueryBuilder<AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, AddPropertyWithType<Model, NewPropertyKey, NewPropertyType>, Row>;
 }
 
@@ -291,14 +285,14 @@ type TransformPropsToFunctionsReturnPropertyName<Model> = {
 };
 
 interface IOrderBy<Model, SelectableModel, Row> {
-    <ConcatKey extends NestedKeysOf<NonNullableRecursive<SelectableModel>, keyof NonNullableRecursive<SelectableModel>, ''>, TName extends keyof any>(
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<SelectableModel>, keyof NonNullableRecursive<SelectableModel>, "">, TName extends keyof any>(
         columnNames: ConcatKey,
-        direction?: 'asc' | 'desc'
+        direction?: "asc" | "desc"
     ): ITypedQueryBuilder<Model, SelectableModel, Row & Record<TName, GetNestedPropertyType<SelectableModel, ConcatKey>>>;
 }
 
 interface IDbFunctionWithAlias<Model, SelectableModel, Row> {
-    <ConcatKey extends NestedKeysOf<NonNullableRecursive<SelectableModel>, keyof NonNullableRecursive<SelectableModel>, ''>, TName extends keyof any>(columnNames: ConcatKey, name: TName): ITypedQueryBuilder<
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<SelectableModel>, keyof NonNullableRecursive<SelectableModel>, "">, TName extends keyof any>(columnNames: ConcatKey, name: TName): ITypedQueryBuilder<
         Model,
         SelectableModel,
         Row & Record<TName, GetNestedPropertyType<SelectableModel, ConcatKey>>
@@ -308,7 +302,7 @@ interface IDbFunctionWithAlias<Model, SelectableModel, Row> {
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never;
 
 interface ISelectWithFunctionColumns3<Model, SelectableModel, Row> {
-    <ConcatKey extends NestedKeysOf<NonNullableRecursive<SelectableModel>, keyof NonNullableRecursive<SelectableModel>, ''>>(...columnNames: ConcatKey[]): ITypedQueryBuilder<
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<SelectableModel>, keyof NonNullableRecursive<SelectableModel>, "">>(...columnNames: ConcatKey[]): ITypedQueryBuilder<
         Model,
         SelectableModel,
         Row & UnionToIntersection<GetNestedProperty<SelectableModel, ConcatKey>>
@@ -316,27 +310,27 @@ interface ISelectWithFunctionColumns3<Model, SelectableModel, Row> {
 }
 
 interface IFindByPrimaryKey<_Model, SelectableModel, Row> {
-    <ConcatKey extends NestedKeysOf<NonNullableRecursive<SelectableModel>, keyof NonNullableRecursive<SelectableModel>, ''>>(primaryKeyValue: any, ...columnNames: ConcatKey[]): Promise<
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<SelectableModel>, keyof NonNullableRecursive<SelectableModel>, "">>(primaryKeyValue: any, ...columnNames: ConcatKey[]): Promise<
         (Row & UnionToIntersection<GetNestedProperty<SelectableModel, ConcatKey>>) | undefined
     >;
 }
 
 interface IKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row> {
-    <ConcatKey extends NestedForeignKeyKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(key: ConcatKey): ITypedQueryBuilder<Model, SelectableModel, Row>;
+    <ConcatKey extends NestedForeignKeyKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, "">>(key: ConcatKey): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
 interface ISelectableColumnKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row> {
-    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(key: ConcatKey): ITypedQueryBuilder<Model, SelectableModel, Row>;
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, "">>(key: ConcatKey): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
 interface IWhere<Model, SelectableModel, Row> {
-    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(key: ConcatKey, value: GetNestedPropertyType<Model, ConcatKey>): ITypedQueryBuilder<Model, SelectableModel, Row>;
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, "">>(key: ConcatKey, value: GetNestedPropertyType<Model, ConcatKey>): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
 interface IWhereWithOperator<Model, SelectableModel, Row> {
-    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(key: ConcatKey, value: GetNestedPropertyType<Model, ConcatKey>): ITypedQueryBuilder<Model, SelectableModel, Row>;
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, "">>(key: ConcatKey, value: GetNestedPropertyType<Model, ConcatKey>): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
-    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(key: ConcatKey, operator: Operator, value: GetNestedPropertyType<Model, ConcatKey>): ITypedQueryBuilder<
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, "">>(key: ConcatKey, operator: Operator, value: GetNestedPropertyType<Model, ConcatKey>): ITypedQueryBuilder<
         Model,
         SelectableModel,
         Row
@@ -344,18 +338,18 @@ interface IWhereWithOperator<Model, SelectableModel, Row> {
 }
 
 interface IWhereIn<Model, SelectableModel, Row> {
-    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(key: ConcatKey, value: GetNestedPropertyType<Model, ConcatKey>[]): ITypedQueryBuilder<Model, SelectableModel, Row>;
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, "">>(key: ConcatKey, value: GetNestedPropertyType<Model, ConcatKey>[]): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
 interface IWhereBetween<Model, SelectableModel, Row> {
-    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>, PropertyType extends GetNestedPropertyType<Model, ConcatKey>>(
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, "">, PropertyType extends GetNestedPropertyType<Model, ConcatKey>>(
         key: ConcatKey,
         value: [PropertyType, PropertyType]
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 }
 
 interface IHaving<Model, SelectableModel, Row> {
-    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>>(key: ConcatKey, operator: Operator, value: GetNestedPropertyType<Model, ConcatKey>): ITypedQueryBuilder<
+    <ConcatKey extends NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, "">>(key: ConcatKey, operator: Operator, value: GetNestedPropertyType<Model, ConcatKey>): ITypedQueryBuilder<
         Model,
         SelectableModel,
         Row
@@ -364,9 +358,9 @@ interface IHaving<Model, SelectableModel, Row> {
 
 interface IWhereCompareTwoColumns<Model, SelectableModel, Row> {
     <_PropertyType1, _PropertyType2, Model2>(
-        key1: NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, ''>,
+        key1: NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, "">,
         operator: Operator,
-        key2: NestedKeysOf<NonNullableRecursive<Model2>, keyof NonNullableRecursive<Model2>, ''>
+        key2: NestedKeysOf<NonNullableRecursive<Model2>, keyof NonNullableRecursive<Model2>, "">
     ): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
     (key1: ColumnFromQuery, operator: Operator, key2: ColumnFromQuery): ITypedQueryBuilder<Model, SelectableModel, Row>;
@@ -391,15 +385,15 @@ function getProxyAndMemories<ModelType, Row>(typedQueryBuilder?: TypedQueryBuild
     const memories = [] as string[];
 
     function allGet(_target: any, name: any): any {
-        if (name === 'memories') {
+        if (name === "memories") {
             return memories;
         }
 
-        if (name === 'getColumnName') {
+        if (name === "getColumnName") {
             return typedQueryBuilder!.getColumnName(...memories);
         }
 
-        if (typeof name === 'string') {
+        if (typeof name === "string") {
             memories.push(name);
         }
         return new Proxy(
@@ -430,19 +424,19 @@ function getProxyAndMemoriesForArray<ModelType, Row>(typedQueryBuilder?: TypedQu
             counter++;
             result.push([]);
         }
-        if (name === 'memories') {
+        if (name === "memories") {
             return result[counter];
         }
-        if (name === 'result') {
+        if (name === "result") {
             return result;
         }
-        if (name === 'level') {
+        if (name === "level") {
             return _target.level;
         }
-        if (name === 'getColumnName') {
+        if (name === "getColumnName") {
             return typedQueryBuilder!.getColumnName(...result[counter]);
         }
-        if (typeof name === 'string') {
+        if (typeof name === "string") {
             result[counter].push(name);
         }
         return new Proxy(
@@ -467,7 +461,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
     public columns: { name: string }[];
 
     public onlyLogQuery = false;
-    public queryLog = '';
+    public queryLog = "";
     private hasSelectClause = false;
 
     private queryBuilder: Knex.QueryBuilder;
@@ -502,7 +496,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
     }
 
     public getNextSubQueryPrefix() {
-        const result = `${this.subQueryPrefix ?? ''}subquery${this.subQueryCounter}$`;
+        const result = `${this.subQueryPrefix ?? ""}subquery${this.subQueryCounter}$`;
         this.subQueryCounter++;
         return result;
     }
@@ -513,16 +507,15 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
     }
 
     public getColumnAlias(name: string) {
-        return this.knex.raw('??', this.getColumnName(...name.split('.'))).toQuery();
+        return this.knex.raw("??", this.getColumnName(...name.split("."))).toQuery();
     }
 
     public getColumn(name: string) {
         return new ColumnFromQuery(this.getColumnAlias(name));
     }
 
-    public distinctOn(columnNames: NestedKeysOf<NonNullableRecursive<ModelType>, keyof NonNullableRecursive<ModelType>, ''>[]): ITypedQueryBuilder<ModelType, SelectableModel, Row> {
-
-        const mappedColumnNames = columnNames.map(columnName => this.getColumnName(...columnName.split('.')));
+    public distinctOn(columnNames: NestedKeysOf<NonNullableRecursive<ModelType>, keyof NonNullableRecursive<ModelType>, "">[]): ITypedQueryBuilder<ModelType, SelectableModel, Row> {
+        const mappedColumnNames = columnNames.map((columnName) => this.getColumnName(...columnName.split(".")));
         this.queryBuilder.distinctOn(mappedColumnNames);
 
         return this as any;
@@ -549,20 +542,20 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
         const query = this.knex.from(this.tableName).insert(item);
         if (returnProperties) {
-            const mappedNames = returnProperties.map(columnName => this.getColumnName(columnName));
+            const mappedNames = returnProperties.map((columnName) => this.getColumnName(columnName));
             query.returning(mappedNames);
         } else {
-            query.returning('*');
+            query.returning("*");
         }
 
         if (this.onlyLogQuery) {
-            this.queryLog += query.toQuery() + '\n';
+            this.queryLog += query.toQuery() + "\n";
 
-            return ({} as any);
+            return {} as any;
         } else {
             const result = await query;
 
-            return (result[0] as any);
+            return result[0] as any;
         }
     }
 
@@ -588,7 +581,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
                 query.transacting(this.transaction);
             }
             if (this.onlyLogQuery) {
-                this.queryLog += query.toQuery() + '\n';
+                this.queryLog += query.toQuery() + "\n";
             } else {
                 await query;
             }
@@ -602,7 +595,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
         const mappedItem = mapObjectToTableObject(this.tableClass, item);
         if (this.onlyLogQuery) {
-            this.queryLog += this.queryBuilder.update(mappedItem).toQuery() + '\n';
+            this.queryLog += this.queryBuilder.update(mappedItem).toQuery() + "\n";
         } else {
             await this.queryBuilder.update(mappedItem);
         }
@@ -620,7 +613,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         const query = this.queryBuilder.update(mappedItem).where(primaryKeyColumnInfo.name, primaryKeyValue);
 
         if (this.onlyLogQuery) {
-            this.queryLog += query.toQuery() + '\n';
+            this.queryLog += query.toQuery() + "\n";
         } else {
             await query;
         }
@@ -638,7 +631,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         while (items.length > 0) {
             const chunk = items.splice(0, 500);
 
-            let sql = '';
+            let sql = "";
             for (const item of chunk) {
                 const query = this.knex.from(this.tableName);
                 if (beforeUpdateTransform) {
@@ -647,7 +640,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
                 item.data = mapObjectToTableObject(this.tableClass, item.data);
 
                 query.update(item.data);
-                sql += query.where(primaryKeyColumnInfo.name, item.primaryKeyValue).toString().replace('?', '\\?') + ';\n';
+                sql += query.where(primaryKeyColumnInfo.name, item.primaryKeyValue).toString().replace("?", "\\?") + ";\n";
             }
 
             const finalQuery = this.knex.raw(sql);
@@ -656,7 +649,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
             }
 
             if (this.onlyLogQuery) {
-                this.queryLog += finalQuery.toQuery() + '\n';
+                this.queryLog += finalQuery.toQuery() + "\n";
             } else {
                 await finalQuery;
             }
@@ -680,12 +673,12 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
     public async findById(id: string, columns: (keyof ModelType)[]) {
         return await this.queryBuilder
             .select(columns as any)
-            .where(this.tableName + '.id', id)
+            .where(this.tableName + ".id", id)
             .first();
     }
 
     public async getCount() {
-        const query = this.queryBuilder.count({ count: '*' });
+        const query = this.queryBuilder.count({ count: "*" });
         const result = await query;
         if (result.length === 0) {
             return 0;
@@ -698,7 +691,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
             this.selectAllModelProperties();
         }
         if (this.onlyLogQuery) {
-            this.queryLog += this.queryBuilder.toQuery() + '\n';
+            this.queryLog += this.queryBuilder.toQuery() + "\n";
             return [];
         } else {
             const items = await this.queryBuilder;
@@ -715,12 +708,12 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
             this.selectAllModelProperties();
         }
         if (this.onlyLogQuery) {
-            this.queryLog += this.queryBuilder.toQuery() + '\n';
+            this.queryLog += this.queryBuilder.toQuery() + "\n";
             return [];
         } else {
             const items = await this.queryBuilder;
             if (!items || items.length === 0) {
-                throw new Error('Item not found.');
+                throw new Error("Item not found.");
             }
 
             return this.flattenByOption(items[0], arguments[0]);
@@ -732,7 +725,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
             this.selectAllModelProperties();
         }
         if (this.onlyLogQuery) {
-            this.queryLog += this.queryBuilder.toQuery() + '\n';
+            this.queryLog += this.queryBuilder.toQuery() + "\n";
             return [];
         } else {
             const items = await this.queryBuilder;
@@ -750,12 +743,12 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
             this.selectAllModelProperties();
         }
         if (this.onlyLogQuery) {
-            this.queryLog += this.queryBuilder.toQuery() + '\n';
+            this.queryLog += this.queryBuilder.toQuery() + "\n";
             return [];
         } else {
             const items = await this.queryBuilder;
             if (!items || items.length === 0) {
-                throw new Error('Item not found.');
+                throw new Error("Item not found.");
             } else if (items.length > 1) {
                 throw new Error(`More than one item found: ${items.length}.`);
             }
@@ -773,7 +766,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
         arguments[0](saveArguments);
 
-        this.queryBuilder.select(this.getColumnName(...calledArguments) + ' as ' + this.getColumnSelectAlias(...calledArguments));
+        this.queryBuilder.select(this.getColumnName(...calledArguments) + " as " + this.getColumnSelectAlias(...calledArguments));
 
         return this as any;
     }
@@ -793,7 +786,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         const columnArgumentsList = this.getArgumentsFromColumnFunction3(f);
 
         for (const columnArguments of columnArgumentsList) {
-            this.queryBuilder.select(this.getColumnName(...columnArguments) + ' as ' + this.getColumnSelectAlias(...columnArguments));
+            this.queryBuilder.select(this.getColumnName(...columnArguments) + " as " + this.getColumnSelectAlias(...columnArguments));
         }
         return this as any;
     }
@@ -802,15 +795,15 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         this.hasSelectClause = true;
         let columnArgumentsList: string[][];
 
-        if (typeof arguments[0] === 'string') {
-            columnArgumentsList = [...arguments].map((concatKey: string) => concatKey.split('.'));
+        if (typeof arguments[0] === "string") {
+            columnArgumentsList = [...arguments].map((concatKey: string) => concatKey.split("."));
         } else {
             const f = arguments[0];
             columnArgumentsList = this.getArgumentsFromColumnFunction3(f);
         }
 
         for (const columnArguments of columnArgumentsList) {
-            this.queryBuilder.select(this.getColumnName(...columnArguments) + ' as ' + this.getColumnSelectAlias(...columnArguments));
+            this.queryBuilder.select(this.getColumnName(...columnArguments) + " as " + this.getColumnSelectAlias(...columnArguments));
         }
         return this as any;
     }
@@ -826,7 +819,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
             this.selectAllModelProperties();
         }
         if (this.onlyLogQuery) {
-            this.queryLog += this.queryBuilder.toQuery() + '\n';
+            this.queryLog += this.queryBuilder.toQuery() + "\n";
             return [];
         } else {
             const items = await this.queryBuilder;
@@ -844,10 +837,10 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
     }
 
     public innerJoinColumn() {
-        return this.joinColumn('innerJoin', arguments[0]);
+        return this.joinColumn("innerJoin", arguments[0]);
     }
     public leftOuterJoinColumn() {
-        return this.joinColumn('leftOuterJoin', arguments[0]);
+        return this.joinColumn("leftOuterJoin", arguments[0]);
     }
 
     public innerJoinTable() {
@@ -874,13 +867,11 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         return this;
     }
 
-
-
     public innerJoin() {
-        return this.join('innerJoin', arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
+        return this.join("innerJoin", arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
     }
     public leftOuterJoin() {
-        return this.join('leftOuterJoin', arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
+        return this.join("leftOuterJoin", arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
     }
 
     public innerJoinTableOnFunction() {
@@ -930,16 +921,16 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
             return this;
         }
 
-        if (typeof arguments[0] === 'string') {
-            column1Name = this.getColumnName(...arguments[0].split('.'));
+        if (typeof arguments[0] === "string") {
+            column1Name = this.getColumnName(...arguments[0].split("."));
             if (!this.parentTypedQueryBuilder) {
                 throw new Error('Parent query builder is missing, "whereColumn" can only be used in sub-query.');
             }
-            column2Name = this.parentTypedQueryBuilder.getColumnName(...arguments[2].split('.'));
+            column2Name = this.parentTypedQueryBuilder.getColumnName(...arguments[2].split("."));
         } else {
             column1Name = this.getColumnName(...this.getArgumentsFromColumnFunction(arguments[0]));
 
-            if (typeof arguments[2] === 'string') {
+            if (typeof arguments[2] === "string") {
                 column2Name = arguments[2];
             } else if (arguments[2].memories !== undefined) {
                 column2Name = arguments[2].getColumnName; // parent this needed ...
@@ -974,8 +965,8 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
     }
 
     public getArgumentsFromColumnFunction(f: any) {
-        if (typeof f === 'string') {
-            return f.split('.');
+        if (typeof f === "string") {
+            return f.split(".");
         }
 
         const { root, memories } = getProxyAndMemories();
@@ -991,36 +982,36 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         const primaryKeyValue = arguments[0];
 
         let columnArgumentsList;
-        if (typeof arguments[1] === 'string') {
+        if (typeof arguments[1] === "string") {
             const [, ...columnArguments] = arguments;
-            columnArgumentsList = columnArguments.map((concatKey: string) => concatKey.split('.'));
+            columnArgumentsList = columnArguments.map((concatKey: string) => concatKey.split("."));
         } else {
             const f = arguments[1];
             columnArgumentsList = this.getArgumentsFromColumnFunction3(f);
         }
 
         for (const columnArguments of columnArgumentsList) {
-            this.queryBuilder.select(this.getColumnName(...columnArguments) + ' as ' + this.getColumnSelectAlias(...columnArguments));
+            this.queryBuilder.select(this.getColumnName(...columnArguments) + " as " + this.getColumnSelectAlias(...columnArguments));
         }
 
         this.queryBuilder.where(primaryKeyColumnInfo.name, primaryKeyValue);
 
         if (this.onlyLogQuery) {
-            this.queryLog += this.queryBuilder.toQuery() + '\n';
+            this.queryLog += this.queryBuilder.toQuery() + "\n";
         } else {
             return this.queryBuilder.first();
         }
     }
 
     public where() {
-        if (typeof arguments[0] === 'string') {
+        if (typeof arguments[0] === "string") {
             return this.callKnexFunctionWithConcatKeyColumn(this.queryBuilder.where.bind(this.queryBuilder), ...arguments);
         }
         return this.callKnexFunctionWithColumnFunction(this.queryBuilder.where.bind(this.queryBuilder), ...arguments);
     }
 
     public whereNot() {
-        if (typeof arguments[0] === 'string') {
+        if (typeof arguments[0] === "string") {
             return this.callKnexFunctionWithConcatKeyColumn(this.queryBuilder.whereNot.bind(this.queryBuilder), ...arguments);
         }
         const columnArguments = this.getArgumentsFromColumnFunction(arguments[0]);
@@ -1068,8 +1059,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
     public callQueryCallbackFunction(functionName: string, typeOfSubQuery: any, functionToCall: any) {
         const that = this as any;
         let subQueryPrefix: string | undefined;
-        if (['whereExists', 'orWhereExists', 'whereNotExists', 'orWhereNotExists', 'havingExists',
-            'havingNotExists'].includes(functionName)) {
+        if (["whereExists", "orWhereExists", "whereNotExists", "orWhereNotExists", "havingExists", "havingNotExists"].includes(functionName)) {
             subQueryPrefix = this.getNextSubQueryPrefix();
         }
         ((this.queryBuilder as any)[functionName] as (callback: Knex.QueryCallback) => Knex.QueryBuilder)(function () {
@@ -1099,7 +1089,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
     }
 
     public whereParentheses() {
-        this.callQueryCallbackFunction('where', this.tableClass, arguments[0]);
+        this.callQueryCallbackFunction("where", this.tableClass, arguments[0]);
 
         return this;
     }
@@ -1108,7 +1098,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         const typeOfSubQuery = arguments[0];
         const functionToCall = arguments[1];
 
-        this.callQueryCallbackFunction('whereExists', typeOfSubQuery, functionToCall);
+        this.callQueryCallbackFunction("whereExists", typeOfSubQuery, functionToCall);
 
         return this;
     }
@@ -1116,7 +1106,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         const typeOfSubQuery = arguments[0];
         const functionToCall = arguments[1];
 
-        this.callQueryCallbackFunction('orWhereExists', typeOfSubQuery, functionToCall);
+        this.callQueryCallbackFunction("orWhereExists", typeOfSubQuery, functionToCall);
 
         return this;
     }
@@ -1125,7 +1115,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         const typeOfSubQuery = arguments[0];
         const functionToCall = arguments[1];
 
-        this.callQueryCallbackFunction('whereNotExists', typeOfSubQuery, functionToCall);
+        this.callQueryCallbackFunction("whereNotExists", typeOfSubQuery, functionToCall);
 
         return this;
     }
@@ -1133,7 +1123,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         const typeOfSubQuery = arguments[0];
         const functionToCall = arguments[1];
 
-        this.callQueryCallbackFunction('orWhereNotExists', typeOfSubQuery, functionToCall);
+        this.callQueryCallbackFunction("orWhereNotExists", typeOfSubQuery, functionToCall);
 
         return this;
     }
@@ -1176,7 +1166,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         const typeOfSubQuery = arguments[0];
         const functionToCall = arguments[1];
 
-        this.callQueryCallbackFunction('havingExists', typeOfSubQuery, functionToCall);
+        this.callQueryCallbackFunction("havingExists", typeOfSubQuery, functionToCall);
 
         return this;
     }
@@ -1185,7 +1175,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         const typeOfSubQuery = arguments[0];
         const functionToCall = arguments[1];
 
-        this.callQueryCallbackFunction('havingNotExists', typeOfSubQuery, functionToCall);
+        this.callQueryCallbackFunction("havingNotExists", typeOfSubQuery, functionToCall);
 
         return this;
     }
@@ -1216,7 +1206,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         const typeOfSubQuery = arguments[0];
         const functionToCall = arguments[1];
 
-        this.callQueryCallbackFunction('union', typeOfSubQuery, functionToCall);
+        this.callQueryCallbackFunction("union", typeOfSubQuery, functionToCall);
 
         return this;
     }
@@ -1225,7 +1215,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         const typeOfSubQuery = arguments[0];
         const functionToCall = arguments[1];
 
-        this.callQueryCallbackFunction('unionAll', typeOfSubQuery, functionToCall);
+        this.callQueryCallbackFunction("unionAll", typeOfSubQuery, functionToCall);
 
         return this;
     }
@@ -1247,35 +1237,35 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
     }
 
     public min() {
-        return this.functionWithAlias('min', arguments[0], arguments[1]);
+        return this.functionWithAlias("min", arguments[0], arguments[1]);
     }
 
     public count() {
-        return this.functionWithAlias('count', arguments[0], arguments[1]);
+        return this.functionWithAlias("count", arguments[0], arguments[1]);
     }
 
     public countDistinct() {
-        return this.functionWithAlias('countDistinct', arguments[0], arguments[1]);
+        return this.functionWithAlias("countDistinct", arguments[0], arguments[1]);
     }
 
     public max() {
-        return this.functionWithAlias('max', arguments[0], arguments[1]);
+        return this.functionWithAlias("max", arguments[0], arguments[1]);
     }
 
     public sum() {
-        return this.functionWithAlias('sum', arguments[0], arguments[1]);
+        return this.functionWithAlias("sum", arguments[0], arguments[1]);
     }
 
     public sumDistinct() {
-        return this.functionWithAlias('sumDistinct', arguments[0], arguments[1]);
+        return this.functionWithAlias("sumDistinct", arguments[0], arguments[1]);
     }
 
     public avg() {
-        return this.functionWithAlias('avg', arguments[0], arguments[1]);
+        return this.functionWithAlias("avg", arguments[0], arguments[1]);
     }
 
     public avgDistinct() {
-        return this.functionWithAlias('avgDistinct', arguments[0], arguments[1]);
+        return this.functionWithAlias("avgDistinct", arguments[0], arguments[1]);
     }
 
     public increment() {
@@ -1298,9 +1288,9 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
         const typedQueryBuilderForInsert = new TypedQueryBuilder<any, any>(arguments[0], this.knex);
         let columnArgumentsList;
-        if (typeof arguments[1] === 'string') {
+        if (typeof arguments[1] === "string") {
             const [, ...columnArguments] = arguments;
-            columnArgumentsList = columnArguments.map((concatKey: string) => concatKey.split('.'));
+            columnArgumentsList = columnArguments.map((concatKey: string) => concatKey.split("."));
         } else {
             const f = arguments[1];
             columnArgumentsList = this.getArgumentsFromColumnFunction3(f);
@@ -1309,7 +1299,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         const insertColumns = columnArgumentsList.map((i) => typedQueryBuilderForInsert.getColumnName(...i));
 
         // https://github.com/knex/knex/issues/1056
-        const qb = this.knex.from(this.knex.raw(`?? (${insertColumns.map(() => '??').join(',')})`, [tableName, ...insertColumns])).insert(this.knex.raw(this.toQuery()));
+        const qb = this.knex.from(this.knex.raw(`?? (${insertColumns.map(() => "??").join(",")})`, [tableName, ...insertColumns])).insert(this.knex.raw(this.toQuery()));
 
         const finalQuery = qb.toString();
         this.toQuery = () => finalQuery;
@@ -1364,18 +1354,17 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         if (keys.length === 1) {
             return firstPartName;
         } else {
-            let columnName = '';
+            let columnName = "";
             let columnAlias;
             let currentClass;
             let currentColumnPart;
-            const prefix = keys.slice(0, -1).join('.');
+            const prefix = keys.slice(0, -1).join(".");
             const extraJoinedProperty = this.extraJoinedProperties.find((i) => i.name === prefix);
             if (extraJoinedProperty) {
                 columnAlias = extraJoinedProperty.name;
                 currentClass = extraJoinedProperty.propertyType;
                 currentColumnPart = getColumnInformation(currentClass, keys[keys.length - 1]);
-                columnName = keys.slice(0, -1).join('_') + '.' + currentColumnPart.name;
-
+                columnName = keys.slice(0, -1).join("_") + "." + currentColumnPart.name;
             } else {
                 currentColumnPart = getColumnInformation(this.tableClass, keys[0]);
                 columnAlias = currentColumnPart.propertyKey;
@@ -1383,13 +1372,13 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
                 for (let i = 1; i < keys.length; i++) {
                     currentColumnPart = getColumnInformation(currentClass, keys[i]);
 
-                    columnName = columnAlias + '.' + (keys.length - 1 === i ? currentColumnPart.name : currentColumnPart.propertyKey);
-                    columnAlias += '_' + (keys.length - 1 === i ? currentColumnPart.name : currentColumnPart.propertyKey);
+                    columnName = columnAlias + "." + (keys.length - 1 === i ? currentColumnPart.name : currentColumnPart.propertyKey);
+                    columnAlias += "_" + (keys.length - 1 === i ? currentColumnPart.name : currentColumnPart.propertyKey);
                     currentClass = currentColumnPart.columnClass;
                 }
             }
 
-            return `${this.subQueryPrefix ?? ''}${columnName}`;
+            return `${this.subQueryPrefix ?? ""}${columnName}`;
         }
     }
 
@@ -1401,14 +1390,14 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         } else {
             let currentColumnPart = getColumnInformation(this.tableClass, keys[0]);
 
-            let columnName = '';
+            let columnName = "";
             let columnAlias = currentColumnPart.propertyKey;
             let currentClass = currentColumnPart.columnClass;
             for (let i = 0; i < keys.length; i++) {
                 currentColumnPart = getColumnInformation(currentClass, keys[i]);
 
-                columnName = columnAlias + '.' + (keys.length - 1 === i ? currentColumnPart.name : currentColumnPart.propertyKey);
-                columnAlias += '_' + (keys.length - 1 === i ? currentColumnPart.name : currentColumnPart.propertyKey);
+                columnName = columnAlias + "." + (keys.length - 1 === i ? currentColumnPart.name : currentColumnPart.propertyKey);
+                columnAlias += "_" + (keys.length - 1 === i ? currentColumnPart.name : currentColumnPart.propertyKey);
                 currentClass = currentColumnPart.columnClass;
             }
             return columnName;
@@ -1423,8 +1412,8 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
     private getColumnNameFromFunctionOrString(f: any) {
         let columnParts;
-        if (typeof f === 'string') {
-            columnParts = f.split('.');
+        if (typeof f === "string") {
+            columnParts = f.split(".");
         } else {
             columnParts = this.getArgumentsFromColumnFunction(f);
         }
@@ -1434,8 +1423,8 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
     private getColumnNameWithoutAliasFromFunctionOrString(f: any) {
         let columnParts;
-        if (typeof f === 'string') {
-            columnParts = f.split('.');
+        if (typeof f === "string") {
+            columnParts = f.split(".");
         } else {
             columnParts = this.getArgumentsFromColumnFunction(f);
         }
@@ -1443,11 +1432,11 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         return this.getColumnNameWithoutAlias(...columnParts);
     }
 
-    private joinColumn(joinType: 'innerJoin' | 'leftOuterJoin', f: any) {
+    private joinColumn(joinType: "innerJoin" | "leftOuterJoin", f: any) {
         let columnToJoinArguments: string[];
 
-        if (typeof f === 'string') {
-            columnToJoinArguments = f.split('.');
+        if (typeof f === "string") {
+            columnToJoinArguments = f.split(".");
         } else {
             columnToJoinArguments = this.getArgumentsFromColumnFunction(f);
         }
@@ -1464,17 +1453,17 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
             const columnInfo = getColumnInformation(beforeSecondColumnClass, columnToJoinArguments[i]);
             secondColumnName = columnInfo.name;
-            secondColumnAlias = beforeSecondColumnAlias + '_' + columnInfo.propertyKey;
+            secondColumnAlias = beforeSecondColumnAlias + "_" + columnInfo.propertyKey;
             secondColumnClass = columnInfo.columnClass;
         }
 
         const tableToJoinName = getTableMetadata(secondColumnClass).tableName;
-        const tableToJoinAlias = `${this.subQueryPrefix ?? ''}${secondColumnAlias}`;
+        const tableToJoinAlias = `${this.subQueryPrefix ?? ""}${secondColumnAlias}`;
         const tableToJoinJoinColumnName = `${tableToJoinAlias}.${getPrimaryKeyColumn(secondColumnClass).name}`;
 
-        if (joinType === 'innerJoin') {
+        if (joinType === "innerJoin") {
             this.queryBuilder.innerJoin(`${tableToJoinName} as ${tableToJoinAlias}`, tableToJoinJoinColumnName, columnToJoinName);
-        } else if (joinType === 'leftOuterJoin') {
+        } else if (joinType === "leftOuterJoin") {
             this.queryBuilder.leftOuterJoin(`${tableToJoinName} as ${tableToJoinAlias}`, tableToJoinJoinColumnName, columnToJoinName);
         }
 
@@ -1493,12 +1482,12 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
                 return extraJoinedProperty.name;
             }
             const columnInfo = getColumnInformation(extraJoinedProperty.propertyType, keys[1]);
-            return extraJoinedProperty.name + '.' + columnInfo.name;
+            return extraJoinedProperty.name + "." + columnInfo.name;
         }
 
         if (keys.length === 1) {
             const columnInfo = getColumnInformation(this.tableClass, keys[0]);
-            return `${this.subQueryPrefix ?? ''}${this.tableName}.${columnInfo.name}`;
+            return `${this.subQueryPrefix ?? ""}${this.tableName}.${columnInfo.name}`;
         } else {
             let currentColumnPart = getColumnInformation(this.tableClass, keys[0]);
 
@@ -1507,7 +1496,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
             for (let i = 1; i < keys.length; i++) {
                 currentColumnPart = getColumnInformation(currentClass, keys[i]);
-                result += '.' + (keys.length - 1 === i ? currentColumnPart.name : currentColumnPart.propertyKey);
+                result += "." + (keys.length - 1 === i ? currentColumnPart.name : currentColumnPart.propertyKey);
                 currentClass = currentColumnPart.columnClass;
             }
 
@@ -1521,7 +1510,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         } else {
             let columnAlias = keys[0];
             for (let i = 1; i < keys.length; i++) {
-                columnAlias += '.' + keys[i];
+                columnAlias += "." + keys[i];
             }
             return columnAlias;
         }
@@ -1557,16 +1546,16 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
             let column1Arguments;
             let column2Arguments;
 
-            if (typeof modelColumn === 'string') {
-                column1Arguments = modelColumn.split('.');
-                column2Arguments = joinedColumn.split('.');
+            if (typeof modelColumn === "string") {
+                column1Arguments = modelColumn.split(".");
+                column2Arguments = joinedColumn.split(".");
             } else {
                 column1Arguments = this.getArgumentsFromColumnFunction(modelColumn);
                 column2Arguments = this.getArgumentsFromColumnFunction(joinedColumn);
             }
 
             const column2ArgumentsWithJoinedTable = [tableToJoinAlias, ...column2Arguments];
-            knexOnObject[functionName](this.getColumnName(...column1Arguments), operator, column2ArgumentsWithJoinedTable.join('.'));
+            knexOnObject[functionName](this.getColumnName(...column1Arguments), operator, column2ArgumentsWithJoinedTable.join("."));
         };
 
         const onWithColumnOperatorValue = (joinedColumn: any, operator: any, value: any, functionName: string) => {
@@ -1577,7 +1566,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
             const column2ArgumentsWithJoinedTable = [tableToJoinAlias, ...column2Arguments];
             knexOnObject[functionName](
                 // this.getColumnName(...column1Arguments),
-                column2ArgumentsWithJoinedTable.join('.'),
+                column2ArgumentsWithJoinedTable.join("."),
                 operator,
                 value
                 // column2ArgumentsWithJoinedTable.join('.')
@@ -1586,38 +1575,38 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
         const onObject = {
             onColumns: (column1: any, operator: any, column2: any) => {
-                onWithJoinedColumnOperatorColumn(column2, operator, column1, 'on');
+                onWithJoinedColumnOperatorColumn(column2, operator, column1, "on");
                 return onObject;
             },
             on: (column1: any, operator: any, column2: any) => {
-                onWithJoinedColumnOperatorColumn(column1, operator, column2, 'on');
+                onWithJoinedColumnOperatorColumn(column1, operator, column2, "on");
                 return onObject;
             },
             andOn: (column1: any, operator: any, column2: any) => {
-                onWithJoinedColumnOperatorColumn(column1, operator, column2, 'andOn');
+                onWithJoinedColumnOperatorColumn(column1, operator, column2, "andOn");
                 return onObject;
             },
             orOn: (column1: any, operator: any, column2: any) => {
-                onWithJoinedColumnOperatorColumn(column1, operator, column2, 'orOn');
+                onWithJoinedColumnOperatorColumn(column1, operator, column2, "orOn");
                 return onObject;
             },
             onVal: (column1: any, operator: any, value: any) => {
-                onWithColumnOperatorValue(column1, operator, value, 'onVal');
+                onWithColumnOperatorValue(column1, operator, value, "onVal");
                 return onObject;
             },
             andOnVal: (column1: any, operator: any, value: any) => {
-                onWithColumnOperatorValue(column1, operator, value, 'andOnVal');
+                onWithColumnOperatorValue(column1, operator, value, "andOnVal");
                 return onObject;
             },
             orOnVal: (column1: any, operator: any, value: any) => {
-                onWithColumnOperatorValue(column1, operator, value, 'orOnVal');
+                onWithColumnOperatorValue(column1, operator, value, "orOnVal");
                 return onObject;
             },
             onNull: (f: any) => {
                 const column2Arguments = this.getArgumentsFromColumnFunction(f);
                 const column2ArgumentsWithJoinedTable = [tableToJoinAlias, ...column2Arguments];
 
-                knexOnObject.onNull(column2ArgumentsWithJoinedTable.join('.'));
+                knexOnObject.onNull(column2ArgumentsWithJoinedTable.join("."));
                 return onObject;
             },
         } as any;
@@ -1628,7 +1617,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
     }
 
     private callKnexFunctionWithColumnFunction(knexFunction: any, ...args: any[]) {
-        if (typeof args[0] === 'string') {
+        if (typeof args[0] === "string") {
             return this.callKnexFunctionWithConcatKeyColumn(knexFunction, ...args);
         }
         const columnArguments = this.getArgumentsFromColumnFunction(args[0]);
@@ -1643,7 +1632,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
     }
 
     private callKnexFunctionWithConcatKeyColumn(knexFunction: any, ...args: any[]) {
-        const columnName = this.getColumnName(...args[0].split('.'));
+        const columnName = this.getColumnName(...args[0].split("."));
 
         if (args.length === 3) {
             knexFunction(columnName, args[1], args[2]);
@@ -1667,7 +1656,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
             propertyType: tableToJoinClass,
         });
 
-        const tableToJoinAliasWithUnderscores = tableToJoinAlias.split('.').join('_');
+        const tableToJoinAliasWithUnderscores = tableToJoinAlias.split(".").join("_");
 
         const tableToJoinName = getTableMetadata(tableToJoinClass).tableName;
 
@@ -1675,12 +1664,10 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
         const joinTableColumnArguments = `${tableToJoinAliasWithUnderscores}.${joinTableColumnInformation.name}`;
 
-        const existingTableColumnName = this.getColumnName(...existingTableColumnString.split('.'));
+        const existingTableColumnName = this.getColumnName(...existingTableColumnString.split("."));
 
         (this.queryBuilder as any)[joinFunctionName](`${tableToJoinName} as ${tableToJoinAliasWithUnderscores}`, joinTableColumnArguments, operator, existingTableColumnName);
 
         return this as any;
     }
-
-
 }
