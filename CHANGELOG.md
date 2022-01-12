@@ -1,5 +1,6 @@
 # Changelog
 
+## 4.5.0
 
 - Feature: added `updateItemWithReturning`.
 - Bug: not using database name on joined column names when using `innerJoinTableOnFunction`.
