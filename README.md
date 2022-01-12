@@ -160,6 +160,7 @@ const typedKnex = new TypedKnex(knex);
 -   [del](#del)
 -   [delByPrimaryKey](#delByPrimaryKey)
 -   [updateItem](#updateItem)
+-   [updateItemWithReturning](#updateItemWithReturning)
 -   [updateItemByPrimaryKey](#updateItemByPrimaryKey)
 -   [updateItemsByPrimaryKey](#updateItemsByPrimaryKey)
 -   [execute](#execute)
@@ -921,6 +922,21 @@ typedKnex.query(User);
 ```ts
 typedKnex.query(User);
 ```
+
+### updateItemWithReturning
+
+```ts
+query.updateItemWithReturning({ id: "newId" });
+
+// update "users" set "id" = 'newId' returning *
+```
+
+```ts
+query.updateItemWithReturning({ id: "newId" }, ["id"]);
+
+// update "users" set "id" = 'newId' returning "users"."id"
+```
+
 
 ### updateItemByPrimaryKey
 

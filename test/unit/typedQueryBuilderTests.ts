@@ -1194,6 +1194,19 @@ describe("TypedKnexQueryBuilder", () => {
         assert.equal((query as any).queryLog.trim(), `update "users" set "id" = 'newId'`);
     });
 
+    it("should create update query with returning", async () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex.query(User);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.updateItemWithReturning({ id: "newId" });
+
+        assert.equal((query as any).queryLog.trim(), `update "users" set "id" = 'newId' returning *`);
+    });
+
     it("should create update query with column name mapping", async () => {
         const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         (typedKnex as any).onlyLogQuery = true;

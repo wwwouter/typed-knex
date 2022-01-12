@@ -137,6 +137,7 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     insertSelect: IInsertSelect;
 
     insertItemWithReturning: IInsertItemWithReturning<Model, SelectableModel, Row>;
+    updateItemWithReturning: IInsertItemWithReturning<Model, SelectableModel, Row>;
 
     getColumnAlias(name: NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, "">): string;
     getColumn(name: NestedKeysOf<NonNullableRecursive<Model>, keyof NonNullableRecursive<Model>, "">): ColumnFromQuery;
@@ -531,7 +532,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         await this.queryBuilder.del().where(primaryKeyColumnInfo.name, value);
     }
 
-    public async insertItemWithReturning() {
+    public async updateItemWithReturning() {
         const newObject = arguments[0];
         const returnProperties = arguments[1] as string[] | undefined;
         let item = newObject;
@@ -540,7 +541,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         }
         item = mapObjectToTableObject(this.tableClass, item);
 
-        const query = this.knex.from(this.tableName).insert(item);
+        const query = this.knex.from(this.tableName).update(item);
         if (returnProperties) {
             const mappedNames = returnProperties.map((columnName) => this.getColumnName(columnName));
             query.returning(mappedNames);
@@ -553,7 +554,42 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
             return {} as any;
         } else {
-            const result = await query;
+            const result = (await query) as any;
+
+            return result[0] as any;
+        }
+    }
+
+    public async insertItemWithReturning() {
+        const newObject = arguments[0];
+        const returnProperties = arguments[1] as string[] | undefined;
+
+        let item = newObject;
+        if (beforeUpdateTransform) {
+            item = beforeUpdateTransform(item, this);
+        }
+
+        const mappedItem = mapObjectToTableObject(this.tableClass, item);
+        if (this.onlyLogQuery) {
+            this.queryLog += this.queryBuilder.update(mappedItem).toQuery() + "\n";
+        } else {
+            await this.queryBuilder.update(mappedItem);
+        }
+        const query = this.queryBuilder.update(mappedItem);
+
+        if (returnProperties) {
+            const mappedNames = returnProperties.map((columnName) => this.getColumnName(columnName));
+            query.returning(mappedNames);
+        } else {
+            query.returning("*");
+        }
+
+        if (this.onlyLogQuery) {
+            this.queryLog += query.toQuery() + "\n";
+
+            return {} as any;
+        } else {
+            const result = (await query) as any;
 
             return result[0] as any;
         }
