@@ -1,8 +1,4 @@
-# **_ Important upgrade notice _**
 
-Because TypeScript 4.1 supports template literal string types, the function syntax is no longer necessary. You can now use strings while maintaining type-safety. The function syntax is removed since version 4.
-
-To help with the upgrade, you can run `npx typed-knex -u string-parameters` to automatically switch over to the string syntax.
 
 # typed-knex
 
@@ -39,6 +35,12 @@ Make sure experimentalDecorators and emitDecoratorMetadata are turned on in your
 ```
 
 _Tested with Knex.js v0.95.0, TypeScript v4.2.3 and Node.js v14.11.0_
+
+# **Important upgrade notice**
+
+Because TypeScript 4.1 supports template literal string types, the function syntax is no longer necessary. You can now use strings while maintaining type-safety. The function syntax is removed since version 4.
+
+To help with the upgrade, you can run `npx typed-knex -u string-parameters` to automatically switch over to the string syntax.
 
 # Breaking changes in v4
 
