@@ -563,20 +563,13 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
     public async insertItemWithReturning() {
         const newObject = arguments[0];
         const returnProperties = arguments[1] as string[] | undefined;
-
         let item = newObject;
-        if (beforeUpdateTransform) {
-            item = beforeUpdateTransform(item, this);
+        if (beforeInsertTransform) {
+            item = beforeInsertTransform(newObject, this);
         }
+        item = mapObjectToTableObject(this.tableClass, item);
 
-        const mappedItem = mapObjectToTableObject(this.tableClass, item);
-        if (this.onlyLogQuery) {
-            this.queryLog += this.queryBuilder.update(mappedItem).toQuery() + "\n";
-        } else {
-            await this.queryBuilder.update(mappedItem);
-        }
-        const query = this.queryBuilder.update(mappedItem);
-
+        const query = this.knex.from(this.tableName).insert(item);
         if (returnProperties) {
             const mappedNames = returnProperties.map((columnName) => this.getColumnName(columnName));
             query.returning(mappedNames);
@@ -589,7 +582,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
             return {} as any;
         } else {
-            const result = (await query) as any;
+            const result = await query;
 
             return result[0] as any;
         }
