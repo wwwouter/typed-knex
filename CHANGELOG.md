@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.5.1
+
+- Republish of 4.5.0 with correct /dist.
+
 ## 4.5.0
 
 - Feature: added `updateItemWithReturning`.
