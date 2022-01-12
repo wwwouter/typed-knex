@@ -233,6 +233,21 @@ describe("TypedKnexQueryBuilder", () => {
         done();
     });
 
+    it("should inner join with function with other table using correct column name", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(UserSetting).innerJoinTableOnFunction("otherUser", User, (join) => {
+            join.on("status", "=", "user2Id").andOnVal("status", "=", "status1").andOn("status", "=", "otherValue");
+        });
+
+        const queryString = query.toQuery();
+        assert.equal(
+            queryString,
+            `select * from "userSettings" inner join "users" as "otherUser" on "userSettings"."user2Id" = "otherUser"."weirdDatabaseName" and "otherUser"."weirdDatabaseName" = 'status1' and "userSettings"."other_value" = "otherUser"."weirdDatabaseName"`
+        );
+
+        done();
+    });
+
     it("should inner join with function with other table", (done) => {
         const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex.query(UserSetting).innerJoin("otherUser", User, "nickName", "=", "value");

@@ -1580,33 +1580,20 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
         const onWithJoinedColumnOperatorColumn = (joinedColumn: any, operator: any, modelColumn: any, functionName: string) => {
             let column1Arguments;
-            let column2Arguments;
 
             if (typeof modelColumn === "string") {
                 column1Arguments = modelColumn.split(".");
-                column2Arguments = joinedColumn.split(".");
             } else {
                 column1Arguments = this.getArgumentsFromColumnFunction(modelColumn);
-                column2Arguments = this.getArgumentsFromColumnFunction(joinedColumn);
             }
+            const column2Name = this.getColumnNameWithoutAlias(newPropertyKey, joinedColumn);
 
-            const column2ArgumentsWithJoinedTable = [tableToJoinAlias, ...column2Arguments];
-            knexOnObject[functionName](this.getColumnName(...column1Arguments), operator, column2ArgumentsWithJoinedTable.join("."));
+            knexOnObject[functionName](this.getColumnName(...column1Arguments), operator, column2Name);
         };
 
         const onWithColumnOperatorValue = (joinedColumn: any, operator: any, value: any, functionName: string) => {
-            // const column1Arguments = this.getArgumentsFromColumnFunction(
-            //     joinedColumn
-            // );
-            const column2Arguments = this.getArgumentsFromColumnFunction(joinedColumn);
-            const column2ArgumentsWithJoinedTable = [tableToJoinAlias, ...column2Arguments];
-            knexOnObject[functionName](
-                // this.getColumnName(...column1Arguments),
-                column2ArgumentsWithJoinedTable.join("."),
-                operator,
-                value
-                // column2ArgumentsWithJoinedTable.join('.')
-            );
+            const column2Name = this.getColumnNameWithoutAlias(newPropertyKey, joinedColumn);
+            knexOnObject[functionName](column2Name, operator, value);
         };
 
         const onObject = {
