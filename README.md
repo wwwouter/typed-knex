@@ -8,7 +8,6 @@ To help with the upgrade, you can run `npx typed-knex -u string-parameters` to a
 
 [![npm version](https://img.shields.io/npm/v/@wwwouter/typed-knex.svg)](https://www.npmjs.com/package/@wwwouter/typed-knex)
 [![Build Status](https://travis-ci.org/wwwouter/typed-knex.svg?branch=master)](https://travis-ci.org/wwwouter/typed-knex)
-[![Dependencies Status](https://david-dm.org/wwwouter/typed-knex.svg)](https://david-dm.org/wwwouter/typed-knex)
 
 Standing on the shoulders of [Knex.js](https://knexjs.org/), but now everything is typed!
 
