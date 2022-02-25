@@ -46,9 +46,8 @@ export function getTableMetadata(tableClass: Function): { tableName: string } {
     return Reflect.getMetadata(tableyMetadataKey, tableClass);
 }
 
-
 export function getTableName(tableClass: Function): string {
-    return Reflect.getMetadata(tableyMetadataKey, tableClass).tableName;
+    return getTableMetadata(tableClass).tableName
 }
 
 export function getColumnName<T>(tableClass: new () => T, propertyName: keyof T): string {

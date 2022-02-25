@@ -1,6 +1,6 @@
 // tslint:disable:use-named-parameter
 import { Knex } from "knex";
-import { getColumnInformation, getColumnProperties, getPrimaryKeyColumn, getTableMetadata } from "./decorators";
+import { getColumnInformation, getColumnProperties, getPrimaryKeyColumn, getTableName } from "./decorators";
 import { mapObjectToTableObject } from "./mapObjectToTableObject";
 import { NestedForeignKeyKeysOf, NestedKeysOf } from "./NestedKeysOf";
 import { NestedRecord } from "./NestedRecord";
@@ -478,7 +478,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
     private subQueryCounter = 0;
 
     constructor(private tableClass: new () => ModelType, private knex: Knex, queryBuilder?: Knex.QueryBuilder, private parentTypedQueryBuilder?: any, private subQueryPrefix?: string) {
-        this.tableName = getTableMetadata(tableClass).tableName;
+        this.tableName = getTableName(tableClass);
         this.columns = getColumnProperties(tableClass);
 
         if (queryBuilder !== undefined) {
@@ -885,7 +885,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         });
 
         const tableToJoinClass = newPropertyType;
-        const tableToJoinName = getTableMetadata(tableToJoinClass).tableName;
+        const tableToJoinName = getTableName(tableToJoinClass);
         const tableToJoinAlias = newPropertyKey;
 
         const table1Column = this.getColumnName(...column1Parts);
@@ -924,7 +924,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         });
 
         const tableToJoinClass = newPropertyType;
-        const tableToJoinName = getTableMetadata(tableToJoinClass).tableName;
+        const tableToJoinName = getTableName(tableToJoinClass);
         const tableToJoinAlias = newPropertyKey;
 
         const table1Column = this.getColumnName(...column1Parts);
@@ -1313,7 +1313,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
     }
 
     public async insertSelect() {
-        const tableName = getTableMetadata(arguments[0]).tableName;
+        const tableName = getTableName(arguments[0]);
 
         const typedQueryBuilderForInsert = new TypedQueryBuilder<any, any>(arguments[0], this.knex);
         let columnArgumentsList;
@@ -1486,7 +1486,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
             secondColumnClass = columnInfo.columnClass;
         }
 
-        const tableToJoinName = getTableMetadata(secondColumnClass).tableName;
+        const tableToJoinName = getTableName(secondColumnClass);
         const tableToJoinAlias = `${this.subQueryPrefix ?? ""}${secondColumnAlias}`;
         const tableToJoinJoinColumnName = `${tableToJoinAlias}.${getPrimaryKeyColumn(secondColumnClass).name}`;
 
@@ -1563,7 +1563,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         });
 
         const tableToJoinClass = newPropertyType;
-        const tableToJoinName = getTableMetadata(tableToJoinClass).tableName;
+        const tableToJoinName = getTableName(tableToJoinClass);
         const tableToJoinAlias = newPropertyKey;
 
         let knexOnObject: any;
@@ -1674,7 +1674,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
         const tableToJoinAliasWithUnderscores = tableToJoinAlias.split(".").join("_");
 
-        const tableToJoinName = getTableMetadata(tableToJoinClass).tableName;
+        const tableToJoinName = getTableName(tableToJoinClass);
 
         const joinTableColumnInformation = getColumnInformation(tableToJoinClass, joinTableColumnString);
 
