@@ -1,5 +1,14 @@
 # Changelog
 
+## 4.5.2
+
+- Attach `tableMetadataKey` and `tableColumns` references to the `Table` class prototypes
+  - This fixes a rare and unique issue where the same `Column`s and `Table`s can get registered multiple times as a side-effect of overenthusiatic tree-shaking
+
+## 4.5.1
+
+- Fix deployment issue where `dist` was not updated to 4.5.0 changes
+
 ## 4.5.0
 
 - Feature: added `updateItemWithReturning`.
