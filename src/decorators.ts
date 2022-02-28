@@ -30,7 +30,7 @@ export function getEntities() {
 
 export function Entity(tableName?: string) {
     return (target: Function) => {
-        target.prototype.tableMetadataKey = Symbol('table')
+        target.prototype.tableMetadataKey = Symbol('table');
         Reflect.metadata(target.prototype.tableMetadataKey, { tableName: tableName ?? target.name })(target);
 
         entities.push({ tableName: tableName ?? target.name, entityClass: target });
@@ -45,7 +45,7 @@ export function getTableMetadata(tableClass: Function): { tableName: string } {
 }
 
 export function getTableName(tableClass: Function): string {
-    return getTableMetadata(tableClass).tableName
+    return getTableMetadata(tableClass).tableName;
 }
 
 export function getColumnName<T>(tableClass: new () => T, propertyName: keyof T): string {
