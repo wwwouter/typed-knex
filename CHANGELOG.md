@@ -1,5 +1,9 @@
 # Changelog
 
+
+- Attach `tableMetadataKey` and `tableColumns` references to the `Table` class prototypes
+  - This fixes a rare and unique issue where the same `Column`s and `Table`s can get registered multiple times as a side-effect of overenthusiatic tree-shaking
+
 ## 4.5.1
 
 - Republish of 4.5.0 with correct /dist.

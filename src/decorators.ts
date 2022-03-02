@@ -1,7 +1,5 @@
 import 'reflect-metadata';
 
-const tableyMetadataKey = Symbol('table');
-
 interface IColumnData {
     name: string;
     primary: boolean;
@@ -9,7 +7,6 @@ interface IColumnData {
     isForeignKey: boolean;
     designType: any;
 }
-const tableColumns = new Map<Function, IColumnData[]>();
 
 const entities = [] as {
     tableName: string;
@@ -33,7 +30,8 @@ export function getEntities() {
 
 export function Entity(tableName?: string) {
     return (target: Function) => {
-        Reflect.metadata(tableyMetadataKey, { tableName: tableName ?? target.name })(target);
+        target.prototype.tableMetadataKey = Symbol('table');
+        Reflect.metadata(target.prototype.tableMetadataKey, { tableName: tableName ?? target.name })(target);
 
         entities.push({ tableName: tableName ?? target.name, entityClass: target });
     };
@@ -43,12 +41,11 @@ export function Entity(tableName?: string) {
 export const Table = Entity;
 
 export function getTableMetadata(tableClass: Function): { tableName: string } {
-    return Reflect.getMetadata(tableyMetadataKey, tableClass);
+    return Reflect.getMetadata(tableClass.prototype.tableMetadataKey, tableClass);
 }
 
-
 export function getTableName(tableClass: Function): string {
-    return Reflect.getMetadata(tableyMetadataKey, tableClass).tableName;
+    return getTableMetadata(tableClass).tableName;
 }
 
 export function getColumnName<T>(tableClass: new () => T, propertyName: keyof T): string {
@@ -110,7 +107,7 @@ function getRegisterColumn(options?: IColumnOptions) {
             false
             : false;
 
-        const columns = tableColumns.get(target.constructor) || [];
+        const columns: IColumnData[] = target.constructor.prototype.tableColumns || [];
 
         let name = propertyKey;
         // console.log('name: ', name);
@@ -124,7 +121,7 @@ function getRegisterColumn(options?: IColumnOptions) {
         }
 
         columns.push({ name, primary, propertyKey, isForeignKey, designType });
-        tableColumns.set(target.constructor, columns);
+        target.constructor.prototype.tableColumns = columns;
     }
 
     return registerColumn;
@@ -163,7 +160,7 @@ export function getColumnInformation(
 }
 
 export function getColumnProperties(tableClass: Function): IColumnData[] {
-    const columns = tableColumns.get(tableClass);
+    const columns: IColumnData[] = tableClass.prototype.tableColumns;
     if (!columns) {
         throw new Error(
             `Cannot get column data from ${tableClass.constructor.name
@@ -175,7 +172,7 @@ export function getColumnProperties(tableClass: Function): IColumnData[] {
 
 export function getPrimaryKeyColumn(tableClass: Function): IColumnData {
     // console.log('tableClass: ', tableClass);
-    const columns = tableColumns.get(tableClass);
+    const columns: IColumnData[] = tableClass.prototype.tableColumns;
     if (!columns) {
         throw new Error(
             `Cannot get column data from ${tableClass.constructor.name
