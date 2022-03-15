@@ -1,7 +1,6 @@
 // tslint:disable:use-named-parameter
 import { Knex } from "knex";
 import { getColumnInformation, getColumnProperties, getPrimaryKeyColumn, getTableName } from "./decorators";
-import { mapObjectToTableObject } from "./mapObjectToTableObject";
 import { NestedForeignKeyKeysOf, NestedKeysOf } from "./NestedKeysOf";
 import { NestedRecord } from "./NestedRecord";
 import { NonForeignKeyObjects } from "./NonForeignKeyObjects";
@@ -672,7 +671,7 @@ export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements 
                 if (beforeUpdateTransform) {
                     item.data = beforeUpdateTransform(item.data, this);
                 }
-                item.data = mapObjectToTableObject(this.tableClass, item.data);
+                this.mapPropertiesToColumns(item.data);
 
                 query.update(item.data);
                 sql += query.where(primaryKeyColumnInfo.name, item.primaryKeyValue).toString().replace("?", "\\?") + ";\n";
