@@ -1,5 +1,6 @@
 # Changelog
 
+## 4.7.0
 
 - Bug: `insertItemWithReturning` and `updateItemWithReturning` didn't use alias.
 
