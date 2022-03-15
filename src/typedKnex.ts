@@ -628,11 +628,11 @@ export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements 
             item = beforeUpdateTransform(item, this);
         }
 
-        const mappedItem = mapObjectToTableObject(this.tableClass, item);
+        this.mapPropertiesToColumns(item);
         if (this.onlyLogQuery) {
-            this.queryLog += this.queryBuilder.update(mappedItem).toQuery() + "\n";
+            this.queryLog += this.queryBuilder.update(item).toQuery() + "\n";
         } else {
-            await this.queryBuilder.update(mappedItem);
+            await this.queryBuilder.update(item);
         }
     }
 
