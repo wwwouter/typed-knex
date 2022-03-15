@@ -554,9 +554,12 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
             return {} as any;
         } else {
-            const result = (await query) as any;
+            const rows = (await query) as any;
+            const item = rows[0];
 
-            return result[0] as any;
+            this.mapColumnsToProperties(item);
+
+            return item as any;
         }
     }
 
@@ -582,9 +585,12 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
             return {} as any;
         } else {
-            const result = await query;
+            const rows = await query;
+            const item = rows[0];
 
-            return result[0] as any;
+            this.mapColumnsToProperties(item);
+
+            return item as any;
         }
     }
 
@@ -1685,5 +1691,39 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         (this.queryBuilder as any)[joinFunctionName](`${tableToJoinName} as ${tableToJoinAliasWithUnderscores}`, joinTableColumnArguments, operator, existingTableColumnName);
 
         return this as any;
+    }
+
+    public mapPropertyNameToColumnName(propertyName: string) {
+        return this.getColumnName(propertyName);
+    }
+    public mapColumnNameToPropertyName(columnName: string) {
+        const columnInfo = getColumnInformation(this.tableClass, columnName);
+        return columnInfo.propertyKey;
+    }
+
+    public mapColumnsToProperties(item: any) {
+        const columnNames = Object.keys(item);
+
+        for (const columnName of columnNames) {
+            const propertyName = this.mapColumnNameToPropertyName(columnName);
+
+            if (columnName !== propertyName) {
+                Object.defineProperty(item, propertyName, Object.getOwnPropertyDescriptor(item, columnName)!);
+                delete item[columnName];
+            }
+        }
+    }
+
+    public mapPropertiesToColumns(item: any) {
+        const propertyNames = Object.keys(item);
+
+        for (const propertyName of propertyNames) {
+            const columnName = this.mapPropertyNameToColumnName(propertyName);
+
+            if (columnName !== propertyName) {
+                Object.defineProperty(item, columnName, Object.getOwnPropertyDescriptor(item, propertyName)!);
+                delete item[propertyName];
+            }
+        }
     }
 }
