@@ -1,7 +1,6 @@
 // tslint:disable:use-named-parameter
 import { Knex } from "knex";
 import { getColumnInformation, getColumnProperties, getPrimaryKeyColumn, getTableName } from "./decorators";
-import { mapObjectToTableObject } from "./mapObjectToTableObject";
 import { NestedForeignKeyKeysOf, NestedKeysOf } from "./NestedKeysOf";
 import { NestedRecord } from "./NestedRecord";
 import { NonForeignKeyObjects } from "./NonForeignKeyObjects";
@@ -458,7 +457,7 @@ function getProxyAndMemoriesForArray<ModelType, Row>(typedQueryBuilder?: TypedQu
     return { root, result };
 }
 
-class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQueryBuilder<ModelType, SelectableModel, Row> {
+export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQueryBuilder<ModelType, SelectableModel, Row> {
     public columns: { name: string }[];
 
     public onlyLogQuery = false;
@@ -539,7 +538,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         if (beforeInsertTransform) {
             item = beforeInsertTransform(newObject, this);
         }
-        item = mapObjectToTableObject(this.tableClass, item);
+        this.mapPropertiesToColumns(item);
 
         const query = this.knex.from(this.tableName).update(item);
         if (returnProperties) {
@@ -554,9 +553,12 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
             return {} as any;
         } else {
-            const result = (await query) as any;
+            const rows = (await query) as any;
+            const item = rows[0];
 
-            return result[0] as any;
+            this.mapColumnsToProperties(item);
+
+            return item as any;
         }
     }
 
@@ -567,7 +569,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         if (beforeInsertTransform) {
             item = beforeInsertTransform(newObject, this);
         }
-        item = mapObjectToTableObject(this.tableClass, item);
+        this.mapPropertiesToColumns(this.tableClass);
 
         const query = this.knex.from(this.tableName).insert(item);
         if (returnProperties) {
@@ -582,9 +584,12 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
 
             return {} as any;
         } else {
-            const result = await query;
+            const rows = await query;
+            const item = rows[0];
 
-            return result[0] as any;
+            this.mapColumnsToProperties(item);
+
+            return item as any;
         }
     }
 
@@ -601,7 +606,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
             }
         }
 
-        items = items.map((item) => mapObjectToTableObject(this.tableClass, item));
+        items.forEach((item) => this.mapPropertiesToColumns(item));
 
         while (items.length > 0) {
             const chunk = items.splice(0, 500);
@@ -622,11 +627,11 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
             item = beforeUpdateTransform(item, this);
         }
 
-        const mappedItem = mapObjectToTableObject(this.tableClass, item);
+        this.mapPropertiesToColumns(item);
         if (this.onlyLogQuery) {
-            this.queryLog += this.queryBuilder.update(mappedItem).toQuery() + "\n";
+            this.queryLog += this.queryBuilder.update(item).toQuery() + "\n";
         } else {
-            await this.queryBuilder.update(mappedItem);
+            await this.queryBuilder.update(item);
         }
     }
 
@@ -635,11 +640,11 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
             item = beforeUpdateTransform(item, this);
         }
 
-        const mappedItem = mapObjectToTableObject(this.tableClass, item);
+        this.mapPropertiesToColumns(item);
 
         const primaryKeyColumnInfo = getPrimaryKeyColumn(this.tableClass);
 
-        const query = this.queryBuilder.update(mappedItem).where(primaryKeyColumnInfo.name, primaryKeyValue);
+        const query = this.queryBuilder.update(item).where(primaryKeyColumnInfo.name, primaryKeyValue);
 
         if (this.onlyLogQuery) {
             this.queryLog += query.toQuery() + "\n";
@@ -666,7 +671,7 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
                 if (beforeUpdateTransform) {
                     item.data = beforeUpdateTransform(item.data, this);
                 }
-                item.data = mapObjectToTableObject(this.tableClass, item.data);
+                this.mapPropertiesToColumns(item.data);
 
                 query.update(item.data);
                 sql += query.where(primaryKeyColumnInfo.name, item.primaryKeyValue).toString().replace("?", "\\?") + ";\n";
@@ -1685,5 +1690,44 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
         (this.queryBuilder as any)[joinFunctionName](`${tableToJoinName} as ${tableToJoinAliasWithUnderscores}`, joinTableColumnArguments, operator, existingTableColumnName);
 
         return this as any;
+    }
+
+    public mapPropertyNameToColumnName(propertyName: string) {
+        const columnInfo = getColumnInformation(this.tableClass, propertyName);
+        return columnInfo.name;
+    }
+    public mapColumnNameToPropertyName(columnName: string) {
+        const columnProperties = getColumnProperties(this.tableClass);
+        const columnProperty = columnProperties.find((i) => i.name === columnName);
+        if (columnProperty === undefined) {
+            throw new Error(`Cannot find column with name "${columnName}"`);
+        }
+        return columnProperty.propertyKey;
+    }
+
+    public mapColumnsToProperties(item: any) {
+        const columnNames = Object.keys(item);
+
+        for (const columnName of columnNames) {
+            const propertyName = this.mapColumnNameToPropertyName(columnName);
+
+            if (columnName !== propertyName) {
+                Object.defineProperty(item, propertyName, Object.getOwnPropertyDescriptor(item, columnName)!);
+                delete item[columnName];
+            }
+        }
+    }
+
+    public mapPropertiesToColumns(item: any) {
+        const propertyNames = Object.keys(item);
+
+        for (const propertyName of propertyNames) {
+            const columnName = this.mapPropertyNameToColumnName(propertyName);
+
+            if (columnName !== propertyName) {
+                Object.defineProperty(item, columnName, Object.getOwnPropertyDescriptor(item, propertyName)!);
+                delete item[propertyName];
+            }
+        }
     }
 }

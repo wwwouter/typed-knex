@@ -1,5 +1,8 @@
 # Changelog
 
+
+- Bug: `insertItemWithReturning` and `updateItemWithReturning` didn't use alias.
+
 ## 4.6.0
 
 - Attach `tableMetadataKey` and `tableColumns` references to the `Table` class prototypes

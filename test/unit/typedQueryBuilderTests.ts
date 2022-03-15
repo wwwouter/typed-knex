@@ -2,7 +2,7 @@ import { assert } from "chai";
 import { knex } from "knex";
 import { getEntities, getTableName } from "../../src";
 import { getColumnName } from "../../src/decorators";
-import { TypedKnex } from "../../src/typedKnex";
+import { TypedKnex, TypedQueryBuilder } from "../../src/typedKnex";
 import { setToNull, unflatten } from "../../src/unflatten";
 import { Region, User, UserCategory, UserSetting } from "../testEntities";
 
@@ -1388,8 +1388,7 @@ describe("TypedKnexQueryBuilder", () => {
 
         (query as any).onlyLogQuery = true;
 
-        const a = await query.getSingleOrNull();
-        console.log("a", a?.id);
+        await query.getSingleOrNull();
 
         assert.equal(
             (query as any).queryLog.trim(),
@@ -1587,6 +1586,56 @@ describe("TypedKnexQueryBuilder", () => {
             );
 
             done();
+        });
+    });
+    describe("mapPropertyNameToColumnName", () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+
+        it("should return aliased name", async () => {
+            const query = typedKnex.query(UserCategory) as TypedQueryBuilder<UserCategory, UserCategory, UserCategory>;
+            const columnName = query.mapPropertyNameToColumnName("specialRegionId");
+            assert.equal(columnName, "INTERNAL_NAME");
+        });
+
+        it("should return name when no alias", async () => {
+            const query = typedKnex.query(UserCategory) as TypedQueryBuilder<UserCategory, UserCategory, UserCategory>;
+            const columnName = query.mapPropertyNameToColumnName("name");
+            assert.equal(columnName, "name");
+        });
+    });
+    describe("mapColumnNameToPropertyName", () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+
+        it("should return aliased name", async () => {
+            const query = typedKnex.query(UserCategory) as TypedQueryBuilder<UserCategory, UserCategory, UserCategory>;
+            const columnName = query.mapColumnNameToPropertyName("INTERNAL_NAME");
+            assert.equal(columnName, "specialRegionId");
+        });
+
+        it("should return name when no alias", async () => {
+            const query = typedKnex.query(UserCategory) as TypedQueryBuilder<UserCategory, UserCategory, UserCategory>;
+            const columnName = query.mapColumnNameToPropertyName("name");
+            assert.equal(columnName, "name");
+        });
+    });
+    describe("mapColumnsToProperties", () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+
+        it("should map", async () => {
+            const query = typedKnex.query(UserCategory) as TypedQueryBuilder<UserCategory, UserCategory, UserCategory>;
+            const item = { INTERNAL_NAME: "internal name", name: "name" } as any;
+            query.mapColumnsToProperties(item);
+            assert.deepEqual(item, { specialRegionId: "internal name", name: "name" });
+        });
+    });
+    describe("mapPropertiesToColumns", () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+
+        it("should map", async () => {
+            const query = typedKnex.query(UserCategory) as TypedQueryBuilder<UserCategory, UserCategory, UserCategory>;
+            const item = { specialRegionId: "internal name", name: "name" } as any;
+            query.mapPropertiesToColumns(item);
+            assert.deepEqual(item, { INTERNAL_NAME: "internal name", name: "name" });
         });
     });
 });
