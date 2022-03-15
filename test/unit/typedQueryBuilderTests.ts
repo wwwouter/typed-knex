@@ -2,7 +2,7 @@ import { assert } from "chai";
 import { knex } from "knex";
 import { getEntities, getTableName } from "../../src";
 import { getColumnName } from "../../src/decorators";
-import { TypedKnex } from "../../src/typedKnex";
+import { TypedKnex, TypedQueryBuilder } from "../../src/typedKnex";
 import { setToNull, unflatten } from "../../src/unflatten";
 import { Region, User, UserCategory, UserSetting } from "../testEntities";
 
@@ -1587,6 +1587,21 @@ describe("TypedKnexQueryBuilder", () => {
             );
 
             done();
+        });
+    });
+    describe("mapPropertyNameToColumnName", () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+
+        it("should return aliased name", async () => {
+            const query = typedKnex.query(UserCategory) as TypedQueryBuilder<UserCategory, UserCategory, UserCategory>;
+            const columnName = query.mapPropertyNameToColumnName("specialRegionId");
+            assert.equal(columnName, "INTERNAL_NAME");
+        });
+
+        it("should return name when no alias", async () => {
+            const query = typedKnex.query(UserCategory) as TypedQueryBuilder<UserCategory, UserCategory, UserCategory>;
+            const columnName = query.mapPropertyNameToColumnName("name");
+            assert.equal(columnName, "name");
         });
     });
 });

@@ -458,7 +458,7 @@ function getProxyAndMemoriesForArray<ModelType, Row>(typedQueryBuilder?: TypedQu
     return { root, result };
 }
 
-class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQueryBuilder<ModelType, SelectableModel, Row> {
+export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQueryBuilder<ModelType, SelectableModel, Row> {
     public columns: { name: string }[];
 
     public onlyLogQuery = false;
@@ -1694,7 +1694,8 @@ class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements ITypedQ
     }
 
     public mapPropertyNameToColumnName(propertyName: string) {
-        return this.getColumnName(propertyName);
+        const columnInfo = getColumnInformation(this.tableClass, propertyName);
+        return columnInfo.name;
     }
     public mapColumnNameToPropertyName(columnName: string) {
         const columnInfo = getColumnInformation(this.tableClass, columnName);
