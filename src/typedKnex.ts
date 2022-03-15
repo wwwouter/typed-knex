@@ -641,11 +641,11 @@ export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements 
             item = beforeUpdateTransform(item, this);
         }
 
-        const mappedItem = mapObjectToTableObject(this.tableClass, item);
+        this.mapPropertiesToColumns(item);
 
         const primaryKeyColumnInfo = getPrimaryKeyColumn(this.tableClass);
 
-        const query = this.queryBuilder.update(mappedItem).where(primaryKeyColumnInfo.name, primaryKeyValue);
+        const query = this.queryBuilder.update(item).where(primaryKeyColumnInfo.name, primaryKeyValue);
 
         if (this.onlyLogQuery) {
             this.queryLog += query.toQuery() + "\n";
