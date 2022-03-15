@@ -1604,4 +1604,19 @@ describe("TypedKnexQueryBuilder", () => {
             assert.equal(columnName, "name");
         });
     });
+    describe("mapColumnNameToPropertyName", () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+
+        it("should return aliased name", async () => {
+            const query = typedKnex.query(UserCategory) as TypedQueryBuilder<UserCategory, UserCategory, UserCategory>;
+            const columnName = query.mapColumnNameToPropertyName("INTERNAL_NAME");
+            assert.equal(columnName, "specialRegionId");
+        });
+
+        it("should return name when no alias", async () => {
+            const query = typedKnex.query(UserCategory) as TypedQueryBuilder<UserCategory, UserCategory, UserCategory>;
+            const columnName = query.mapColumnNameToPropertyName("name");
+            assert.equal(columnName, "name");
+        });
+    });
 });

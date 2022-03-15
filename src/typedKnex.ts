@@ -1698,8 +1698,12 @@ export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements 
         return columnInfo.name;
     }
     public mapColumnNameToPropertyName(columnName: string) {
-        const columnInfo = getColumnInformation(this.tableClass, columnName);
-        return columnInfo.propertyKey;
+        const columnProperties = getColumnProperties(this.tableClass);
+        const columnProperty = columnProperties.find((i) => i.name === columnName);
+        if (columnProperty === undefined) {
+            throw new Error(`Cannot find column with name "${columnName}"`);
+        }
+        return columnProperty.propertyKey;
     }
 
     public mapColumnsToProperties(item: any) {
