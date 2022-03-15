@@ -1388,8 +1388,7 @@ describe("TypedKnexQueryBuilder", () => {
 
         (query as any).onlyLogQuery = true;
 
-        const a = await query.getSingleOrNull();
-        console.log("a", a?.id);
+        await query.getSingleOrNull();
 
         assert.equal(
             (query as any).queryLog.trim(),

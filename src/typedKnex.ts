@@ -539,7 +539,7 @@ export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements 
         if (beforeInsertTransform) {
             item = beforeInsertTransform(newObject, this);
         }
-        item = mapObjectToTableObject(this.tableClass, item);
+        this.mapPropertiesToColumns(item);
 
         const query = this.knex.from(this.tableName).update(item);
         if (returnProperties) {
