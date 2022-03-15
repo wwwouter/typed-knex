@@ -607,7 +607,7 @@ export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements 
             }
         }
 
-        items = items.map((item) => mapObjectToTableObject(this.tableClass, item));
+        items.forEach((item) => this.mapPropertiesToColumns(item));
 
         while (items.length > 0) {
             const chunk = items.splice(0, 500);
