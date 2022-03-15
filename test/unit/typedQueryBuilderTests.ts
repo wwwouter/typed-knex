@@ -1619,4 +1619,24 @@ describe("TypedKnexQueryBuilder", () => {
             assert.equal(columnName, "name");
         });
     });
+    describe("mapColumnsToProperties", () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+
+        it("should map", async () => {
+            const query = typedKnex.query(UserCategory) as TypedQueryBuilder<UserCategory, UserCategory, UserCategory>;
+            const item = { INTERNAL_NAME: "internal name", name: "name" } as any;
+            query.mapColumnsToProperties(item);
+            assert.deepEqual(item, { specialRegionId: "internal name", name: "name" });
+        });
+    });
+    describe("mapPropertiesToColumns", () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+
+        it("should map", async () => {
+            const query = typedKnex.query(UserCategory) as TypedQueryBuilder<UserCategory, UserCategory, UserCategory>;
+            const item = { specialRegionId: "internal name", name: "name" } as any;
+            query.mapPropertiesToColumns(item);
+            assert.deepEqual(item, { INTERNAL_NAME: "internal name", name: "name" });
+        });
+    });
 });
