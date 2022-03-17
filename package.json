@@ -5,8 +5,8 @@
     "dependencies": {
         "flat": "5.0.2",
         "reflect-metadata": "0.1.13",
-        "ts-morph": "8.1.2",
-        "yargs": "16.1.0"
+        "ts-morph": "14.0.0",
+        "yargs": "17.3.1"
     },
     "main": "./dist/src/index.js",
     "typings": "dist/src/index",
@@ -40,22 +40,22 @@
     },
     "homepage": "https://github.com/wwwouter/typed-knex#readme",
     "devDependencies": {
-        "@types/chai": "4.2.14",
-        "@types/chai-as-promised": "7.1.3",
-        "@types/flat": "5.0.1",
-        "@types/mocha": "8.0.3",
-        "@types/sqlite3": "3.1.6",
-        "@types/yargs": "15.0.9",
+        "@types/chai": "4.3.0",
+        "@types/chai-as-promised": "7.1.5",
+        "@vscode/sqlite3": "5.0.7",
+        "@types/flat": "5.0.2",
+        "@types/mocha": "9.1.0",
+        "@types/sqlite3": "3.1.8",
+        "@types/yargs": "17.0.9",
         "@wwwouter/tslint-contrib": "1.0.0",
-        "chai": "4.2.0",
+        "chai": "4.3.6",
         "chai-as-promised": "7.1.1",
-        "knex": "0.95.0",
-        "mocha": "8.2.0",
-        "npm-check-updates": "9.1.2",
-        "sqlite3": "5.0.0",
+        "knex": "1.0.4",
+        "mocha": "9.2.2",
+        "npm-check-updates": "12.5.3",
         "tslint": "6.1.3",
         "tslint-microsoft-contrib": "6.2.0",
-        "typescript": "4.2.3"
+        "typescript": "4.6.2"
     },
     "prettier": {
         "singleQuote": false,

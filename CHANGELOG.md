@@ -1,5 +1,7 @@
 # Changelog
 
+- Chore: Upgrade packages: Knex.js is now tested at v1.0.4
+
 ## 4.7.0
 
 - Bug: `insertItemWithReturning` and `updateItemWithReturning` didn't use alias.
