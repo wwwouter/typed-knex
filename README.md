@@ -34,7 +34,7 @@ Make sure experimentalDecorators and emitDecoratorMetadata are turned on in your
 }
 ```
 
-_Tested with Knex.js v0.95.0, TypeScript v4.2.3 and Node.js v14.11.0_
+_Tested with Knex.js v1.0.4, TypeScript v4.6.2 and Node.js v17.4.0_
 
 # **Important upgrade notice**
 
