@@ -1,7 +1,7 @@
-import { Column, Table } from '../src/decorators';
-import { ICustomDatabaseType } from '../src/ICustomDatabaseType';
+import { Column, Table } from "../src/decorators";
+import { ICustomDatabaseType } from "../src/ICustomDatabaseType";
 
-@Table('regions')
+@Table("regions")
 export class Region {
     @Column({ primary: true })
     public id!: string;
@@ -9,13 +9,13 @@ export class Region {
     public code: number;
 }
 
-@Table('userCategories')
+@Table("userCategories")
 export class UserCategory {
     @Column({ primary: true })
     public id!: string;
     @Column()
     public name!: string;
-    @Column({ name: 'regionId' })
+    @Column({ name: "regionId" })
     public region!: Region;
     @Column()
     public regionId!: string;
@@ -23,18 +23,16 @@ export class UserCategory {
     public year!: number;
     @Column()
     public phoneNumber?: string;
-    @Column({ name: 'backupRegionId' })
+    @Column({ name: "backupRegionId" })
     public backupRegion?: Region;
-    @Column({ name: 'INTERNAL_NAME' })
+    @Column({ name: "INTERNAL_NAME" })
     public specialRegionId!: string;
 }
 
 // tslint:disable-next-line: no-empty-interfaces
-class IExtraData extends ICustomDatabaseType {
+class IExtraData extends ICustomDatabaseType {}
 
-}
-
-@Table('users')
+@Table("users")
 export class User {
     @Column({ primary: true })
     public id!: string;
@@ -44,11 +42,11 @@ export class User {
     public numericValue: number;
     @Column()
     public someValue!: string;
-    @Column({ name: 'categoryId' })
+    @Column({ name: "categoryId" })
     public category!: UserCategory;
     @Column()
     public categoryId!: string;
-    @Column({ name: 'category2Id' })
+    @Column({ name: "category2Id" })
     public category2!: UserCategory;
     @Column()
     public nickName?: string;
@@ -58,13 +56,13 @@ export class User {
     public deathDate: Date | null;
     @Column()
     public tags?: string[];
-    @Column({ name: 'weirdDatabaseName' })
+    @Column({ name: "weirdDatabaseName" })
     public status?: string;
-    @Column({ name: 'weirdDatabaseName2' })
+    @Column({ name: "weirdDatabaseName2" })
     public notUndefinedStatus: string;
-    @Column({ name: 'optionalCategoryId' })
+    @Column({ name: "optionalCategoryId" })
     public optionalCategory?: UserCategory;
-    @Column({ name: 'nullableCategoryId' })
+    @Column({ name: "nullableCategoryId" })
     public nullableCategory: UserCategory | null;
     @Column()
     public someOptionalValue?: string;
@@ -74,15 +72,15 @@ export class User {
     public extraData!: IExtraData;
 }
 
-@Table('userSettings')
+@Table("userSettings")
 export class UserSetting {
     @Column({ primary: true })
     public id!: string;
-    @Column({ name: 'userId' })
+    @Column({ name: "userId" })
     public user!: User;
     @Column()
     public userId!: string;
-    @Column({ name: 'user2Id' })
+    @Column({ name: "user2Id" })
     public user2!: User;
     @Column()
     public user2Id!: string;
@@ -92,10 +90,9 @@ export class UserSetting {
     public value!: string;
     @Column()
     public initialValue!: string;
-    @Column({ name: 'other_value' })
+    @Column({ name: "other_value" })
     public otherValue!: string;
 }
-
 
 @Table()
 // tslint:disable-next-line: class-name

@@ -1,5 +1,3 @@
-
-
 # typed-knex
 
 [![npm version](https://img.shields.io/npm/v/@wwwouter/typed-knex.svg)](https://www.npmjs.com/package/@wwwouter/typed-knex)
@@ -369,18 +367,18 @@ typedKnex.query(User).whereNotExists(UserSetting, (subQuery) => {
 
 Use `getColumn` when nesting
 
-``` ts
+```ts
 query.whereExists(User, (subQuery1) => {
-        subQuery1.whereColumn('status', '=', 'status'); // Compares subQuery1 with its parent (query).  
+    subQuery1.whereColumn("status", "=", "status"); // Compares subQuery1 with its parent (query).
 
-        subQuery1.whereExists(User, (subQuery2) => {
-            subQuery2.whereColumn(subQuery2.getColumn('status'), '=', query.getColumn('status')); // Compares subQuery2 with the first parent (query)
+    subQuery1.whereExists(User, (subQuery2) => {
+        subQuery2.whereColumn(subQuery2.getColumn("status"), "=", query.getColumn("status")); // Compares subQuery2 with the first parent (query)
 
-            subQuery2.whereExists(User, (subQuery3) => {
-                subQuery3.whereColumn(subQuery3.getColumn('status'), '=', subQuery1.getColumn('status')); // Compares subQuery3 with the second parent (subQuery1)
-            });
+        subQuery2.whereExists(User, (subQuery3) => {
+            subQuery3.whereColumn(subQuery3.getColumn("status"), "=", subQuery1.getColumn("status")); // Compares subQuery3 with the second parent (subQuery1)
         });
     });
+});
 ```
 
 ### whereNull
@@ -937,7 +935,6 @@ query.updateItemWithReturning({ id: "newId" }, ["id"]);
 
 // update "users" set "id" = 'newId' returning "users"."id"
 ```
-
 
 ### updateItemByPrimaryKey
 

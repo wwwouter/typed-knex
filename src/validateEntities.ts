@@ -1,5 +1,5 @@
-import { Knex } from 'knex';
-import { getColumnProperties, getEntities } from './decorators';
+import { Knex } from "knex";
+import { getColumnProperties, getEntities } from "./decorators";
 
 export async function validateEntities(knex: Knex) {
     const entities = getEntities();

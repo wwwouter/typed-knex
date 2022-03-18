@@ -1,32 +1,34 @@
 # Changelog
 
-- Chore: Upgrade packages: Knex.js is now tested at v1.0.4
-- Feature: registerQueryBuilderExtension
+-   Chore: Upgrade packages: Knex.js is now tested at v1.0.4
+-   Feature: registerQueryBuilderExtension
+-   Chore: use prettier
 
 ## 4.7.0
 
-- Bug: `insertItemWithReturning` and `updateItemWithReturning` didn't use alias.
+-   Bug: `insertItemWithReturning` and `updateItemWithReturning` didn't use alias.
 
 ## 4.6.0
 
-- Attach `tableMetadataKey` and `tableColumns` references to the `Table` class prototypes
-  - This fixes a rare and unique issue where the same `Column`s and `Table`s can get registered multiple times as a side-effect of overenthusiatic tree-shaking
+-   Attach `tableMetadataKey` and `tableColumns` references to the `Table` class prototypes
+    -   This fixes a rare and unique issue where the same `Column`s and `Table`s can get registered multiple times as a side-effect of overenthusiatic tree-shaking
 
 ## 4.5.1
 
-- Republish of 4.5.0 with correct /dist.
+-   Republish of 4.5.0 with correct /dist.
 
 ## 4.5.0
 
-- Feature: added `updateItemWithReturning`.
-- Bug: not using database name on joined column names when using `innerJoinTableOnFunction`.
+-   Feature: added `updateItemWithReturning`.
+-   Bug: not using database name on joined column names when using `innerJoinTableOnFunction`.
 
 ## 4.4.1
 
-- Bug: result of `getFirstOrNull` and `getSingleOrNull` not always union with `null`.
+-   Bug: result of `getFirstOrNull` and `getSingleOrNull` not always union with `null`.
+
 ## 4.4.0
 
-- Feature: use `getColumn` in `whereColumn` in cases with nested subqueries.
+-   Feature: use `getColumn` in `whereColumn` in cases with nested subqueries.
 
 ## 4.3.0
 

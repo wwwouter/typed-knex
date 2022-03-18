@@ -1,18 +1,17 @@
-import * as flat from 'flat';
+import * as flat from "flat";
 
 export enum FlattenOption {
-    flatten = 'flatten',
+    flatten = "flatten",
     /**
      * @deprecated since version 2.8.1, use .keepFlat()
      */
-    noFlatten = 'noFlatten',
-    flattenAndSetToNull = 'flattenAndSetToNull',
+    noFlatten = "noFlatten",
+    flattenAndSetToNull = "flattenAndSetToNull",
 }
-
 
 export function unflatten(o: any): any {
     if (o instanceof Array) {
-        return o.map(i => unflatten(i));
+        return o.map((i) => unflatten(i));
     }
     return flat.unflatten(o);
 }
@@ -37,12 +36,12 @@ function areAllPropertiesNull(o: any) {
 
 export function setToNull(o: any): any {
     if (o instanceof Array) {
-        return o.map(i => setToNull(i));
+        return o.map((i) => setToNull(i));
     } else {
         if (o !== null && o !== undefined) {
             const keys = Object.keys(o);
             for (const key of keys) {
-                if (typeof o[key] === 'object') {
+                if (typeof o[key] === "object") {
                     setToNull(o[key]);
                     if (areAllPropertiesNull(o[key])) {
                         o[key] = null;
@@ -59,10 +58,7 @@ export function flattenByOption(o: any, flattenOption?: FlattenOption) {
         return o;
     }
     const unflattened = unflatten(o);
-    if (
-        flattenOption === undefined ||
-        flattenOption === FlattenOption.flatten
-    ) {
+    if (flattenOption === undefined || flattenOption === FlattenOption.flatten) {
         return unflattened;
     }
     return setToNull(unflattened);

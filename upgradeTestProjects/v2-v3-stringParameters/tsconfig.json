@@ -17,12 +17,6 @@
         "noImplicitThis": true,
         "declaration": true
     },
-    "include": [
-        "src/**/*",
-        "test/**/*"
-    ],
-    "exclude": [
-        "node_modules",
-        "**/*.spec.ts"
-    ]
+    "include": ["src/**/*", "test/**/*"],
+    "exclude": ["node_modules", "**/*.spec.ts"]
 }
