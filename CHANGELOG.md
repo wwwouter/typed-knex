@@ -1,5 +1,7 @@
 # Changelog
 
+## 4.8.0
+
 -   Chore: Upgrade packages: Knex.js is now tested at v1.0.4
 -   Feature: registerQueryBuilderExtension
 -   Chore: use prettier
