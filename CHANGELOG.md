@@ -1,5 +1,7 @@
 # Changelog
 
+## ## 4.8.1
+
 -   Bug: Export registerQueryBuilderExtension
 
 ## 4.8.0
