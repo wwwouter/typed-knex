@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/require-await */
 import { assert } from "chai";
 import { Project } from "ts-morph";
 import { upgradeProjectStringParameters } from "../../src/upgrade/upgradeRunner";

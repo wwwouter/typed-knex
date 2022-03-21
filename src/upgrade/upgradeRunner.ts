@@ -141,6 +141,7 @@ export function upgradeProjectJoinOnColumnsToOn(project: Project) {
                 if (typeString.includes("IJoinOnColumns<")) {
                     const callExpression = node.getParentIfKind(SyntaxKind.CallExpression);
                     if (callExpression) {
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                         callExpression.getFirstChild()!.getChildren()[2].replaceWithText("on");
                         const args = callExpression.getArguments();
 

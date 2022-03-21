@@ -1,3 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { assert } from "chai";
 import { knex } from "knex";
 import { getEntities, getTableName } from "../../src";
@@ -979,6 +984,7 @@ describe("TypedKnexQueryBuilder", () => {
     it('should return select * from "users"', (done) => {
         const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex.query(User);
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         query.useKnexQueryBuilder((queryBuilder) => queryBuilder.where("somethingelse", "value"));
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where "somethingelse" = \'value\'');

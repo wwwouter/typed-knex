@@ -14,7 +14,7 @@ describe("validateEntitiesTests", () => {
         try {
             await validateEntities(db);
             assert.isFalse(true);
-            // tslint:disable-next-line:no-empty
+            // eslint-disable-next-line no-empty
         } catch (_error) {}
 
         await db.destroy();

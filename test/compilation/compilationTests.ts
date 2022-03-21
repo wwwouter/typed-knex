@@ -42,7 +42,7 @@ describe("compile time typed-knex string column parameters", function () {
     afterEach(() => {
         try {
             fs.unlinkSync(testFilename);
-            // tslint:disable-next-line: no-empty
+            // eslint-disable-next-line no-empty
         } catch (_e) {}
     });
 
