@@ -21,7 +21,7 @@
         "upgrade-packages": "rm -f package-lock.json && ncu --removeRange -u -x @types/node",
         "prettier:fix": "prettier --write . --ignore-path ./.gitignore",
         "prettier:check": "prettier --check . --ignore-path ./.gitignore",
-        "lint": "eslint -f visualstudio --ext .ts test/**/*.ts src/**/*.ts",
+        "lint": "eslint -f visualstudio --ext .ts test/**/*.ts src/**/*.ts src/*.ts",
         "lint:fix": "npm run lint -- --fix"
     },
     "bin": {
