@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SelectableColumnTypes } from "./SelectableColumnTypes";
 
 export type NestedKeysOf<T extends { [key: string]: any }, Key extends keyof T, Level extends string> =

@@ -18,5 +18,16 @@
                 "project": ["./tsconfig.json"] // Specify it only for TypeScript files
             }
         }
-    ]
+    ],
+    "rules": {
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": [
+            "error",  
+            {
+                "argsIgnorePattern": "^_",
+                "varsIgnorePattern": "^_",
+                "caughtErrorsIgnorePattern": "^_"
+            }
+        ]
+    }
 }

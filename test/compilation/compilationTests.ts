@@ -1,4 +1,3 @@
-// tslint:disable:no-multiline-string
 import { assert } from "chai";
 import * as fs from "fs";
 import * as path from "path";

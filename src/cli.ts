@@ -13,11 +13,11 @@ async function main() {
         .alias("h", "help").argv;
 
     if (argv.u) {
-        // tslint:disable-next-line: no-floating-promises
-        runUpgrade(argv._ as string[], argv.p);
+        await runUpgrade(argv._ as string[], argv.p);
     } else {
         yargs.showHelp();
     }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 main();

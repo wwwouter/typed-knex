@@ -1,3 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import "reflect-metadata";
 
 interface IColumnData {
@@ -35,10 +40,10 @@ export function Entity(tableName?: string) {
     };
 }
 
-// tslint:disable-next-line: variable-name
 export const Table = Entity;
 
 export function getTableMetadata(tableClass: Function): { tableName: string } {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return Reflect.getMetadata(tableClass.prototype.tableMetadataKey, tableClass);
 }
 

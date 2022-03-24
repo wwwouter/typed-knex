@@ -1,4 +1,13 @@
-// tslint:disable:use-named-parameter
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable prefer-rest-params */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Knex } from "knex";
 import { getColumnInformation, getColumnProperties, getPrimaryKeyColumn, getTableName } from "./decorators";
 import { NestedForeignKeyKeysOf, NestedKeysOf } from "./NestedKeysOf";
@@ -21,8 +30,8 @@ export class TypedKnex {
             this.knex
                 .transaction((tr) => resolve(tr))
                 // If this error is not caught here, it will throw, resulting in an unhandledRejection
-                // tslint:disable-next-line:no-empty
-                .catch((_e) => {});
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                .catch(() => {});
         });
     }
 }
@@ -390,6 +399,7 @@ function getProxyAndMemories<ModelType, Row>(typedQueryBuilder?: TypedQueryBuild
         }
 
         if (name === "getColumnName") {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             return typedQueryBuilder!.getColumnName(...memories);
         }
 
@@ -434,6 +444,7 @@ function getProxyAndMemoriesForArray<ModelType, Row>(typedQueryBuilder?: TypedQu
             return _target.level;
         }
         if (name === "getColumnName") {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             return typedQueryBuilder!.getColumnName(...result[counter]);
         }
         if (typeof name === "string") {
@@ -558,7 +569,7 @@ export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements 
 
             this.mapColumnsToProperties(item);
 
-            return item as any;
+            return item;
         }
     }
 
@@ -949,7 +960,7 @@ export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements 
         const operator = arguments[1];
 
         if (arguments[0] instanceof ColumnFromQuery) {
-            column1Name = (arguments[0] as ColumnFromQuery).toString();
+            column1Name = arguments[0].toString();
             column2Name = (arguments[2] as ColumnFromQuery).toString();
             this.queryBuilder.whereRaw(`${column1Name} ${operator} ${column2Name}`);
             return this;
@@ -1097,6 +1108,7 @@ export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements 
             subQueryPrefix = this.getNextSubQueryPrefix();
         }
         ((this.queryBuilder as any)[functionName] as (callback: Knex.QueryCallback) => Knex.QueryBuilder)(function () {
+            // eslint-disable-next-line @typescript-eslint/no-this-alias
             const subQuery = this;
             const { root, memories } = getProxyAndMemories(that);
 
@@ -1632,7 +1644,7 @@ export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements 
             },
         } as any;
 
-        onFunction(onObject as any);
+        onFunction(onObject);
 
         return this as any;
     }
@@ -1712,6 +1724,7 @@ export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements 
             const propertyName = this.mapColumnNameToPropertyName(columnName);
 
             if (columnName !== propertyName) {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 Object.defineProperty(item, propertyName, Object.getOwnPropertyDescriptor(item, columnName)!);
                 delete item[columnName];
             }
@@ -1725,6 +1738,7 @@ export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements 
             const columnName = this.mapPropertyNameToColumnName(propertyName);
 
             if (columnName !== propertyName) {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 Object.defineProperty(item, columnName, Object.getOwnPropertyDescriptor(item, propertyName)!);
                 delete item[propertyName];
             }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 type GetLevel4Property<Model, Key1 extends string, Key2 extends string, Key3 extends string, Key4 extends string> = Key1 extends keyof Model
     ? Key2 extends keyof Model[Key1]
         ? Key3 extends keyof Model[Key1][Key2]
