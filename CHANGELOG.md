@@ -2,7 +2,7 @@
 
 ## 4.8.3
 
-- Bug (#51): Don't override query builder in `updateItemWithReturning`, `insertItemWithReturning`, `insertItems` and `updateItemsByPrimaryKey`.
+-   Bug (#51): Don't override query builder in `updateItemWithReturning`, `insertItemWithReturning`, `insertItems` and `updateItemsByPrimaryKey`.
 
 ## 4.8.2
 
