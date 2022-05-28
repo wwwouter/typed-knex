@@ -1,10 +1,13 @@
 # Changelog
 
-## ## 4.8.2
+
+- Bug (#51): Don't override query builder in `updateItemWithReturning`, `insertItemWithReturning`, `insertItems` and `updateItemsByPrimaryKey`.
+
+## 4.8.2
 
 -   Bug: Export registerQueryBuilderExtension
 
-## ## 4.8.1
+## 4.8.1
 
 -   Bug: Export registerQueryBuilderExtension (NOT FIXED)
 

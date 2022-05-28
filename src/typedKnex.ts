@@ -540,7 +540,7 @@ export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements 
         }
         this.mapPropertiesToColumns(item);
 
-        const query = this.knex.from(this.tableName).update(item);
+        const query = this.queryBuilder.update(item);
         if (returnProperties) {
             const mappedNames = returnProperties.map((columnName) => this.getColumnName(columnName));
             query.returning(mappedNames);
@@ -571,7 +571,7 @@ export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements 
         }
         this.mapPropertiesToColumns(this.tableClass);
 
-        const query = this.knex.from(this.tableName).insert(item);
+        const query = this.queryBuilder.insert(item);
         if (returnProperties) {
             const mappedNames = returnProperties.map((columnName) => this.getColumnName(columnName));
             query.returning(mappedNames);
@@ -610,7 +610,7 @@ export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements 
 
         while (items.length > 0) {
             const chunk = items.splice(0, 500);
-            const query = this.knex.from(this.tableName).insert(chunk);
+            const query = this.queryBuilder.clone().insert(chunk);
             if (this.transaction !== undefined) {
                 query.transacting(this.transaction);
             }
@@ -667,7 +667,7 @@ export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements 
 
             let sql = "";
             for (const item of chunk) {
-                const query = this.knex.from(this.tableName);
+                const query = this.queryBuilder.clone();
                 if (beforeUpdateTransform) {
                     item.data = beforeUpdateTransform(item.data, this);
                 }

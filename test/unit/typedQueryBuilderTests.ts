@@ -1638,4 +1638,18 @@ describe("TypedKnexQueryBuilder", () => {
             assert.deepEqual(item, { INTERNAL_NAME: "internal name", name: "name" });
         });
     });
+
+    describe("updateItemWithReturning", () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+
+        it("should use where clause", async () => {
+            const query = typedKnex.query(User);
+
+            (query as any).onlyLogQuery = true;
+
+            await query.where("name", "name1").updateItemWithReturning({ id: "newId" });
+
+            assert.equal((query as any).queryLog.trim(), `update "users" set "id" = 'newId' where "users"."name" = 'name1' returning *`);
+        });
+    });
 });
