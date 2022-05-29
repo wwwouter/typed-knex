@@ -147,8 +147,10 @@ export function getColumnProperties(tableClass: Function): IColumnData[] {
     return columns;
 }
 
+/**
+ * @deprecated
+ */
 export function getPrimaryKeyColumn(tableClass: Function): IColumnData {
-    // console.log('tableClass: ', tableClass);
     const columns: IColumnData[] = tableClass.prototype.tableColumns;
     if (!columns) {
         throw new Error(`Cannot get column data from ${tableClass.constructor.name}, did you set @Column() attribute?`);

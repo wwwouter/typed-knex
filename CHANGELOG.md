@@ -1,5 +1,8 @@
 # Changelog
 
+
+- Deprecation message for functions using the primary key: `findByPrimaryKey`, `delByPrimaryKey`, `updateItemByPrimaryKey`, `updateItemsByPrimaryKey`.
+
 ## 4.8.3
 
 -   Bug (#51): Don't override query builder in `updateItemWithReturning`, `insertItemWithReturning`, `insertItems` and `updateItemsByPrimaryKey`.
