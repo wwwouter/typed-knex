@@ -145,7 +145,7 @@ const typedKnex = new TypedKnex(knex);
 
 ### Getting the results (Promises)
 
--   [findByPrimaryKey](#findByPrimaryKey) *deprecated*
+-   [findByPrimaryKey](#findByPrimaryKey) _deprecated_
 -   [getFirstOrNull](#getFirstOrNull)
 -   [getFirst](#getFirst)
 -   [getSingleOrNull](#getSingleOrNull)
@@ -157,11 +157,11 @@ const typedKnex = new TypedKnex(knex);
 -   [insertItems](#insertItems)
 -   [insertSelect](#insertSelect)
 -   [del](#del)
--   [delByPrimaryKey](#delByPrimaryKey) *deprecated*
+-   [delByPrimaryKey](#delByPrimaryKey) _deprecated_
 -   [updateItem](#updateItem)
 -   [updateItemWithReturning](#updateItemWithReturning)
--   [updateItemByPrimaryKey](#updateItemByPrimaryKey) *deprecated*
--   [updateItemsByPrimaryKey](#updateItemsByPrimaryKey) *deprecated*
+-   [updateItemByPrimaryKey](#updateItemByPrimaryKey) _deprecated_
+-   [updateItemsByPrimaryKey](#updateItemsByPrimaryKey) _deprecated_
 -   [execute](#execute)
 
 ### Building the query
@@ -486,7 +486,7 @@ select "userCategories"."id" as "id", (select count("users"."id") as "total" fro
 
 ### findByPrimaryKey
 
-*deprecated*
+_deprecated_
 
 ```ts
 const user = await typedKnex.query(User).findByPrimaryKey("id", "d", "name");
@@ -914,7 +914,7 @@ typedKnex.query(User);
 
 ### delByPrimaryKey
 
-*deprecated*
+_deprecated_
 
 ```ts
 typedKnex.query(User);
@@ -942,7 +942,7 @@ query.updateItemWithReturning({ id: "newId" }, ["id"]);
 
 ### updateItemByPrimaryKey
 
-*deprecated*
+_deprecated_
 
 ```ts
 typedKnex.query(User);
@@ -950,7 +950,7 @@ typedKnex.query(User);
 
 ### updateItemsByPrimaryKey
 
-*deprecated*
+_deprecated_
 
 ```ts
 typedKnex.query(User);
