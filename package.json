@@ -20,7 +20,8 @@
         "mocha:all": "npm run build && mocha \"build/test/**/*Tests.js\"",
         "upgrade-packages": "rm -f package-lock.json && ncu --removeRange -u -x @types/node",
         "prettier:fix": "prettier --write . --ignore-path ./.gitignore",
-        "prettier:check": "prettier --check . --ignore-path ./.gitignore"
+        "prettier:check": "prettier --check . --ignore-path ./.gitignore",
+        "prepare": "husky install"
     },
     "bin": {
         "typed-knex": "./dist/src/cli.js"
@@ -52,7 +53,9 @@
         "@wwwouter/tslint-contrib": "1.0.0",
         "chai": "4.3.6",
         "chai-as-promised": "7.1.1",
+        "husky": "8.0.1",
         "knex": "1.0.4",
+        "lint-staged": "12.4.3",
         "mocha": "9.2.2",
         "npm-check-updates": "12.5.3",
         "prettier": "^2.6.0",
@@ -63,5 +66,8 @@
     "prettier": {
         "tabWidth": 4,
         "printWidth": 220
+    },
+    "lint-staged": {
+        "*.{js,css,md}": "prettier --write"
     }
 }
