@@ -941,4 +941,30 @@ describe("compile time typed-knex string column parameters", function () {
 
         done();
     });
+
+    it("should fail if result of getSingleOrUndefined of query without select is used as object", (done) => {
+        const allDiagnostics = getDiagnostics(`
+        import { knex} from 'knex';
+
+        import { TypedKnex } from '../src/typedKnex';
+        import { User } from './testEntities';
+
+
+        (async () => {
+
+            const typedKnex = new TypedKnex(knex({ client: 'postgresql' }));
+            const result = await typedKnex
+                .query(User)
+                .getSingleOrUndefined();
+
+            // result is User|undefined and this should fail
+            console.log(result.id);
+
+        })();
+    `);
+
+        assert.notEqual(allDiagnostics.length, 0);
+
+        done();
+    });
 });

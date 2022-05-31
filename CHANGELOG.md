@@ -1,5 +1,7 @@
 # Changelog
 
+-   Feature: Added `getSingleOrUndefined` and `getFirstOrUndefined`.
+
 ## 4.8.4
 
 -   Deprecation message for functions using the primary key: `findByPrimaryKey`, `delByPrimaryKey`, `updateItemByPrimaryKey`, `updateItemsByPrimaryKey`.

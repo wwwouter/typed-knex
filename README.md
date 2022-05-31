@@ -147,8 +147,10 @@ const typedKnex = new TypedKnex(knex);
 
 -   [findByPrimaryKey](#findByPrimaryKey) _deprecated_
 -   [getFirstOrNull](#getFirstOrNull)
+-   [getFirstOrUndefined](#getFirstOrUndefined)
 -   [getFirst](#getFirst)
 -   [getSingleOrNull](#getSingleOrNull)
+-   [getSingleOrUndefined](#getSingleOrUndefined)
 -   [getSingle](#getSingle)
 -   [getMany](#getMany)
 -   [getCount](#getCount)
@@ -805,25 +807,44 @@ console.log(query.toQuery()); // select * from "users"
 
 ### getFirstOrNull
 
-| Result            | No item | One item | Many items |
-| ----------------- | ------- | -------- | ---------- |
-| `getFirst`        | `Error` | Item     | First item |
-| `getSingle`       | `Error` | Item     | `Error`    |
-| `getFirstOrNull`  | `null`  | Item     | First item |
-| `getSingleOrNull` | `null`  | Item     | `Error`    |
+| Result                 | No item     | One item | Many items |
+| ---------------------- | ----------- | -------- | ---------- |
+| `getFirst`             | `Error`     | Item     | First item |
+| `getSingle`            | `Error`     | Item     | `Error`    |
+| `getFirstOrNull`       | `null`      | Item     | First item |
+| `getSingleOrNull`      | `null`      | Item     | `Error`    |
+| `getFirstOrUndefined`  | `undefined` | Item     | First item |
+| `getSingleOrUndefined` | `undefined` | Item     | `Error`    |
 
 ```ts
 const user = await typedKnex.query(User).where("name", "name").getFirstOrNull();
 ```
 
+### getFirstOrUndefined
+
+| Result                 | No item     | One item | Many items |
+| ---------------------- | ----------- | -------- | ---------- |
+| `getFirst`             | `Error`     | Item     | First item |
+| `getSingle`            | `Error`     | Item     | `Error`    |
+| `getFirstOrNull`       | `null`      | Item     | First item |
+| `getSingleOrNull`      | `null`      | Item     | `Error`    |
+| `getFirstOrUndefined`  | `undefined` | Item     | First item |
+| `getSingleOrUndefined` | `undefined` | Item     | `Error`    |
+
+```ts
+const user = await typedKnex.query(User).where("name", "name").getFirstOrUndefined();
+```
+
 ### getFirst
 
-| Result            | No item | One item | Many items |
-| ----------------- | ------- | -------- | ---------- |
-| `getFirst`        | `Error` | Item     | First item |
-| `getSingle`       | `Error` | Item     | `Error`    |
-| `getFirstOrNull`  | `null`  | Item     | First item |
-| `getSingleOrNull` | `null`  | Item     | `Error`    |
+| Result                 | No item     | One item | Many items |
+| ---------------------- | ----------- | -------- | ---------- |
+| `getFirst`             | `Error`     | Item     | First item |
+| `getSingle`            | `Error`     | Item     | `Error`    |
+| `getFirstOrNull`       | `null`      | Item     | First item |
+| `getSingleOrNull`      | `null`      | Item     | `Error`    |
+| `getFirstOrUndefined`  | `undefined` | Item     | First item |
+| `getSingleOrUndefined` | `undefined` | Item     | `Error`    |
 
 ```ts
 const user = await typedKnex.query(User).where("name", "name").getFirst();
@@ -831,25 +852,44 @@ const user = await typedKnex.query(User).where("name", "name").getFirst();
 
 ### getSingleOrNull
 
-| Result            | No item | One item | Many items |
-| ----------------- | ------- | -------- | ---------- |
-| `getFirst`        | `Error` | Item     | First item |
-| `getSingle`       | `Error` | Item     | `Error`    |
-| `getFirstOrNull`  | `null`  | Item     | First item |
-| `getSingleOrNull` | `null`  | Item     | `Error`    |
+| Result                 | No item     | One item | Many items |
+| ---------------------- | ----------- | -------- | ---------- |
+| `getFirst`             | `Error`     | Item     | First item |
+| `getSingle`            | `Error`     | Item     | `Error`    |
+| `getFirstOrNull`       | `null`      | Item     | First item |
+| `getSingleOrNull`      | `null`      | Item     | `Error`    |
+| `getFirstOrUndefined`  | `undefined` | Item     | First item |
+| `getSingleOrUndefined` | `undefined` | Item     | `Error`    |
 
 ```ts
 const user = await typedKnex.query(User).where("name", "name").getSingleOrNull();
 ```
 
+### getSingleOrUndefined
+
+| Result                 | No item     | One item | Many items |
+| ---------------------- | ----------- | -------- | ---------- |
+| `getFirst`             | `Error`     | Item     | First item |
+| `getSingle`            | `Error`     | Item     | `Error`    |
+| `getFirstOrNull`       | `null`      | Item     | First item |
+| `getSingleOrNull`      | `null`      | Item     | `Error`    |
+| `getFirstOrUndefined`  | `undefined` | Item     | First item |
+| `getSingleOrUndefined` | `undefined` | Item     | `Error`    |
+
+```ts
+const user = await typedKnex.query(User).where("name", "name").getSingleOrUndefined();
+```
+
 ### getSingle
 
-| Result            | No item | One item | Many items |
-| ----------------- | ------- | -------- | ---------- |
-| `getFirst`        | `Error` | Item     | First item |
-| `getSingle`       | `Error` | Item     | `Error`    |
-| `getFirstOrNull`  | `null`  | Item     | First item |
-| `getSingleOrNull` | `null`  | Item     | `Error`    |
+| Result                 | No item     | One item | Many items |
+| ---------------------- | ----------- | -------- | ---------- |
+| `getFirst`             | `Error`     | Item     | First item |
+| `getSingle`            | `Error`     | Item     | `Error`    |
+| `getFirstOrNull`       | `null`      | Item     | First item |
+| `getSingleOrNull`      | `null`      | Item     | `Error`    |
+| `getFirstOrUndefined`  | `undefined` | Item     | First item |
+| `getSingleOrUndefined` | `undefined` | Item     | `Error`    |
 
 ```ts
 const user = await typedKnex.query(User).where("name", "name").getSingle();
