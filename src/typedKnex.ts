@@ -154,8 +154,10 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     toQuery(): string;
 
     getFirstOrNull(flattenOption?: FlattenOption): Promise<(Row extends Model ? RemoveObjectsFrom<Model> : Row) | null>;
+    getFirstOrUndefined(flattenOption?: FlattenOption): Promise<(Row extends Model ? RemoveObjectsFrom<Model> : Row) | undefined>;
     getFirst(flattenOption?: FlattenOption): Promise<Row extends Model ? RemoveObjectsFrom<Model> : Row>;
     getSingleOrNull(flattenOption?: FlattenOption): Promise<(Row extends Model ? RemoveObjectsFrom<Model> : Row) | null>;
+    getSingleOrUndefined(flattenOption?: FlattenOption): Promise<(Row extends Model ? RemoveObjectsFrom<Model> : Row) | undefined>;
     getSingle(flattenOption?: FlattenOption): Promise<Row extends Model ? RemoveObjectsFrom<Model> : Row>;
     getMany(flattenOption?: FlattenOption): Promise<(Row extends Model ? RemoveObjectsFrom<Model> : Row)[]>;
     getCount(): Promise<number>;
@@ -736,6 +738,13 @@ export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements 
             return this.flattenByOption(items[0], arguments[0]);
         }
     }
+    public async getFirstOrUndefined() {
+        const firstOrNullResult = await this.getFirstOrNull();
+        if (firstOrNullResult === null) {
+            return undefined;
+        }
+        return firstOrNullResult;
+    }
 
     public async getFirst() {
         if (this.hasSelectClause === false) {
@@ -770,6 +779,14 @@ export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements 
             }
             return this.flattenByOption(items[0], arguments[0]);
         }
+    }
+
+    public async getSingleOrUndefined() {
+        const singleOrNullResult = await this.getSingleOrNull();
+        if (singleOrNullResult === null) {
+            return undefined;
+        }
+        return singleOrNullResult;
     }
 
     public async getSingle() {

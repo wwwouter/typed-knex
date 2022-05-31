@@ -1364,6 +1364,22 @@ describe("TypedKnexQueryBuilder", () => {
         );
     });
 
+    it("getFirstOrUndefined should select all columns of root type with correct aliases", async () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex.query(UserCategory);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.getFirstOrUndefined();
+
+        assert.equal(
+            (query as any).queryLog.trim(),
+            `select "id" as "id", "name" as "name", "regionId" as "region", "regionId" as "regionId", "year" as "year", "phoneNumber" as "phoneNumber", "backupRegionId" as "backupRegion", "INTERNAL_NAME" as "specialRegionId" from "userCategories"`
+        );
+    });
+
     it("getSingle should select all columns of root type with correct aliases", async () => {
         const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         (typedKnex as any).onlyLogQuery = true;
@@ -1389,6 +1405,22 @@ describe("TypedKnexQueryBuilder", () => {
         (query as any).onlyLogQuery = true;
 
         await query.getSingleOrNull();
+
+        assert.equal(
+            (query as any).queryLog.trim(),
+            `select "id" as "id", "name" as "name", "regionId" as "region", "regionId" as "regionId", "year" as "year", "phoneNumber" as "phoneNumber", "backupRegionId" as "backupRegion", "INTERNAL_NAME" as "specialRegionId" from "userCategories"`
+        );
+    });
+
+    it("getSingleOrUndefined should select all columns of root type with correct aliases", async () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex.query(UserCategory);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.getSingleOrUndefined();
 
         assert.equal(
             (query as any).queryLog.trim(),
@@ -1429,6 +1461,7 @@ describe("TypedKnexQueryBuilder", () => {
 
         done();
     });
+
     it("getSingleOrNull should select all columns of root type with correct aliases", async () => {
         const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         (typedKnex as any).onlyLogQuery = true;
@@ -1438,6 +1471,22 @@ describe("TypedKnexQueryBuilder", () => {
         (query as any).onlyLogQuery = true;
 
         await query.getSingleOrNull();
+
+        assert.equal(
+            (query as any).queryLog.trim(),
+            `select "id" as "id", "name" as "name", "regionId" as "region", "regionId" as "regionId", "year" as "year", "phoneNumber" as "phoneNumber", "backupRegionId" as "backupRegion", "INTERNAL_NAME" as "specialRegionId" from "userCategories"`
+        );
+    });
+
+    it("getSingleOrUndefined should select all columns of root type with correct aliases", async () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        (typedKnex as any).onlyLogQuery = true;
+
+        const query = typedKnex.query(UserCategory);
+
+        (query as any).onlyLogQuery = true;
+
+        await query.getSingleOrUndefined();
 
         assert.equal(
             (query as any).queryLog.trim(),
