@@ -2,6 +2,9 @@ import "reflect-metadata";
 
 interface IColumnData {
     name: string;
+    /**
+     * @deprecated
+     */
     primary: boolean;
     propertyKey: string;
     isForeignKey: boolean;
