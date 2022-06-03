@@ -51,7 +51,7 @@ describe("compile time typed-knex string column parameters", function () {
         import { knex} from 'knex';
 
         import { TypedKnex } from '../src/typedKnex';
-        import { User } from './testEntities';
+        import { User } from './testTables';
 
 
         (async () => {
@@ -77,7 +77,7 @@ describe("compile time typed-knex string column parameters", function () {
         import { knex} from 'knex';
 
         import { TypedKnex } from '../src/typedKnex';
-        import { User } from './testEntities';
+        import { User } from './testTables';
 
 
         (async () => {
@@ -103,7 +103,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User } from './testEntities';
+            import { User } from './testTables';
 
 
             (async () => {
@@ -129,7 +129,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User } from './testEntities';
+            import { User } from './testTables';
 
 
             (async () => {
@@ -155,7 +155,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User } from './testEntities';
+            import { User } from './testTables';
 
 
             (async () => {
@@ -179,7 +179,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User } from './testEntities';
+            import { User } from './testTables';
 
 
             (async () => {
@@ -200,7 +200,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User } from './testEntities';
+            import { User } from './testTables';
 
 
             (async () => {
@@ -223,7 +223,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User } from './testEntities';
+            import { User } from './testTables';
 
 
             (async () => {
@@ -244,7 +244,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User } from './testEntities';
+            import { User } from './testTables';
 
 
             (async () => {
@@ -265,7 +265,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User, UserSetting } from './testEntities';
+            import { User, UserSetting } from './testTables';
 
 
             (async () => {
@@ -290,7 +290,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User, UserSetting } from './testEntities';
+            import { User, UserSetting } from './testTables';
 
 
             (async () => {
@@ -315,7 +315,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User } from './testEntities';
+            import { User } from './testTables';
 
 
             (async () => {
@@ -340,7 +340,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User } from './testEntities';
+            import { User } from './testTables';
 
 
             (async () => {
@@ -365,7 +365,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User } from './testEntities';
+            import { User } from './testTables';
 
 
             (async () => {
@@ -394,7 +394,7 @@ describe("compile time typed-knex string column parameters", function () {
     //         import { knex} from 'knex';
 
     //         import { TypedKnex } from '../src/typedKnex';
-    //         import { User } from './testEntities';
+    //         import { User } from './testTables';
 
     //         (async () => {
 
@@ -422,7 +422,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User } from './testEntities';
+            import { User } from './testTables';
 
 
             (async () => {
@@ -449,7 +449,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User } from './testEntities';
+            import { User } from './testTables';
 
 
             (async () => {
@@ -476,7 +476,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User } from './testEntities';
+            import { User } from './testTables';
 
 
             (async () => {
@@ -503,7 +503,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User } from './testEntities';
+            import { User } from './testTables';
 
 
             (async () => {
@@ -530,7 +530,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User } from './testEntities';
+            import { User } from './testTables';
 
 
             (async () => {
@@ -557,7 +557,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User } from './testEntities';
+            import { User } from './testTables';
 
 
             (async () => {
@@ -584,7 +584,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User } from './testEntities';
+            import { User } from './testTables';
 
 
             (async () => {
@@ -611,7 +611,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User } from './testEntities';
+            import { User } from './testTables';
 
 
             (async () => {
@@ -638,7 +638,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User } from './testEntities';
+            import { User } from './testTables';
 
 
             (async () => {
@@ -665,7 +665,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User, UserSetting } from './testEntities';
+            import { User, UserSetting } from './testTables';
 
 
             (async () => {
@@ -697,7 +697,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User, UserSetting } from './testEntities';
+            import { User, UserSetting } from './testTables';
 
 
             (async () => {
@@ -728,7 +728,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User, UserSetting } from './testEntities';
+            import { User, UserSetting } from './testTables';
 
 
             (async () => {
@@ -759,7 +759,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User, UserSetting } from './testEntities';
+            import { User, UserSetting } from './testTables';
 
 
             (async () => {
@@ -791,7 +791,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User } from './testEntities';
+            import { User } from './testTables';
 
 
             (async () => {
@@ -816,7 +816,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User } from './testEntities';
+            import { User } from './testTables';
 
 
             (async () => {
@@ -841,7 +841,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User } from './testEntities';
+            import { User } from './testTables';
 
 
             (async () => {
@@ -866,7 +866,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User } from './testEntities';
+            import { User } from './testTables';
 
 
             (async () => {
@@ -891,7 +891,7 @@ describe("compile time typed-knex string column parameters", function () {
             import { knex} from 'knex';
 
             import { TypedKnex } from '../src/typedKnex';
-            import { User, UserSetting } from './testEntities';
+            import { User, UserSetting } from './testTables';
 
 
             (async () => {
@@ -921,7 +921,7 @@ describe("compile time typed-knex string column parameters", function () {
         import { knex} from 'knex';
 
         import { TypedKnex } from '../src/typedKnex';
-        import { User } from './testEntities';
+        import { User } from './testTables';
 
 
         (async () => {
@@ -947,7 +947,7 @@ describe("compile time typed-knex string column parameters", function () {
         import { knex} from 'knex';
 
         import { TypedKnex } from '../src/typedKnex';
-        import { User } from './testEntities';
+        import { User } from './testTables';
 
 
         (async () => {

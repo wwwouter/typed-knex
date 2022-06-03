@@ -1,10 +1,10 @@
 import { assert } from "chai";
 import { knex } from "knex";
-import { getEntities, getTableName } from "../../src";
+import { getTables, getTableName } from "../../src";
 import { getColumnName } from "../../src/decorators";
 import { TypedKnex, TypedQueryBuilder } from "../../src/typedKnex";
 import { setToNull, unflatten } from "../../src/unflatten";
-import { Region, User, UserCategory, UserSetting } from "../testEntities";
+import { Region, User, UserCategory, UserSetting } from "../testTables";
 
 describe("TypedKnexQueryBuilder", () => {
     it('should return select * from "users"', (done) => {
@@ -815,12 +815,12 @@ describe("TypedKnexQueryBuilder", () => {
         done();
     });
 
-    it("should return metadata from Entities", (done) => {
-        const entities = getEntities();
+    it("should return metadata from tables", (done) => {
+        const tables = getTables();
 
-        assert.equal(entities.length, 5);
-        assert.exists(entities.find((i) => i.tableName === "users"));
-        assert.exists(entities.find((i) => i.tableName === "correctTableName"));
+        assert.equal(tables.length, 5);
+        assert.exists(tables.find((i) => i.tableName === "users"));
+        assert.exists(tables.find((i) => i.tableName === "correctTableName"));
 
         done();
     });

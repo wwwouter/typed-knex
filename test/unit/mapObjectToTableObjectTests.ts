@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { mapObjectToTableObject } from "../../src/mapObjectToTableObject";
-import { User } from "../testEntities";
+import { User } from "../testTables";
 
 describe("mapObjectToTableObject", () => {
     it("should map object to table object", (done) => {

@@ -2,7 +2,7 @@ import { assert } from "chai";
 import { knex } from "knex";
 import { TypedKnex } from "../../src";
 import { registerQueryBuilderExtension } from "../../src/registerQueryBuilderExtension";
-import { User } from "../testEntities";
+import { User } from "../testTables";
 
 describe("registerQueryBuilderExtension", () => {
     it("should map object to table object", (done) => {

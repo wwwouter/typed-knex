@@ -1,9 +1,9 @@
 import { assert } from "chai";
 import { knex } from "knex";
-import { validateEntities } from "../../src/validateEntities";
-import {} from "../testEntities";
+import { validateTables } from "../../src/validateTables";
+import {} from "../testTables";
 
-describe("validateEntitiesTests", () => {
+describe("validateTables", () => {
     it("should fail on empty database", async () => {
         const db = knex({
             client: "sqlite3",
@@ -12,7 +12,7 @@ describe("validateEntitiesTests", () => {
         });
 
         try {
-            await validateEntities(db);
+            await validateTables(db);
             assert.isFalse(true);
             // tslint:disable-next-line:no-empty
         } catch (_error) {}

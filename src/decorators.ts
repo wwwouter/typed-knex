@@ -11,30 +11,31 @@ interface IColumnData {
     designType: any;
 }
 
-const entities = [] as {
+const tables = [] as {
     tableName: string;
-    entityClass: Function;
+    tableClass: Function;
 }[];
 
-// export function Entity2(tableName: string) {
-
-//     return ((target: Function) => {
-//         console.log('target: ', target);
-//         return Reflect.metadata(tableyMetadataKey, { tableName: tableName });
-//     })(arguments);
-
-// }
-
+/**
+ * @deprecated use `getTables`.
+ */
 export function getEntities() {
-    return entities;
+    return tables;
 }
 
+export function getTables() {
+    return tables;
+}
+
+/**
+ * @deprecated use `Table`.
+ */
 export function Entity(tableName?: string) {
     return (target: Function) => {
         target.prototype.tableMetadataKey = Symbol("table");
         Reflect.metadata(target.prototype.tableMetadataKey, { tableName: tableName ?? target.name })(target);
 
-        entities.push({ tableName: tableName ?? target.name, entityClass: target });
+        tables.push({ tableName: tableName ?? target.name, tableClass: target });
     };
 }
 
@@ -52,27 +53,6 @@ export function getTableName(tableClass: Function): string {
 export function getColumnName<T>(tableClass: new () => T, propertyName: keyof T): string {
     return getColumnInformation(tableClass, propertyName as string).name;
 }
-
-// function registerEntity(target: any, propertyKey: string): void {
-
-//     Reflect.metadata(columnMetadataKey, { isColumn: true })(target);
-
-//     const columns = tableColumns.get(target.constructor) || [];
-
-//     let name = propertyKey;
-//     // console.log('name: ', name);
-//     let primary = false;
-//     // console.log('options: ', options);
-//     if (options) {
-//         if (options.name !== undefined) {
-//             name = options.name;
-//         }
-//         primary = options.primary === true;
-//     }
-
-//     columns.push({ name, primary, propertyKey });
-//     tableColumns.set(target.constructor, columns);
-// }
 
 const columnMetadataKey = Symbol("column");
 
