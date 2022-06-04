@@ -1,5 +1,6 @@
 # Changelog
 
+-   Chore: Use prepack script instead of prepublish.
 -   Chore: Properly deprecate mentions of "entity".
 -   Chore: Deprecate `primary` property of column.
 -   Feature: Added `getSingleOrUndefined` and `getFirstOrUndefined`.
