@@ -537,8 +537,8 @@ export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements 
         const newObject = arguments[0];
         const returnProperties = arguments[1] as string[] | undefined;
         let item = newObject;
-        if (beforeInsertTransform) {
-            item = beforeInsertTransform(newObject, this);
+        if (beforeUpdateTransform) {
+            item = beforeUpdateTransform(newObject, this);
         }
         this.mapPropertiesToColumns(item);
 
@@ -602,10 +602,8 @@ export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements 
     public async insertItems(items: Partial<RemoveObjectsFrom<ModelType>>[]) {
         items = [...items];
 
-        for (let item of items) {
-            if (beforeInsertTransform) {
-                item = beforeInsertTransform(item, this);
-            }
+        if (beforeInsertTransform) {
+            items = items.map((item) => beforeInsertTransform!(item, this));
         }
 
         items.forEach((item) => this.mapPropertiesToColumns(item));

@@ -1,5 +1,7 @@
 # Changelog
 
+-   Bug: Correct `registerBeforeUpdateTransform` and `registerBeforeInsertTransform` calls.
+
 ## 4.9.0
 
 -   Chore: Use prepack script instead of prepublish.

@@ -2,7 +2,7 @@ import { assert } from "chai";
 import { knex } from "knex";
 import { getTables, getTableName } from "../../src";
 import { getColumnName } from "../../src/decorators";
-import { TypedKnex, TypedQueryBuilder } from "../../src/typedKnex";
+import { TypedKnex, TypedQueryBuilder, registerBeforeUpdateTransform, registerBeforeInsertTransform } from "../../src/typedKnex";
 import { setToNull, unflatten } from "../../src/unflatten";
 import { Region, User, UserCategory, UserSetting } from "../testTables";
 
@@ -1699,6 +1699,90 @@ describe("TypedKnexQueryBuilder", () => {
             await query.where("name", "name1").updateItemWithReturning({ id: "newId" });
 
             assert.equal((query as any).queryLog.trim(), `update "users" set "id" = 'newId' where "users"."name" = 'name1' returning *`);
+        });
+    });
+
+    describe("registerBeforeUpdateTransform", () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+
+        afterEach(() => {
+            registerBeforeUpdateTransform(undefined as any);
+        });
+
+        it("should change item to when using updateItem", async () => {
+            const query = typedKnex.query(User);
+
+            registerBeforeUpdateTransform((item: any) => {
+                return {
+                    ...item,
+                    name: "name override",
+                };
+            });
+
+            (query as any).onlyLogQuery = true;
+
+            await query.where("name", "name1").updateItem({ id: "newId" });
+
+            assert.equal((query as any).queryLog.trim(), `update "users" set "id" = 'newId', "name" = 'name override' where "users"."name" = 'name1'`);
+        });
+
+        it("should change item to when using updateItemWithReturning", async () => {
+            const query = typedKnex.query(User);
+
+            registerBeforeUpdateTransform((item: any) => {
+                return {
+                    ...item,
+                    name: "name override",
+                };
+            });
+
+            (query as any).onlyLogQuery = true;
+
+            await query.where("name", "name1").updateItemWithReturning({ id: "newId" });
+
+            assert.equal((query as any).queryLog.trim(), `update "users" set "id" = 'newId', "name" = 'name override' where "users"."name" = 'name1' returning *`);
+        });
+    });
+
+    describe("registerBeforeInsertTransform", () => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+
+        afterEach(() => {
+            registerBeforeInsertTransform(undefined as any);
+        });
+
+        it("should change item to when using insertItem", async () => {
+            const query = typedKnex.query(User);
+
+            registerBeforeInsertTransform((item: any) => {
+                return {
+                    ...item,
+                    name: "name override",
+                };
+            });
+
+            (query as any).onlyLogQuery = true;
+
+            await query.insertItem({ id: "newId" });
+
+            assert.equal((query as any).queryLog.trim(), `insert into "users" ("id", "name") values ('newId', 'name override')`);
+        });
+
+        it("should change item to when using insertItemWithReturning", async () => {
+            const query = typedKnex.query(User);
+
+            registerBeforeInsertTransform((item: any) => {
+                return {
+                    ...item,
+                    name: "name override",
+                };
+            });
+
+            (query as any).onlyLogQuery = true;
+
+            await query.where("name", "name1").insertItemWithReturning({ id: "newId" });
+
+            assert.equal((query as any).queryLog.trim(), `insert into "users" ("id", "name") values ('newId', 'name override') returning *`);
         });
     });
 });
