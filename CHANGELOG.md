@@ -1,5 +1,7 @@
 # Changelog
 
+## 4.9.1
+
 -   Bug: Correct `registerBeforeUpdateTransform` and `registerBeforeInsertTransform` calls.
 
 ## 4.9.0
