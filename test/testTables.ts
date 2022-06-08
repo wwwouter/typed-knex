@@ -29,7 +29,6 @@ export class UserCategory {
     public specialRegionId!: string;
 }
 
-// tslint:disable-next-line: no-empty-interfaces
 class IExtraData extends ICustomDatabaseType {}
 
 @Table("users")
@@ -95,7 +94,6 @@ export class UserSetting {
 }
 
 @Table()
-// tslint:disable-next-line: class-name
 export class correctTableName {
     @Column({ primary: true })
     public id!: string;

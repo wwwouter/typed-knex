@@ -1,4 +1,3 @@
-// tslint:disable:use-named-parameter
 import { Knex } from "knex";
 import { getColumnInformation, getColumnProperties, getPrimaryKeyColumn, getTableName } from "./decorators";
 import { NestedForeignKeyKeysOf, NestedKeysOf } from "./NestedKeysOf";
@@ -21,7 +20,6 @@ export class TypedKnex {
             this.knex
                 .transaction((tr) => resolve(tr))
                 // If this error is not caught here, it will throw, resulting in an unhandledRejection
-                // tslint:disable-next-line:no-empty
                 .catch((_e) => {});
         });
     }

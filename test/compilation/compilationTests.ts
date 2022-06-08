@@ -1,4 +1,3 @@
-// tslint:disable:no-multiline-string
 import { assert } from "chai";
 import * as fs from "fs";
 import * as path from "path";
@@ -42,7 +41,6 @@ describe("compile time typed-knex string column parameters", function () {
     afterEach(() => {
         try {
             fs.unlinkSync(testFilename);
-            // tslint:disable-next-line: no-empty
         } catch (_e) {}
     });
 

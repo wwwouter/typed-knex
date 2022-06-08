@@ -39,7 +39,6 @@ export function Entity(tableName?: string) {
     };
 }
 
-// tslint:disable-next-line: variable-name
 export const Table = Entity;
 
 export function getTableMetadata(tableClass: Function): { tableName: string } {
