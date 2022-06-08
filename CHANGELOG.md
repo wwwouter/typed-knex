@@ -1,5 +1,8 @@
 # Changelog
 
+-   Chore: CI tests 14.x, 16.x, 18.x.
+-   Chore: Remove tslint, add eslint.
+
 ## 4.9.1
 
 -   Bug: Correct `registerBeforeUpdateTransform` and `registerBeforeInsertTransform` calls.

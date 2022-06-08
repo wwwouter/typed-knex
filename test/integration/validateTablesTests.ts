@@ -14,7 +14,6 @@ describe("validateTables", () => {
         try {
             await validateTables(db);
             assert.isFalse(true);
-            // tslint:disable-next-line:no-empty
         } catch (_error) {}
 
         await db.destroy();
