@@ -1,7 +1,7 @@
 # Changelog
 
 -   Chore: CI tests 14.x, 16.x, 18.x.
--   Chore: remove tslint, add eslint.
+-   Chore: Remove tslint, add eslint.
 
 ## 4.9.1
 
