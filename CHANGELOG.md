@@ -1,5 +1,6 @@
 # Changelog
 
+-   Fix: Use knex count return type. See [getCount()](readme.md#getcount)
 -   Chore: CI tests 14.x, 16.x, 18.x.
 -   Chore: Remove tslint, add eslint.
 

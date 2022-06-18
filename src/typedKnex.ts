@@ -158,7 +158,7 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     getSingleOrUndefined(flattenOption?: FlattenOption): Promise<(Row extends Model ? RemoveObjectsFrom<Model> : Row) | undefined>;
     getSingle(flattenOption?: FlattenOption): Promise<Row extends Model ? RemoveObjectsFrom<Model> : Row>;
     getMany(flattenOption?: FlattenOption): Promise<(Row extends Model ? RemoveObjectsFrom<Model> : Row)[]>;
-    getCount(): Promise<number>;
+    getCount(): Promise<number | string>;
     insertItem(newObject: Partial<RemoveObjectsFrom<Model>>): Promise<void>;
     insertItems(items: Partial<RemoveObjectsFrom<Model>>[]): Promise<void>;
     del(): Promise<void>;
