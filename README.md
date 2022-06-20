@@ -32,7 +32,7 @@ Make sure experimentalDecorators and emitDecoratorMetadata are turned on in your
 }
 ```
 
-_Tested with Knex.js v1.0.4, TypeScript v4.6.2 and Node.js 14.x, 16.x, 18.x_
+_Tested with Knex.js v2.1.0, TypeScript v4.7.4 and Node.js 14.x, 16.x, 18.x_
 
 # **Important upgrade notice**
 
@@ -914,8 +914,50 @@ const users = await typedKnex.query(User).whereNotNull("name").getMany();
 
 ### getCount
 
+Returns the row count of the query.
+
 ```ts
-typedKnex.query(User);
+const count = await typedKnex.query(User).getCount();
+```
+
+The return type is `Promise<number|string>`. This follows the Knex.js typing, see the [count documentation](https://knexjs.org/guide/query-builder.html#count).
+
+> The value of count will, by default, have type of string | number. This may be counter-intuitive but some connectors (eg. postgres) will automatically cast BigInt result to string when javascript's Number type is not large enough for the value.
+
+The return type can be changed by overriding the `ITypedQueryBuilder` interface.
+
+Declare as `number`:
+
+```typescript
+declare module "@wwwouter/typed-knex" {
+    interface ITypedQueryBuilder<Model, SelectableModel, Row> {
+        getCount(): Promise<number>;
+    }
+}
+```
+
+Declare as `BigInt`:
+
+```typescript
+declare module "@wwwouter/typed-knex" {
+    interface ITypedQueryBuilder<Model, SelectableModel, Row> {
+        getCount(): Promise<BigInt>;
+    }
+}
+```
+
+When using Postgres, `pg.types.setTypeParser` can be used to automatically convert the values.
+
+To convert to `integer`, use this code:
+
+```typescript
+pg.types.setTypeParser(20, "text", parseInt);
+```
+
+To convert to `bigint`, use this code:
+
+```typescript
+pg.types.setTypeParser(20, "text", BigInt);
 ```
 
 ### insertItem
