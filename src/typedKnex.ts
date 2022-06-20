@@ -149,6 +149,7 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     offset(value: number): ITypedQueryBuilder<Model, SelectableModel, Row>;
 
     useKnexQueryBuilder(f: (query: Knex.QueryBuilder) => void): ITypedQueryBuilder<Model, SelectableModel, Row>;
+    getKnexQueryBuilder(): Knex.QueryBuilder;
     toQuery(): string;
 
     getFirstOrNull(flattenOption?: FlattenOption): Promise<(Row extends Model ? RemoveObjectsFrom<Model> : Row) | null>;
@@ -1393,6 +1394,10 @@ export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements 
     public useKnexQueryBuilder(f: (query: Knex.QueryBuilder) => void) {
         f(this.queryBuilder);
         return this;
+    }
+
+    public getKnexQueryBuilder() {
+        return this.queryBuilder;
     }
 
     public getColumnName(...keys: string[]): string {

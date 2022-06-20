@@ -1,5 +1,7 @@
 # Changelog
 
+-   Feature: Added `getKnexQueryBuilder`.
+
 ## 4.10.0
 
 -   Fix: Use knex count return type. See [getCount()](readme.md#getcount)
