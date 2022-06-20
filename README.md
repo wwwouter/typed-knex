@@ -140,6 +140,7 @@ const typedKnex = new TypedKnex(knex);
 -   [transacting](#transacting)
 -   [toQuery](#toQuery)
 -   [useKnexQueryBuilder](#useKnexQueryBuilder)
+-   [getKnexQueryBuilder](#getKnexQueryBuilder)
 -   [keepFlat](#keepFlat)
 -   [getColumnAlias](#getColumnAlias)
 
@@ -767,9 +768,19 @@ Use `useKnexQueryBuilder` to get to the underlying Knex.js query builder.
 
 ```ts
 const query = typedKnex.query(User)
-    .useKnexQueryBuilder(queryBuilder => queryBuilder.where('somethingelse', 'value')
+    .useKnexQueryBuilder(queryBuilder => queryBuilder.where('somethingelse', 'value'))
     .select("name");
 );
+```
+
+### getKnexQueryBuilder
+
+Use `getKnexQueryBuilder` to get to the underlying Knex.js query builder.
+
+```ts
+const query = typedKnex.query(User).select("name");
+const knexQuery = query.getKnexQueryBuilder();
+queryBuilder.where("somethingelse", "value");
 ```
 
 ### keepFlat

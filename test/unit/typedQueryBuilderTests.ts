@@ -976,10 +976,21 @@ describe("TypedKnexQueryBuilder", () => {
         done();
     });
 
-    it('should return select * from "users"', (done) => {
+    it("should let useKnexQueryBuilder add to query", (done) => {
         const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex.query(User);
         query.useKnexQueryBuilder((queryBuilder) => queryBuilder.where("somethingelse", "value"));
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" where "somethingelse" = \'value\'');
+
+        done();
+    });
+
+    it("should let getKnexQueryBuilder add to query", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User);
+        const knexQuery = query.getKnexQueryBuilder();
+        knexQuery.where("somethingelse", "value");
         const queryString = query.toQuery();
         assert.equal(queryString, 'select * from "users" where "somethingelse" = \'value\'');
 
