@@ -1145,6 +1145,8 @@ const knex = Knex({
 await validateTables(knex);
 ```
 
+Add an array of table names to
+
 ## Test
 
     npm test
@@ -1161,3 +1163,25 @@ for beta
 
     update version to x.x.x-beta.x
     npm publish --access public --tag beta --otp=CODE
+
+nex,["users"]);
+
+```
+
+## Test
+
+    npm test
+
+## Update version
+
+    npm version major|minor|patch
+    update CHANGELOG.md
+    git commit --amend
+    npm publish --access=public --otp=CODE
+    git push
+
+for beta
+
+    update version to x.x.x-beta.x
+    npm publish --access public --tag beta --otp=CODE
+```
