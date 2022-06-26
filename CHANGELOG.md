@@ -1,5 +1,7 @@
 # Changelog
 
+## 4.11.0
+
 -   Feature: Added `getKnexQueryBuilder`.
 -   Feature: Added extra parameter to `validateTables` to filter on specific tables.
 
