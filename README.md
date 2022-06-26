@@ -131,6 +131,7 @@ const typedKnex = new TypedKnex(knex);
 -   [getColumnName](#getColumnName)
 -   [registerBeforeInsertTransform](#registerBeforeInsertTransform)
 -   [registerBeforeUpdateTransform](#registerBeforeUpdateTransform)
+-   [validateTables](#validateTables)
 
 ## Querybuilder
 
@@ -1129,7 +1130,7 @@ try {
 }
 ```
 
-## Validate tables
+## validateTables
 
 Use the `validateTables` function to make sure that the `Table`'s and `Column`'s in TypeScript exist in the database.
 
