@@ -18,4 +18,19 @@ describe("validateTables", () => {
 
         await db.destroy();
     });
+
+    it("should succeed on empty database, is tableNamesToValidate is empty", async () => {
+        const db = knex({
+            client: "sqlite3",
+            useNullAsDefault: false,
+            connection: { filename: ":memory:" },
+        });
+
+        try {
+            await validateTables(db, []);
+            assert.isFalse(true);
+        } catch (_error) {}
+
+        await db.destroy();
+    });
 });

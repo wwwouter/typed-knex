@@ -1,8 +1,12 @@
 import { Knex } from "knex";
 import { getColumnProperties, getTables } from "./decorators";
 
-export async function validateTables(knex: Knex) {
-    const tables = getTables();
+export async function validateTables(knex: Knex, tableNamesToValidate?: string[]) {
+    let tables = getTables();
+
+    if (tableNamesToValidate) {
+        tables = tables.filter((table) => tableNamesToValidate.includes(table.tableName));
+    }
 
     for (const table of tables) {
         const doesTableExists = await knex.schema.hasTable(table.tableName);

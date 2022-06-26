@@ -1145,6 +1145,20 @@ const knex = Knex({
 await validateTables(knex);
 ```
 
+Add an array of table names to the `validateTables` function to only validate those tables.
+
+```ts
+import * as Knex from "knex";
+import { validateTables } from "@wwwouter/typed-knex";
+
+const knex = Knex({
+    client: "pg",
+    connection: "postgres://user:pass@localhost:5432/dbname",
+});
+
+await validateTables(knex, ["users"]);
+```
+
 ## Test
 
     npm test
