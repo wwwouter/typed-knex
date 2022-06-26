@@ -1145,27 +1145,18 @@ const knex = Knex({
 await validateTables(knex);
 ```
 
-Add an array of table names to
+Add an array of table names to the `validateTables` function to only validate those tables.
 
-## Test
+```ts
+import * as Knex from "knex";
+import { validateTables } from "@wwwouter/typed-knex";
 
-    npm test
+const knex = Knex({
+    client: "pg",
+    connection: "postgres://user:pass@localhost:5432/dbname",
+});
 
-## Update version
-
-    npm version major|minor|patch
-    update CHANGELOG.md
-    git commit --amend
-    npm publish --access=public --otp=CODE
-    git push
-
-for beta
-
-    update version to x.x.x-beta.x
-    npm publish --access public --tag beta --otp=CODE
-
-nex,["users"]);
-
+await validateTables(knex, ["users"]);
 ```
 
 ## Test
@@ -1184,4 +1175,3 @@ for beta
 
     update version to x.x.x-beta.x
     npm publish --access public --tag beta --otp=CODE
-```
