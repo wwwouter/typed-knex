@@ -305,7 +305,7 @@ query.selectRaw("hash", String, `hashFunction(${query.getColumnAlias("name")})`)
 
 ### select
 
-https://knexjs.org/#Builder-select
+https://knexjs.org/guide/query-builder.html#select
 
 ```ts
 typedKnex.query(User).select("id");
@@ -317,7 +317,7 @@ typedKnex.query(User).select("id", "name");
 
 ### where
 
-https://knexjs.org/#Builder-where
+https://knexjs.org/guide/query-builder.html#where
 
 ```ts
 typedKnex.query(User).where("name", "name");
@@ -353,7 +353,7 @@ typedKnex.query(User).where("name", "name").orWhere("name", "like", "%na%");
 
 ### whereNot
 
-https://knexjs.org/#Builder-whereNot
+https://knexjs.org/guide/query-builder.html#wherenot
 
 ```ts
 typedKnex.query(User).whereNot("name", "name");

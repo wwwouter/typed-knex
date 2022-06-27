@@ -1,5 +1,7 @@
 # Changelog
 
+-   Chore: Fix links to Knex.js documentation.
+
 ## 4.11.0
 
 -   Feature: Added `getKnexQueryBuilder`.
