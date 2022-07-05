@@ -335,6 +335,15 @@ describe("TypedKnexQueryBuilder", () => {
         done();
     });
 
+    it("should select raw query with sql bindings", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex.query(User).selectRaw("subQuery", Number, "select ?? from other where ?? like ?", "other.id", "other.name", "%test%");
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select (select "other"."id" from other where "other"."name" like \'%test%\') as "subQuery" from "users"');
+
+        done();
+    });
+
     it("should create query with AND in where clause", (done) => {
         const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
         const query = typedKnex.query(User).where("name", "user1").andWhere("name", "user2").andWhere("name", "like", "%user%");
