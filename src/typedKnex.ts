@@ -101,6 +101,7 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     orWhereNotExists: IWhereExists<Model, SelectableModel, Row>;
 
     whereParentheses: IWhereParentheses<Model, SelectableModel, Row>;
+    orWhereParentheses: IWhereParentheses<Model, SelectableModel, Row>;
 
     groupBy: ISelectableColumnKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
 
@@ -1137,6 +1138,11 @@ export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements 
 
     public whereParentheses() {
         this.callQueryCallbackFunction("where", this.tableClass, arguments[0]);
+
+        return this;
+    }
+    public orWhereParentheses() {
+        this.callQueryCallbackFunction("orWhere", this.tableClass, arguments[0]);
 
         return this;
     }

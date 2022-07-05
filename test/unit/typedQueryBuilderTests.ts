@@ -824,6 +824,19 @@ describe("TypedKnexQueryBuilder", () => {
         done();
     });
 
+    it("should create query with parentheses in orWhere", (done) => {
+        const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+        const query = typedKnex
+            .query(User)
+            .where("name", "=", "Tester")
+            .orWhereParentheses((sub) => sub.whereNotNull("someNullableValue").andWhere("numericValue", ">", 20));
+
+        const queryString = query.toQuery();
+        assert.equal(queryString, 'select * from "users" where "users"."name" = \'Tester\' or ("users"."someNullableValue" is not null and "users"."numericValue" > 20)');
+
+        done();
+    });
+
     it("should return metadata from tables", (done) => {
         const tables = getTables();
 
