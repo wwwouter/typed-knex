@@ -265,7 +265,12 @@ interface IJoin<Model, _SelectableModel, Row> {
 }
 
 interface ISelectRaw<Model, SelectableModel, Row> {
-    <TReturn extends Boolean | String | Number, TName extends keyof any>(name: TName, returnType: IConstructor<TReturn>, query: string): ITypedQueryBuilder<
+    <TReturn extends Boolean | String | Number, TName extends keyof any>(
+        name: TName,
+        returnType: IConstructor<TReturn>,
+        query: string,
+        ...bindings: string[]
+    ): ITypedQueryBuilder<
         Model,
         SelectableModel,
         Record<TName, ObjectToPrimitive<TReturn>> & Row
@@ -877,10 +882,9 @@ export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements 
 
     public selectRaw() {
         this.hasSelectClause = true;
-        const name = arguments[0];
-        const query = arguments[2];
+        const [name, _, query, ...bindings] = Array.from(arguments)
 
-        this.queryBuilder.select(this.knex.raw(`(${query}) as "${name}"`));
+        this.queryBuilder.select(this.knex.raw(`(${query}) as "${name}"`, bindings));
         return this as any;
     }
 
