@@ -101,6 +101,7 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     orWhereNotExists: IWhereExists<Model, SelectableModel, Row>;
 
     whereParentheses: IWhereParentheses<Model, SelectableModel, Row>;
+    orWhereParentheses: IWhereParentheses<Model, SelectableModel, Row>;
 
     groupBy: ISelectableColumnKeyFunctionAsParametersReturnQueryBuider<Model, SelectableModel, Row>;
 
@@ -265,7 +266,7 @@ interface IJoin<Model, _SelectableModel, Row> {
 }
 
 interface ISelectRaw<Model, SelectableModel, Row> {
-    <TReturn extends Boolean | String | Number, TName extends keyof any>(name: TName, returnType: IConstructor<TReturn>, query: string): ITypedQueryBuilder<
+    <TReturn extends Boolean | String | Number, TName extends keyof any>(name: TName, returnType: IConstructor<TReturn>, query: string, ...bindings: string[]): ITypedQueryBuilder<
         Model,
         SelectableModel,
         Record<TName, ObjectToPrimitive<TReturn>> & Row
@@ -877,10 +878,9 @@ export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements 
 
     public selectRaw() {
         this.hasSelectClause = true;
-        const name = arguments[0];
-        const query = arguments[2];
+        const [name, _, query, ...bindings] = Array.from(arguments);
 
-        this.queryBuilder.select(this.knex.raw(`(${query}) as "${name}"`));
+        this.queryBuilder.select(this.knex.raw(`(${query}) as "${name}"`, bindings));
         return this as any;
     }
 
@@ -1138,6 +1138,11 @@ export class TypedQueryBuilder<ModelType, SelectableModel, Row = {}> implements 
 
     public whereParentheses() {
         this.callQueryCallbackFunction("where", this.tableClass, arguments[0]);
+
+        return this;
+    }
+    public orWhereParentheses() {
+        this.callQueryCallbackFunction("orWhere", this.tableClass, arguments[0]);
 
         return this;
     }

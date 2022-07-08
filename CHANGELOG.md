@@ -2,6 +2,11 @@
 
 -   Chore: Fix links to Knex.js documentation.
 
+## 4.12.0
+
+-   Feature: Added bindings argument to `selectRaw` to utilize knex raw string bindings
+-   Added `orWhereParentheses`
+
 ## 4.11.0
 
 -   Feature: Added `getKnexQueryBuilder`.
