@@ -1,5 +1,7 @@
 # Changelog
 
+## 4.13.0
+
 -   Chore: Fix links to Knex.js documentation.
 -   Chore: package upgrades.
 
