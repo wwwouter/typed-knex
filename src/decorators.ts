@@ -27,10 +27,7 @@ export function getTables() {
     return tables;
 }
 
-/**
- * @deprecated use `Table`.
- */
-export function Entity(tableName?: string) {
+export function Table(tableName?: string) {
     return (target: Function) => {
         target.prototype.tableMetadataKey = Symbol("table");
         Reflect.metadata(target.prototype.tableMetadataKey, { tableName: tableName ?? target.name })(target);
@@ -39,7 +36,10 @@ export function Entity(tableName?: string) {
     };
 }
 
-export const Table = Entity;
+/**
+ * @deprecated use `Table`.
+ */
+export const Entity = Table;
 
 export function getTableMetadata(tableClass: Function): { tableName: string } {
     return Reflect.getMetadata(tableClass.prototype.tableMetadataKey, tableClass);

@@ -1,5 +1,7 @@
 # Changelog
 
+-   Chore: correctly deprecate Entity
+
 ## 4.13.0
 
 -   Chore: Fix links to Knex.js documentation.
