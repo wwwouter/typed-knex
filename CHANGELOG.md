@@ -1,5 +1,7 @@
 # Changelog
 
+## 4.13.1
+
 -   Chore: correctly deprecate Entity
 
 ## 4.13.0
