@@ -46,6 +46,7 @@
     },
     "homepage": "https://github.com/wwwouter/typed-knex#readme",
     "devDependencies": {
+        "@type-challenges/utils": "0.1.1",
         "@types/chai": "4.3.3",
         "@types/chai-as-promised": "7.1.5",
         "@types/flat": "5.0.2",
