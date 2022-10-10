@@ -4,19 +4,21 @@
         "sourceMap": false,
         "target": "ES2017",
         "experimentalDecorators": true,
-        "strict": true,
-        "strictPropertyInitialization": false,
-        "noUnusedLocals": true,
         "emitDecoratorMetadata": true,
         "skipLibCheck": true,
         "outDir": "build",
-        "noUnusedParameters": true,
         "inlineSourceMap": true,
         "inlineSources": true,
-        "noImplicitReturns": true,
-        "noImplicitThis": true,
         "declaration": true,
-        "esModuleInterop": true
+        "esModuleInterop": true,
+
+        // Necessary for complication tests, is covered by no-unused-vars eslint rule
+        "noUnusedLocals": false,
+        "strict": true,
+        "strictPropertyInitialization": false,
+        "noUnusedParameters": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true
     },
     "include": ["src/**/*", "test/**/*"],
     "exclude": ["node_modules", "**/*.spec.ts"]
