@@ -4,6 +4,7 @@ import { NestedForeignKeyKeysOf, NestedKeysOf } from "./NestedKeysOf";
 import { NestedRecord } from "./NestedRecord";
 import { NonForeignKeyObjects } from "./NonForeignKeyObjects";
 import { NonNullableRecursive } from "./NonNullableRecursive";
+import { PartialAndUndefined } from "./PartialAndUndefined";
 import { GetNestedProperty, GetNestedPropertyType } from "./PropertyTypes";
 import { SelectableColumnTypes } from "./SelectableColumnTypes";
 import { FlattenOption, setToNull, unflatten } from "./unflatten";
@@ -161,16 +162,16 @@ export interface ITypedQueryBuilder<Model, SelectableModel, Row> {
     getSingle(flattenOption?: FlattenOption): Promise<Row extends Model ? RemoveObjectsFrom<Model> : Row>;
     getMany(flattenOption?: FlattenOption): Promise<(Row extends Model ? RemoveObjectsFrom<Model> : Row)[]>;
     getCount(): Promise<number | string>;
-    insertItem(newObject: Partial<RemoveObjectsFrom<Model>>): Promise<void>;
-    insertItems(items: Partial<RemoveObjectsFrom<Model>>[]): Promise<void>;
+    insertItem(newObject: PartialAndUndefined<RemoveObjectsFrom<Model>>): Promise<void>;
+    insertItems(items: PartialAndUndefined<RemoveObjectsFrom<Model>>[]): Promise<void>;
     del(): Promise<void>;
     delByPrimaryKey(primaryKeyValue: any): Promise<void>;
-    updateItem(item: Partial<RemoveObjectsFrom<Model>>): Promise<void>;
-    updateItemByPrimaryKey(primaryKeyValue: any, item: Partial<RemoveObjectsFrom<Model>>): Promise<void>;
+    updateItem(item: PartialAndUndefined<RemoveObjectsFrom<Model>>): Promise<void>;
+    updateItemByPrimaryKey(primaryKeyValue: any, item: PartialAndUndefined<RemoveObjectsFrom<Model>>): Promise<void>;
     updateItemsByPrimaryKey(
         items: {
             primaryKeyValue: any;
-            data: Partial<RemoveObjectsFrom<Model>>;
+            data: PartialAndUndefined<RemoveObjectsFrom<Model>>;
         }[]
     ): Promise<void>;
     execute(): Promise<void>;

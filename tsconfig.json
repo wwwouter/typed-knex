@@ -18,7 +18,8 @@
         "strictPropertyInitialization": false,
         "noUnusedParameters": true,
         "noImplicitReturns": true,
-        "noImplicitThis": true
+        "noImplicitThis": true,
+        "exactOptionalPropertyTypes": true
     },
     "include": ["src/**/*", "test/**/*"],
     "exclude": ["node_modules", "**/*.spec.ts"]

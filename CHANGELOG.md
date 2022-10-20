@@ -1,5 +1,9 @@
 # Changelog
 
+## Next
+
+-   Support `"exactOptionalPropertyTypes": true` by allowing undefined values in `insertItem`,`insertItems`,`updateItem` and `updateItems`.
+
 ## 4.13.1
 
 -   Chore: correctly deprecate Entity

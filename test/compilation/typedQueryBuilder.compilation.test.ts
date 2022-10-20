@@ -27,3 +27,9 @@ export async function select() {
     // @ts-expect-error - should fail
     await typedKnex.query(UserSetting).select("id", "unknown").getSingle();
 }
+
+export async function exactOptionalPropertyTypes() {
+    const typedKnex = new TypedKnex(knex({ client: "postgresql" }));
+
+    await typedKnex.query(UserSetting).updateItem({ id: "id", initialValue: undefined });
+}
