@@ -1,6 +1,6 @@
 # Changelog
 
-## Next
+## 4.14.0
 
 -   Support `"exactOptionalPropertyTypes": true` by allowing undefined values in `insertItem`,`insertItems`,`updateItem` and `updateItems`.
 
