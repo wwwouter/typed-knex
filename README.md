@@ -1,3 +1,14 @@
+# Status of this module
+
+This module is deprecated. I'm happy to say that in the last 8 years, a lot of good libraries have been created that help with type safety for sql queries. There is no real need anymore for this library, so it's deprecated.
+
+I recommend you to use one of these:
+
+-   Knex.js with types.
+-   [TypeORM](https://typeorm.io/#/)
+-   [Prisma](https://www.prisma.io/)
+-   [MikroORM](https://mikro-orm.io/)
+
 # typed-knex
 
 [![npm version](https://img.shields.io/npm/v/@wwwouter/typed-knex.svg)](https://www.npmjs.com/package/@wwwouter/typed-knex)
