@@ -2,9 +2,10 @@
 
 This module is deprecated. I'm happy to say that in the last 8 years, a lot of good libraries have been created that help with type safety for sql queries. There is no real need anymore for this library, so it's deprecated.
 
-I recommend you to use one of these:
+I recommend the following libraries:
 
 -   Knex.js with types.
+-   [Kysely](https://koskimas.github.io/kysely/index.html)
 -   [TypeORM](https://typeorm.io/#/)
 -   [Prisma](https://www.prisma.io/)
 -   [MikroORM](https://mikro-orm.io/)
